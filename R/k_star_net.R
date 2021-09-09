@@ -19,7 +19,7 @@ k_star_net <- function(mat, distFun, sparsity = 1, knn = 25, cores = 20) {
 
     knn_elems_l <- mat %>% purrr::array_branch(2) %>% list(as.list(names(.)), . )
 
-    cl <- parallel::makeCluster(20)
+    cl <- parallel::makeCluster(cores)
     doParallel::registerDoParallel(cl)
 
     knn_elems <- foreach::foreach(i=1:length(knn_elems_l[[1]]), .export = c("get_neigh",
