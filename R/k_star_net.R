@@ -13,7 +13,7 @@
 #' @return tibble colomuns : source, destination, weight
 #' @export
 
-k_star_net <- function(mat, distFun, sparsity = 1, knn = 25, cores = 20) {
+k_star_net <- function(mat, distFun, sparsity = 1, knn = 25, cores = 1) {
 
     my_vp <- build_Vptreefrom_mat(mat, distFun)
 
