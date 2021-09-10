@@ -19,6 +19,12 @@ k_star_net <- function(mat, distFun, sparsity = 1, knn = 25, cores = 1) {
 
     knn_elems_l <- mat %>% purrr::array_branch(2) %>% list(as.list(names(.)), . )
 
+    top_vp_arr <- c()
+    for (i in 1:length(knn_elems_l[[1]])) {
+        q = knn_elems_l[[2]][[i]]
+        top_vp_arr <- c(top_vp_arr, get_n_nearest_neighbors(q = q, tree = my_vp, k = knn + 1 , distFun = distFun))
+    }
+
     if (cores > 1) {
         cl <- parallel::makeCluster(cores)
         doParallel::registerDoParallel(cl)
@@ -29,15 +35,13 @@ k_star_net <- function(mat, distFun, sparsity = 1, knn = 25, cores = 1) {
                                                                                 "append_neigh",
                                                                                 "search_k_star_nn",
                                                                                 "is_leaf")) %dopar%
-            get_neigh(knn_elems_l[[1]][[i]], knn_elems_l[[2]][[i]],
-                      vp_t = my_vp, k = knn, distFun = distFun, sparsity = sparsity)
+            get_neigh(knn_elems_l[[1]][[i]], top_vp_arr[i], distFun = distFun, sparsity = sparsity)
 
         parallel::stopCluster(cl)
 
     } else {
         knn_elems <- foreach::foreach(i=1:length(knn_elems_l[[1]])) %do%
-        get_neigh(knn_elems_l[[1]][[i]], knn_elems_l[[2]][[i]],
-                  vp_t = my_vp, k = knn, distFun = distFun, sparsity = sparsity)
+        get_neigh(knn_elems_l[[1]][[i]], distFun = distFun, sparsity = sparsity)
     }
 
     dplyr::bind_rows(knn_elems)
@@ -129,10 +133,9 @@ new_node <- function(vp, vp_id){
     self
 }
 
-get_neigh <- function(id, q, vp_t, k, distFun, sparsity = 1){
+get_neigh <- function(id, top_vp, distFun, sparsity = 1){
     # print(id)
     # print(head(q))
-    top_vp <- get_n_nearest_neighbors(q = q, tree = vp_t, k = k + 1 , distFun = distFun)
     if (id %in% names(top_vp))
         top_vp <- top_vp[!names(top_vp) == id]
 
