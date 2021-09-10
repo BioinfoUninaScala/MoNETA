@@ -4,7 +4,7 @@
 \alias{k_star_net}
 \title{Do k_star}
 \usage{
-k_star_net(mat, distFun, sparsity = 1, knn = 25, cores = 20)
+k_star_net(mat, distFun, sparsity = 1, knn = 25, cores = 1)
 }
 \arguments{
 \item{mat}{an omics matrix}
