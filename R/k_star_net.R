@@ -15,6 +15,7 @@
 
 k_star_net <- function(mat, distFun, sparsity = 1, knn = 25, cores = 1) {
 
+
     my_vp <- build_Vptreefrom_mat(mat, distFun)
 
     knn_elems_l <- mat %>% purrr::array_branch(2) %>% list(as.list(names(.)), . )
