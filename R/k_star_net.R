@@ -19,6 +19,7 @@ k_star_net <- function(mat, distFun, sparsity = 1, knn = 25, cores = 1) {
 
     knn_elems_l <- mat %>% purrr::array_branch(2) %>% list(as.list(names(.)), . )
 
+
     cl <- parallel::makeCluster(cores)
     doParallel::registerDoParallel(cl)
 
