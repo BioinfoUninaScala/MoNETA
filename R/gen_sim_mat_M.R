@@ -115,15 +115,24 @@ gen_sim_mat_M <- function(network, tau = NA, restart = 0.7, delta = 0.5, cond_ju
 
     message("Computing RWR for every network node...")
 
-    cl <- parallel::makeForkCluster(mc <- getOption("cl.cores", cores))
-    doParallel::registerDoParallel(cl)
+    if (cores > 1) {
+        cl <- parallel::makeForkCluster(mc <- getOption("cl.cores", cores))
+        doParallel::registerDoParallel(cl)
 
-    Results <- foreach::foreach(i = 1:length(Allnodes), .packages = c("Matrix") ) %dopar% {
-        Random.Walk.Restart.Multiplex.default(AdjMatrixNorm, MultiplexObject,
-                                              Allnodes[i], r = restart, DispResults = "Alphabetic", MeanType = "Sum", tau = tau)
+        Results <- foreach::foreach(i = 1:length(Allnodes), .packages = c("Matrix") ) %dopar% {
+            Random.Walk.Restart.Multiplex.default(AdjMatrixNorm, MultiplexObject,
+                                                  Allnodes[i], r = restart, DispResults = "Alphabetic", MeanType = "Sum", tau = tau)
+        }
+
+        stopCluster(cl)
+
+    } else {
+        Results <- foreach::foreach(i = 1:length(Allnodes)) %do% {
+            Random.Walk.Restart.Multiplex.default(AdjMatrixNorm, MultiplexObject,
+                                                  Allnodes[i], r = restart, DispResults = "Alphabetic", MeanType = "Sum", tau = tau)
+        }
     }
 
-    stopCluster(cl)
 
 
     #### #### #### #### #### #### #### #### #### #### #### #### #### #### #### ####

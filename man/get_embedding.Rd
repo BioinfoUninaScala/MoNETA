@@ -4,7 +4,7 @@
 \alias{get_embedding}
 \title{Create jump matrix}
 \usage{
-get_embedding(mtx, EMBED_DIMENSION, NUM_STEPS = 10^7, cores)
+get_embedding(mtx, EMBED_DIMENSION, NUM_STEPS = 10^7, cores = 20)
 }
 \arguments{
 \item{mtx}{a RWR matrix}

@@ -14,7 +14,7 @@
 #' @export
 #'
 #'
-get_embedding <- function(mtx, EMBED_DIMENSION, NUM_STEPS = 10 ^ 7, cores) {
+get_embedding <- function(mtx, EMBED_DIMENSION, NUM_STEPS = 10 ^ 7, cores = 20) {
 
     rows <- base::rownames(mtx)
     base::colnames(mtx) <- 1:ncol(mtx)#as.character(1:ncol(RWR_mat_plot))
@@ -119,9 +119,10 @@ train <- function(neighborhood, nodes, list_neighbours, NUM_STEPS, NUM_SAMPLED, 
 
     embeddings <- bigstatsr::as_FBM(embd)
 
-
-    cl <- parallel::makeCluster(cores, outfile = "")
-    doParallel::registerDoParallel(cl)
+    if (cores > 1) {
+        cl <- parallel::makeCluster(cores, outfile = "")
+        doParallel::registerDoParallel(cl)
+    }
 
 
     nb_nodes <- length(nodes)
@@ -162,9 +163,9 @@ train <- function(neighborhood, nodes, list_neighbours, NUM_STEPS, NUM_SAMPLED, 
         #print(steps * k)
     }
 
-
-    parallel::stopCluster(cl)
-
+    if (cores > 1) {
+        parallel::stopCluster(cl)
+    }
 
     embeddings[]
 
