@@ -25,6 +25,7 @@
 
 plot_umap <- function(mat, anno_df, id_name, id_anno_color = NA, id_anno_shape = NA, title = "") {
 
+    mat <- t(mat)
     nodes_anno <- anno_df
     nodes_anno <- nodes_anno %>% dplyr::filter(nodes_anno[[id_name]] %in%
                                             base::rownames(mat))
