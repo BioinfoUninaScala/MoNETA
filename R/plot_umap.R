@@ -31,7 +31,6 @@ plot_umap <- function(mat, anno_df, id_name, id_anno_color = NA, id_anno_shape =
                                             base::rownames(mat))
     #base::colnames(nodes_anno)[1:3] <- c("id", "group", "group2")
     if (is.na(id_anno_color) & is.na(id_anno_shape)) {
-        print("1")
         nodes_anno <- nodes_anno %>% select(id_name)
         colnames(nodes_anno) <- "id"
         umap_coord <- umap::umap(d = mat)
@@ -44,7 +43,6 @@ plot_umap <- function(mat, anno_df, id_name, id_anno_color = NA, id_anno_shape =
                            title = title)
 
     } else if (!is.na(id_anno_color) & !is.na(id_anno_shape)) {
-        print("2")
         nodes_anno <- nodes_anno %>% select(id_name, id_anno_color, id_anno_shape)
         colnames(nodes_anno) <- c("id", "group1", "group2")
         umap_coord <- umap::umap(d = mat)
@@ -57,7 +55,6 @@ plot_umap <- function(mat, anno_df, id_name, id_anno_color = NA, id_anno_shape =
                            title = title)
 
     } else if (!is.na(id_anno_color)) {
-        print("3")
         nodes_anno <- nodes_anno %>% select(id_name, id_anno_color)
         colnames(nodes_anno) <- c("id", "group1")
         umap_coord <- umap::umap(d = mat)
@@ -70,7 +67,6 @@ plot_umap <- function(mat, anno_df, id_name, id_anno_color = NA, id_anno_shape =
                            title = title)
 
     } else if (!is.na(id_anno_shape)) {
-        print("4")
         nodes_anno <- nodes_anno %>% select(id_name, id_anno_shape)
         colnames(nodes_anno) <- c("id", "group2")
         umap_coord <- umap::umap(d = mat)
