@@ -5,8 +5,10 @@
 #' @import tibble
 #' @import magrittr
 #' @importFrom stats median setNames
+#' @importFrom doMC registerDoMC
 #' @importFrom BiocParallel MulticoreParam
 #' @importFrom BiocNeighbors buildIndex queryKNN VptreeParam KmknnParam
+#' @importFrom foreach registerDoSEQ
 #' @param mat an omics matrix
 #' @param distFun a string that represents a distance function, two possible choices: "Manhattan" and "Euclidean"
 #' @param sparsity a positive real
@@ -17,25 +19,19 @@
 
 k_star_net <- function(mat, distFun = "Euclidean", sparsity = 1, knn = 25, cores = 1) {
 
-
-
     index <- BiocNeighbors::buildIndex(t(mat), BNPARAM = BiocNeighbors::VptreeParam(distance=distFun))
 
     if (cores > 1) {
+        doMC::registerDoMC(cores)
         knns <- BiocNeighbors::queryKNN(BNINDEX = index, query = t(mat), k = knn + 1,
                                         BPPARAM = BiocParallel::MulticoreParam(cores))
-        cl <- parallel::makeCluster(cores)
-        doParallel::registerDoParallel(cl)
-
-        knn_elems <- foreach::foreach(i=1:length(knn_elems_l[[1]]), .export = c("get_neigh",
-                                                                                "search_k_star_nn")) %dopar%
-            get_neigh(colnames(mat)[knns$index[i,]], knns$distance[i,2:(knn+1)], sparsity = sparsity)
-        parallel::stopCluster(cl)
     } else {
+        foreach::registerDoSEQ()
         knns <- BiocNeighbors::queryKNN(BNINDEX = index, query = t(mat), k = knn + 1)
-        knn_elems <- foreach::foreach(i=2:length(knn_elems_l[[1]])) %do%
-            get_neigh(knn_elems_l[[1]][[i]], distFun = distFun, sparsity = sparsity)
     }
+
+    knn_elems <- foreach::foreach(i=1:dim(mat)[2], .export = c("search_k_star_nn")) %dopar%
+        search_k_star_nn(colnames(mat)[knns$index[i,]], knns$distance[i,2:(knn+1)], sparsity = sparsity)
 
     dplyr::bind_rows(knn_elems)
 

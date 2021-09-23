@@ -6,6 +6,8 @@
 #' @import bigstatsr
 #' @import Matrix
 #' @import wordspace
+#' @importFrom doMC registerDoMC
+#' @importFrom foreach registerDoSEQ
 #' @param mtx a RWR matrix
 #' @param EMBED_DIMENSION dimension of embedding
 #' @param NUM_STEPS number of epoches
@@ -120,8 +122,11 @@ train <- function(neighborhood, nodes, list_neighbours, NUM_STEPS, NUM_SAMPLED, 
     embeddings <- bigstatsr::as_FBM(embd)
 
     if (cores > 1) {
-        cl <- parallel::makeCluster(cores, outfile = "")
-        doParallel::registerDoParallel(cl)
+        #cl <- parallel::makeCluster(cores)
+        #doParallel::registerDoParallel(cl)
+        doMC::registerDoMC(cores)
+    } else {
+        foreach::registerDoSEQ()
     }
 
 
@@ -163,9 +168,9 @@ train <- function(neighborhood, nodes, list_neighbours, NUM_STEPS, NUM_SAMPLED, 
         #print(steps * k)
     }
 
-    if (cores > 1) {
-        parallel::stopCluster(cl)
-    }
+    #if (cores > 1) {
+    #    parallel::stopCluster(cl)
+    #}
 
     embeddings[]
 
