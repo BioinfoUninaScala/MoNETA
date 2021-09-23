@@ -5,44 +5,36 @@
 #' @import tibble
 #' @import magrittr
 #' @importFrom stats median setNames
+#' @importFrom BiocParallel MulticoreParam
+#' @importFrom BiocNeighbors buildIndex queryKNN VptreeParam KmknnParam
 #' @param mat an omics matrix
-#' @param distFun a distance function
+#' @param distFun a string that represents a distance function, two possible choices: "Manhattan" and "Euclidean"
 #' @param sparsity a positive real
 #' @param knn an integer
 #' @param cores number of threads
 #' @return tibble colomuns : source, destination, weight
 #' @export
 
-k_star_net <- function(mat, distFun, sparsity = 1, knn = 25, cores = 1) {
+k_star_net <- function(mat, distFun = "Euclidean", sparsity = 1, knn = 25, cores = 1) {
 
 
-    my_vp <- build_Vptreefrom_mat(mat, distFun)
 
-    knn_elems_l <- mat %>% purrr::array_branch(2) %>% list(as.list(names(.)), . )
-
-    top_vp_arr <- c()
-    for (i in 1:length(knn_elems_l[[1]])) {
-        q = knn_elems_l[[2]][[i]]
-        top_vp_arr <- c(top_vp_arr, get_n_nearest_neighbors(q = q, tree = my_vp, k = knn + 1 , distFun = distFun))
-    }
+    index <- BiocNeighbors::buildIndex(t(mat), BNPARAM = BiocNeighbors::VptreeParam(distance=distFun))
 
     if (cores > 1) {
+        knns <- BiocNeighbors::queryKNN(BNINDEX = index, query = t(mat), k = knn + 1,
+                                        BPPARAM = BiocParallel::MulticoreParam(cores))
         cl <- parallel::makeCluster(cores)
         doParallel::registerDoParallel(cl)
 
-
         knn_elems <- foreach::foreach(i=1:length(knn_elems_l[[1]]), .export = c("get_neigh",
-                                                                                "get_n_nearest_neighbors",
-                                                                                "append_neigh",
-                                                                                "search_k_star_nn",
-                                                                                "is_leaf")) %dopar%
-            get_neigh(knn_elems_l[[1]][[i]], top_vp_arr[i], distFun = distFun, sparsity = sparsity)
-
+                                                                                "search_k_star_nn")) %dopar%
+            get_neigh(colnames(mat)[knns$index[i,]], knns$distance[i,2:(knn+1)], sparsity = sparsity)
         parallel::stopCluster(cl)
-
     } else {
-        knn_elems <- foreach::foreach(i=1:length(knn_elems_l[[1]])) %do%
-        get_neigh(knn_elems_l[[1]][[i]], distFun = distFun, sparsity = sparsity)
+        knns <- BiocNeighbors::queryKNN(BNINDEX = index, query = t(mat), k = knn + 1)
+        knn_elems <- foreach::foreach(i=2:length(knn_elems_l[[1]])) %do%
+            get_neigh(knn_elems_l[[1]][[i]], distFun = distFun, sparsity = sparsity)
     }
 
     dplyr::bind_rows(knn_elems)
@@ -134,11 +126,12 @@ new_node <- function(vp, vp_id){
     self
 }
 
-get_neigh <- function(id, top_vp, distFun, sparsity = 1){
+get_neigh <- function(id, top_vp, sparsity = 1){
     # print(id)
     # print(head(q))
-    if (id %in% names(top_vp))
-        top_vp <- top_vp[!names(top_vp) == id]
+
+    #if (id %in% names(top_vp))
+    #    top_vp <- top_vp[!names(top_vp) == id]
 
     search_k_star_nn(id = id, delta = top_vp, sparsity = sparsity)
 }
@@ -200,7 +193,7 @@ get_n_nearest_neighbors <- function(q, tree, k, distFun){
 }
 
 
-search_k_star_nn <- function(id , delta, sparsity = 1){
+search_k_star_nn <- function(id, delta, sparsity = 1){
 
     #min-max normalise distances and multiply by 100
     #delta <- (delta-min(delta))/(max(delta)-min(delta))
@@ -210,7 +203,7 @@ search_k_star_nn <- function(id , delta, sparsity = 1){
     Sum_beta_square <- 0
     lambda <-  beta[1] + 1
     k <- 0
-    while (lambda > beta[k + 1] && k < (length(beta) - 1)){
+    while (lambda > beta[k + 1] && k < (length(beta))){
         k = k + 1;
         Sum_beta <- Sum_beta + beta[k]
         Sum_beta_square <- Sum_beta_square + beta[k] ^ 2
@@ -219,8 +212,7 @@ search_k_star_nn <- function(id , delta, sparsity = 1){
 
     }
 
-
-    edges <- tibble::tibble(source = id, dest = names(delta)[1:k], weight = delta[1:k])
+    edges <- tibble::tibble(source = id[1], dest = id[2:k], weight = delta[2:k])
 
     edges
 }
