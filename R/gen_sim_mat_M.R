@@ -1,4 +1,4 @@
-#' Create jump matrix
+#' Generate similarity matrix
 #'
 #' @import doFuture
 #' @import igraph
@@ -12,13 +12,13 @@
 #' @import tidyverse
 #' @import doParallel
 #' @importFrom doMC registerDoMC
-#' @importFrom foreach registerDoSEQ
+#' @importFrom foreach registerDoSEQ %dopar%
 #' @param network a network
 #' @param tau tau
-#' @param restart restart
+#' @param restart A real in the range of 0-1, it is the probability to restart the algorithm in the starting point
 #' @param delta delta
 #' @param cond_jump cond_jump
-#' @param cores number of threads launched
+#' @param cores Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed
 #' @return RWRM_similarity
 #' @export
 
@@ -127,7 +127,9 @@ gen_sim_mat_M <- function(network, tau = NA, restart = 0.7, delta = 0.5, cond_ju
         Random.Walk.Restart.Multiplex.default(AdjMatrixNorm, MultiplexObject,
                                               Allnodes[i], r = restart, DispResults = "Alphabetic", MeanType = "Sum", tau = tau)
     }
-
+    if (cores > 1) {
+        foreach::registerDoSEQ()
+    }
 
 
     #### #### #### #### #### #### #### #### #### #### #### #### #### #### #### ####

@@ -1,8 +1,8 @@
-#' Create jump matrix
+#' Create jump matrix containing the probabilities to switch from one omics to another
 #'
 #' @importFrom dplyr inner_join
-#' @param multiplex a multiplex
-#' @return jump_mat a jump matrix
+#' @param multiplex A multiplex, an object that comprises different omics
+#' @return A Matrix containing the probabilities to switch from one omics to another
 #' @export
 
 create_jump_matrix <- function(multiplex) {

@@ -15,12 +15,12 @@
 #' @import umap
 #' @import dplyr
 #' @import tibble
-#' @param mat matrix with samples on columns
-#' @param anno_df annotation dataframe
-#' @param id identification of annotation dataframe
-#' @param id_anno_color color of identification of annotation dataframe
-#' @param id_anno_shape shape of identification of annotation dataframe
-#' @return plot umap
+#' @param mat A Matrix with samples on rows that has to be plotted
+#' @param anno_df Annotation DataFrame with all the information for each sample
+#' @param id_name String for identification of sample in anno_df
+#' @param id_anno_color String for the column necessary for distinguish cases in the anno_df, it will be used for giving a specific color for each case
+#' @param id_anno_shape String for the column necessary for distinguish cases in the anno_df, it will be used for giving a specific shape for each case
+#' @return A plot
 #' @export
 
 plot_umap <- function(mat, anno_df, id_name, id_anno_color = NA, id_anno_shape = NA, title = "") {

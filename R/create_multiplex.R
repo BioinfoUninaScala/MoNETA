@@ -1,9 +1,9 @@
-#' Create multiplex
+#' Create a multiplex, an object that comprises different omics
 #'
 #' @importFrom dplyr bind_rows select mutate
 #' @importFrom purrr map
-#' @param omics_list a list of omics
-#' @return multiplex
+#' @param omics_list A list of DataFrames containings omics data, each with three columns : source, destination, weight
+#' @return An object that comprises each DataFrame
 #' @export
 
 

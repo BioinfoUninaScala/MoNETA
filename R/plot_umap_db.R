@@ -1,4 +1,4 @@
-#' Create jump matrix
+#' Plot umap db
 #'
 #' @import igraph
 #' @import visNetwork
@@ -14,11 +14,11 @@
 #' @import plotly
 #' @import umap
 #' @import dplyr
-#' @param mat matrix
-#' @param nodes_anno nodes annotation
-#' @param name name of plot
-#' @param type type
-#' @param k k
+#' @param mat A Matrix with samples on rows that has to be plotted
+#' @param nodes_anno Annotation DataFrame with all the information for each sample
+#' @param name Title of plot to be displayed
+#' @param type Type of mat, used as input for umap, see umap documentation
+#' @param k Reachability distance, dbscan
 #' @export
 
 

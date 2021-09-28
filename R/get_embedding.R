@@ -7,12 +7,12 @@
 #' @import Matrix
 #' @import wordspace
 #' @importFrom doMC registerDoMC
-#' @importFrom foreach registerDoSEQ
-#' @param mtx a RWR matrix
-#' @param EMBED_DIMENSION dimension of embedding
-#' @param NUM_STEPS number of epoches
-#' @param cores number of cores for parallelism
-#' @return embedding
+#' @importFrom foreach registerDoSEQ %dopar%
+#' @param mtx A squared numeric matrix with values in the range 0-1
+#' @param EMBED_DIMENSION Dimension of the output embedding
+#' @param NUM_STEPS Number of total epoches
+#' @param cores Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed
+#' @return An embedding of the input Matrix: on the rows there are the samples, the number of columns are specified by EMBED_DIMENSION
 #' @export
 #'
 #'
@@ -168,9 +168,10 @@ train <- function(neighborhood, nodes, list_neighbours, NUM_STEPS, NUM_SAMPLED, 
         #print(steps * k)
     }
 
-    #if (cores > 1) {
-    #    parallel::stopCluster(cl)
-    #}
+    if (cores > 1) {
+        #parallel::stopCluster(cl)
+        foreach::registerDoSEQ()
+    }
 
     embeddings[]
 

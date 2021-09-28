@@ -1,4 +1,4 @@
-#' Create jump matrix
+#' Plot network
 #'
 #' @import igraph
 #' @import visNetwork
@@ -6,10 +6,10 @@
 #' @import network
 #' @import RColorBrewer
 #' @import dplyr
-#' @param edgeList dataframe representing a graph
-#' @param nodes_anno nodes annotation
-#' @param name name of plot
-#' @param html bool if you want to save the plot in a html file
+#' @param edgeList DataFrame representing a graph
+#' @param nodes_anno Annotation DataFrame with all the information for each sample
+#' @param name Title of plot to be displayed
+#' @param html Boolean, if you want to save the plot in a html file
 #' @export
 
 
