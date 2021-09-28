@@ -2,19 +2,19 @@
 % Please edit documentation in R/plot_net.R
 \name{plot_net}
 \alias{plot_net}
-\title{Create jump matrix}
+\title{Plot network}
 \usage{
 plot_net(edgeList, nodes_anno, name, html = FALSE)
 }
 \arguments{
-\item{edgeList}{dataframe representing a graph}
+\item{edgeList}{DataFrame representing a graph}
 
-\item{nodes_anno}{nodes annotation}
+\item{nodes_anno}{Annotation DataFrame with all the information for each sample}
 
-\item{name}{name of plot}
+\item{name}{Title of plot to be displayed}
 
-\item{html}{bool if you want to save the plot in a html file}
+\item{html}{Boolean, if you want to save the plot in a html file}
 }
 \description{
-Create jump matrix
+Plot network
 }

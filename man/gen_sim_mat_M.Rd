@@ -2,7 +2,7 @@
 % Please edit documentation in R/gen_sim_mat_M.R
 \name{gen_sim_mat_M}
 \alias{gen_sim_mat_M}
-\title{Create jump matrix}
+\title{Generate similarity matrix}
 \usage{
 gen_sim_mat_M(
   network,
@@ -18,17 +18,17 @@ gen_sim_mat_M(
 
 \item{tau}{tau}
 
-\item{restart}{restart}
+\item{restart}{A real in the range of 0-1, it is the probability to restart the algorithm in the starting point}
 
 \item{delta}{delta}
 
 \item{cond_jump}{cond_jump}
 
-\item{cores}{number of threads launched}
+\item{cores}{Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed}
 }
 \value{
 RWRM_similarity
 }
 \description{
-Create jump matrix
+Generate similarity matrix
 }

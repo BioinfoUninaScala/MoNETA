@@ -14,18 +14,18 @@ plot_umap(
 )
 }
 \arguments{
-\item{mat}{matrix with samples on columns}
+\item{mat}{A Matrix with samples on rows that has to be plotted}
 
-\item{anno_df}{annotation dataframe}
+\item{anno_df}{Annotation DataFrame with all the information for each sample}
 
-\item{id_anno_color}{color of identification of annotation dataframe}
+\item{id_name}{String for identification of sample in anno_df}
 
-\item{id_anno_shape}{shape of identification of annotation dataframe}
+\item{id_anno_color}{String for the column necessary for distinguish cases in the anno_df, it will be used for giving a specific color for each case}
 
-\item{id}{identification of annotation dataframe}
+\item{id_anno_shape}{String for the column necessary for distinguish cases in the anno_df, it will be used for giving a specific shape for each case}
 }
 \value{
-plot umap
+A plot
 }
 \description{
 Plot umap

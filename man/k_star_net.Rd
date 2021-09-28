@@ -2,24 +2,24 @@
 % Please edit documentation in R/k_star_net.R
 \name{k_star_net}
 \alias{k_star_net}
-\title{Do k_star}
+\title{Apply K Start algorithm in order to find knn nearest neighbors for each node, using Vantage-point tree}
 \usage{
 k_star_net(mat, distFun = "Euclidean", sparsity = 1, knn = 25, cores = 1)
 }
 \arguments{
-\item{mat}{an omics matrix}
+\item{mat}{A numeric Matrix representing a particular omics, rows are genes and columns are samples}
 
-\item{distFun}{a string that represents a distance function, two possible choices: "Manhattan" and "Euclidean"}
+\item{distFun}{A string that represents a distance function, two possible choices: "Manhattan" and "Euclidean"}
 
-\item{sparsity}{a positive real}
+\item{sparsity}{A positive real}
 
-\item{knn}{an integer}
+\item{knn}{An integer, it is the number of neighbors to be considered}
 
-\item{cores}{number of threads}
+\item{cores}{Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed}
 }
 \value{
-tibble colomuns : source, destination, weight
+A Tibble with three columns : source node, destination node, weight of connection
 }
 \description{
-Do k_star
+Apply K Start algorithm in order to find knn nearest neighbors for each node, using Vantage-point tree
 }

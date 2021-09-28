@@ -2,16 +2,16 @@
 % Please edit documentation in R/create_multiplex.R
 \name{create_multiplex}
 \alias{create_multiplex}
-\title{Create multiplex}
+\title{Create a multiplex, an object that comprises different omics}
 \usage{
 create_multiplex(omics_list)
 }
 \arguments{
-\item{omics_list}{a list of omics}
+\item{omics_list}{A list of DataFrames containings omics data, each with three columns : source, destination, weight}
 }
 \value{
-multiplex
+An object that comprises each DataFrame
 }
 \description{
-Create multiplex
+Create a multiplex, an object that comprises different omics
 }

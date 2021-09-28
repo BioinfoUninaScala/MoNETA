@@ -2,16 +2,16 @@
 % Please edit documentation in R/create_jump_matrix.R
 \name{create_jump_matrix}
 \alias{create_jump_matrix}
-\title{Create jump matrix}
+\title{Create jump matrix containing the probabilities to switch from one omics to another}
 \usage{
 create_jump_matrix(multiplex)
 }
 \arguments{
-\item{multiplex}{a multiplex}
+\item{multiplex}{A multiplex, an object that comprises different omics}
 }
 \value{
-jump_mat a jump matrix
+A Matrix containing the probabilities to switch from one omics to another
 }
 \description{
-Create jump matrix
+Create jump matrix containing the probabilities to switch from one omics to another
 }

@@ -7,16 +7,16 @@
 get_embedding(mtx, EMBED_DIMENSION, NUM_STEPS = 10^7, cores = 20)
 }
 \arguments{
-\item{mtx}{a RWR matrix}
+\item{mtx}{A squared numeric matrix with values in the range 0-1}
 
-\item{EMBED_DIMENSION}{dimension of embedding}
+\item{EMBED_DIMENSION}{Dimension of the output embedding}
 
-\item{NUM_STEPS}{number of epoches}
+\item{NUM_STEPS}{Number of total epoches}
 
-\item{cores}{number of cores for parallelism}
+\item{cores}{Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed}
 }
 \value{
-embedding
+An embedding of the input Matrix: on the rows there are the samples, the number of columns are specified by EMBED_DIMENSION
 }
 \description{
 Create jump matrix

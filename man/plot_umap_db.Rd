@@ -2,21 +2,21 @@
 % Please edit documentation in R/plot_umap_db.R
 \name{plot_umap_db}
 \alias{plot_umap_db}
-\title{Create jump matrix}
+\title{Plot umap db}
 \usage{
 plot_umap_db(mat, nodes_anno, name = NA, type = "data", k = 1)
 }
 \arguments{
-\item{mat}{matrix}
+\item{mat}{A Matrix with samples on rows that has to be plotted}
 
-\item{nodes_anno}{nodes annotation}
+\item{nodes_anno}{Annotation DataFrame with all the information for each sample}
 
-\item{name}{name of plot}
+\item{name}{Title of plot to be displayed}
 
-\item{type}{type}
+\item{type}{Type of mat, used as input for umap, see umap documentation}
 
-\item{k}{k}
+\item{k}{Reachability distance, dbscan}
 }
 \description{
-Create jump matrix
+Plot umap db
 }
