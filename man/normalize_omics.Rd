@@ -4,10 +4,10 @@
 \alias{normalize_omics}
 \title{normalize_omics takes in input a Matrix that has to be centered and scaled along the columns}
 \usage{
-normalize_omics(mtx)
+normalize_omics(matrix)
 }
 \arguments{
-\item{mtx}{A numeric Matrix representing a particular omics, rows are genes and columns are samples}
+\item{matrix}{A numeric Matrix representing a particular omics, rows are genes and columns are samples}
 }
 \value{
 An object of the same type as mtx. The matrix mtx is normalize along the columns

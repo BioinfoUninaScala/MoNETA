@@ -4,10 +4,17 @@
 \alias{k_star_net}
 \title{Apply K Start algorithm in order to find knn nearest neighbors for each node, using Vantage-point tree}
 \usage{
-k_star_net(mat, distFun = "Euclidean", sparsity = 1, knn = 25, cores = 1)
+k_star_net(
+  matrix,
+  distFun = "Euclidean",
+  sparsity = 1,
+  knn = 25,
+  k_star = TRUE,
+  cores = 1
+)
 }
 \arguments{
-\item{mat}{A numeric Matrix representing a particular omics, rows are genes and columns are samples}
+\item{matrix}{A numeric Matrix representing a particular omics, rows are genes and columns are samples}
 
 \item{distFun}{A string that represents a distance function, two possible choices: "Manhattan" and "Euclidean"}
 
@@ -15,7 +22,9 @@ k_star_net(mat, distFun = "Euclidean", sparsity = 1, knn = 25, cores = 1)
 
 \item{knn}{An integer, it is the number of neighbors to be considered}
 
-\item{cores}{Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed}
+\item{k_star}{A boolean that specifies if k_star must be performed}
+
+\item{cores}{Number of threads for parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed}
 }
 \value{
 A Tibble with three columns : source node, destination node, weight of connection

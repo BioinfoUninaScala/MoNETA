@@ -8,12 +8,12 @@
 #' @import dplyr
 #' @param edgeList DataFrame representing a graph
 #' @param nodes_anno Annotation DataFrame with all the information for each sample
-#' @param name Title of plot to be displayed
+#' @param title Title of plot to be displayed
 #' @param html Boolean, if you want to save the plot in a html file
 #' @export
 
 
-plot_net <- function (edgeList, nodes_anno, name, html = FALSE)
+plot_net <- function (edgeList, nodes_anno, title, html = FALSE)
 {
     base::colnames(edgeList) <- c("from", "to")
     graph <- igraph::graph_from_data_frame(edgeList, directed = FALSE)
@@ -27,14 +27,14 @@ plot_net <- function (edgeList, nodes_anno, name, html = FALSE)
     nodes$color <- RColorBrewer::brewer.pal(n = length(unique(network::as.color(nodes$anno))),
                               name = "Dark2")[network::as.color(nodes$anno)]
     if (!(html)) {
-        visNetwork::visNetwork(nodes, edgeList, main = name) %>% visNetwork::visIgraphLayout() %>%
+        visNetwork::visNetwork(nodes, edgeList, main = title) %>% visNetwork::visIgraphLayout() %>%
             visNetwork::visOptions(highlightNearest = list(enabled = TRUE,
                                                degree = 3), selectedBy = "anno")
     }
     else {
-        visNetwork::visNetwork(nodes, edgeList, main = name) %>% visNetwork::visLegend(main = name) %>%
+        visNetwork::visNetwork(nodes, edgeList, main = title) %>% visNetwork::visLegend(main = title) %>%
             visNetwork::visIgraphLayout() %>% visNetwork::visOptions(highlightNearest = list(enabled = TRUE,
-                                                                     degree = 3), selectedBy = "anno") %>% visNetwork::visSave(file = paste0(name,
+                                                                     degree = 3), selectedBy = "anno") %>% visNetwork::visSave(file = paste0(title,
                                                                                                                                  ".html"))
     }
 }

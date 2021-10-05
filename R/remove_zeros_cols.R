@@ -1,10 +1,10 @@
-#' Create jump matrix
+#' This function clean a Matrix removing the columns with all zeros
 #'
-#' @param mtx a matrix
-#' @return the same matrix as input without the zeros columns
+#' @param matrix A Matrix
+#' @return A Matrix of the same type of mtx without columns with all zeros
 #' @export
 
 
-remove_zeros_cols <- function(mtx) {
-    mtx[, colSums(mtx) > 0]
+remove_zeros_cols <- function(matrix) {
+    matrix[, colSums(matrix) > 0]
 }

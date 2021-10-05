@@ -1,7 +1,7 @@
 #' Create jump matrix containing the probabilities to switch from one omics to another
 #'
 #' @importFrom dplyr inner_join
-#' @param multiplex A multiplex, an object that comprises different omics
+#' @param multiplex A multiplex, an object that comprises different omics. It is a DataFrame containing these information: EdgeType, source, target, weight
 #' @return A Matrix containing the probabilities to switch from one omics to another
 #' @export
 
@@ -17,7 +17,6 @@ create_jump_matrix <- function(multiplex) {
 
     jump_mat[lower.tri(jump_mat)] <- t(jump_mat)[lower.tri(jump_mat)]
 
-    # base:: o Matrix::
     jump_mat <- jump_mat/base::rowSums(jump_mat)
     jump_mat
 }

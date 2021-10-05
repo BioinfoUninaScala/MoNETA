@@ -2,16 +2,16 @@
 % Please edit documentation in R/remove_zeros_cols.R
 \name{remove_zeros_cols}
 \alias{remove_zeros_cols}
-\title{Create jump matrix}
+\title{This function clean a Matrix removing the columns with all zeros}
 \usage{
-remove_zeros_cols(mtx)
+remove_zeros_cols(matrix)
 }
 \arguments{
-\item{mtx}{a matrix}
+\item{matrix}{A Matrix}
 }
 \value{
-the same matrix as input without the zeros columns
+A Matrix of the same type of mtx without columns with all zeros
 }
 \description{
-Create jump matrix
+This function clean a Matrix removing the columns with all zeros
 }

@@ -5,8 +5,8 @@
 \title{Plot umap}
 \usage{
 plot_umap(
-  mat,
-  anno_df,
+  matrix,
+  nodes_anno,
   id_name,
   id_anno_color = NA,
   id_anno_shape = NA,
@@ -14,15 +14,15 @@ plot_umap(
 )
 }
 \arguments{
-\item{mat}{A Matrix with samples on rows that has to be plotted}
+\item{matrix}{A Matrix with samples on rows that has to be plotted}
 
-\item{anno_df}{Annotation DataFrame with all the information for each sample}
+\item{nodes_anno}{Annotation DataFrame with all the information for each sample}
 
-\item{id_name}{String for identification of sample in anno_df}
+\item{id_name}{String for identification of sample in nodes_anno}
 
-\item{id_anno_color}{String for the column necessary for distinguish cases in the anno_df, it will be used for giving a specific color for each case}
+\item{id_anno_color}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case}
 
-\item{id_anno_shape}{String for the column necessary for distinguish cases in the anno_df, it will be used for giving a specific shape for each case}
+\item{id_anno_shape}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case}
 }
 \value{
 A plot

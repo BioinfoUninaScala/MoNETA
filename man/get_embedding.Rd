@@ -4,19 +4,19 @@
 \alias{get_embedding}
 \title{Create jump matrix}
 \usage{
-get_embedding(mtx, EMBED_DIMENSION, NUM_STEPS = 10^7, cores = 20)
+get_embedding(matrix, embedding_size, num_steps = 10^7, cores = 20)
 }
 \arguments{
-\item{mtx}{A squared numeric matrix with values in the range 0-1}
+\item{matrix}{A squared numeric matrix with values in the range 0-1}
 
-\item{EMBED_DIMENSION}{Dimension of the output embedding}
+\item{embedding_size}{Size of the output embedding}
 
-\item{NUM_STEPS}{Number of total epoches}
+\item{num_steps}{Number of total epoches}
 
 \item{cores}{Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed}
 }
 \value{
-An embedding of the input Matrix: on the rows there are the samples, the number of columns are specified by EMBED_DIMENSION
+An embedding of the input Matrix: on the rows there are the samples, the number of columns are specified by embedding_size
 }
 \description{
 Create jump matrix

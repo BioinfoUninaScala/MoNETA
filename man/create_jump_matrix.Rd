@@ -7,7 +7,7 @@
 create_jump_matrix(multiplex)
 }
 \arguments{
-\item{multiplex}{A multiplex, an object that comprises different omics}
+\item{multiplex}{A multiplex, an object that comprises different omics. It is a DataFrame containing these information: EdgeType, source, target, weight}
 }
 \value{
 A Matrix containing the probabilities to switch from one omics to another

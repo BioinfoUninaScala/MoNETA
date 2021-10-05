@@ -4,16 +4,12 @@
 \alias{plot_umap_db}
 \title{Plot umap db}
 \usage{
-plot_umap_db(mat, nodes_anno, name = NA, type = "data", k = 1)
+plot_umap_db(matrix, type = "data", k = 1)
 }
 \arguments{
-\item{mat}{A Matrix with samples on rows that has to be plotted}
+\item{matrix}{A Matrix with samples on rows that has to be plotted}
 
-\item{nodes_anno}{Annotation DataFrame with all the information for each sample}
-
-\item{name}{Title of plot to be displayed}
-
-\item{type}{Type of mat, used as input for umap, see umap documentation}
+\item{type}{Type of matrix, used as input for umap, see umap documentation}
 
 \item{k}{Reachability distance, dbscan}
 }

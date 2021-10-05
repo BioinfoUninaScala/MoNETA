@@ -4,14 +4,14 @@
 \alias{plot_net}
 \title{Plot network}
 \usage{
-plot_net(edgeList, nodes_anno, name, html = FALSE)
+plot_net(edgeList, nodes_anno, title, html = FALSE)
 }
 \arguments{
 \item{edgeList}{DataFrame representing a graph}
 
 \item{nodes_anno}{Annotation DataFrame with all the information for each sample}
 
-\item{name}{Title of plot to be displayed}
+\item{title}{Title of plot to be displayed}
 
 \item{html}{Boolean, if you want to save the plot in a html file}
 }

@@ -8,34 +8,33 @@
 #' @import wordspace
 #' @importFrom doMC registerDoMC
 #' @importFrom foreach registerDoSEQ %dopar%
-#' @param mtx A squared numeric matrix with values in the range 0-1
-#' @param EMBED_DIMENSION Dimension of the output embedding
-#' @param NUM_STEPS Number of total epoches
+#' @param matrix A squared numeric matrix with values in the range 0-1
+#' @param embedding_size Size of the output embedding
+#' @param num_steps Number of total epoches
 #' @param cores Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed
-#' @return An embedding of the input Matrix: on the rows there are the samples, the number of columns are specified by EMBED_DIMENSION
+#' @return An embedding of the input Matrix: on the rows there are the samples, the number of columns are specified by embedding_size
 #' @export
 #'
 #'
-get_embedding <- function(mtx, EMBED_DIMENSION, NUM_STEPS = 10 ^ 7, cores = 20) {
+get_embedding <- function(matrix, embedding_size, num_steps = 10 ^ 7, cores = 20) {
 
-    rows <- base::rownames(mtx)
-    base::colnames(mtx) <- 1:ncol(mtx)#as.character(1:ncol(RWR_mat_plot))
-    base::rownames(mtx) <- 1:nrow(mtx)#as.character(1:nrow(RWR_mat_plot))
-    embedding <- get_embed(mtx, EMBED_DIMENSION, NUM_STEPS, cores)
+    rows <- base::rownames(matrix)
+    base::colnames(matrix) <- 1:ncol(matrix)#as.character(1:ncol(RWR_mat_plot))
+    base::rownames(matrix) <- 1:nrow(matrix)#as.character(1:nrow(RWR_mat_plot))
+    embedding <- get_embed(matrix, embedding_size, num_steps, cores)
     base::rownames(embedding) <- rows
     embedding
 }
 
 
-get_embed <- function(mtx, EMBED_DIMENSION, NUM_STEPS = 10 ^ 7, cores) {
+get_embed <- function(matrix, embedding_size, num_steps = 10 ^ 7, cores) {
     CLOSEST_NODES = 20
     NUM_SAMPLED = 3
     LEARNING_RATE = 0.01
     NB_CHUNK = 1
     CHUNK_SIZE = 10
-    EMBED_DIMENSION = EMBED_DIMENSION
 
-    r_DistancematrixPPI <- mtx #read_csv("data/mat_1.csv")
+    r_DistancematrixPPI <- matrix #read_csv("data/mat_1.csv")
 
     lst <- preprocess(r_DistancematrixPPI, CLOSEST_NODES)
 
@@ -44,10 +43,10 @@ get_embed <- function(mtx, EMBED_DIMENSION, NUM_STEPS = 10 ^ 7, cores) {
     list_neighbours <- lst$list_neighbours
     reverse_data_DistancematrixPPI <- lst$reverse_data_DistancematrixPPI
 
-    embeddings <- matrix(stats::rnorm(length(nodes) * EMBED_DIMENSION, mean = 0., sd = 1),
-                         nrow = length(nodes), ncol = EMBED_DIMENSION)
+    embeddings <- matrix(stats::rnorm(length(nodes) * embedding_size, mean = 0., sd = 1),
+                         nrow = length(nodes), ncol = embedding_size)
 
-    emb <- train(neighborhood, nodes, list_neighbours, NUM_STEPS, NUM_SAMPLED, LEARNING_RATE,
+    emb <- train(neighborhood, nodes, list_neighbours, num_steps, NUM_SAMPLED, LEARNING_RATE,
                  CLOSEST_NODES, CHUNK_SIZE, NB_CHUNK, embeddings, reverse_data_DistancematrixPPI,
                  cores)
 
