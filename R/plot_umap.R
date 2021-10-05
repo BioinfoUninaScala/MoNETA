@@ -20,6 +20,7 @@
 #' @param id_name String for identification of sample in nodes_anno
 #' @param id_anno_color String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case
 #' @param id_anno_shape String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case
+#' @param title Title of the plot
 #' @return A plot
 #' @export
 
