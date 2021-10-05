@@ -17,11 +17,12 @@
 #' @param matrix A Matrix with samples on rows that has to be plotted
 #' @param type Type of matrix, used as input for umap, see umap documentation
 #' @param k Reachability distance, dbscan
+#' @param interactive A boolean flag, it TRUE returns an interactive plot
 #' @export
 
 
 
-plot_umap_db <- function(matrix, type="data", k=1){
+plot_umap_db <- function(matrix, type="data", k=1, interactive = TRUE){
 
     matrix = t(matrix)
     umap_coord <- umap::umap(d = matrix, input = type)
@@ -30,13 +31,17 @@ plot_umap_db <- function(matrix, type="data", k=1){
     ds.norm = fpc::dbscan(umap_coord$layout, k)
     gPlot_umap_data$clust = factor(ds.norm$cluster)
     hc.norm.cent = gPlot_umap_data %>% dplyr::group_by(clust) %>% dplyr::select(V1,
-                                                                  V2) %>% dplyr::summarize_all(mean)
-    gPlot_umap_data_key <- ifelse(flag, plotly::highlight_key(gPlot_umap_data, ~id), gPlot_umap_data)
+                                                                  V2, clust) %>% dplyr::summarize_all(mean)
+    if (interactive) {
+        gPlot_umap_data_key <- plotly::highlight_key(gPlot_umap_data, ~id)
+    } else {
+        gPlot_umap_data_key <- gPlot_umap_data
+    }
 
     gPlot_umap_cl <- (ggplot(gPlot_umap_data_key, aes(x = V1,
                                                       y = V2, colour = clust)) + geom_point(alpha = 0.3) +
-                          theme_bw() + geom_label_repel(aes(label = clust), data = hc.norm.cent) +
-                          ggtitle(paste(id, "DBSCAN epslion:", k)))
+                          theme_bw() + ggrepel::geom_label_repel(aes(label = clust), data = hc.norm.cent) +
+                          ggtitle(paste("DBSCAN epslion:", k)))
 
     gPlot_umap_cl
 

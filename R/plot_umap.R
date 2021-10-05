@@ -20,14 +20,15 @@
 #' @param id_name String for identification of sample in nodes_anno
 #' @param id_anno_color String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case
 #' @param id_anno_shape String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case
+#' @param interactive A boolean flag, it TRUE returns an interactive plot
 #' @param title Title of the plot
 #' @return A plot
 #' @export
 
-plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_shape = NA, title = "") {
+plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_shape = NA, interactive = TRUE, title = "") {
 
     matrix <- t(matrix)
-    nodes_anno <- nodes_anno
+
     nodes_anno <- nodes_anno %>% dplyr::filter(nodes_anno[[id_name]] %in%
                                             base::rownames(matrix))
     #base::colnames(nodes_anno)[1:3] <- c("id", "group", "group2")
@@ -37,11 +38,19 @@ plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_s
         umap_coord <- umap::umap(d = matrix)
         gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id") %>%
             dplyr::left_join(nodes_anno, by = "id")
-        gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
-                                                          mode = "markers",
-                                                          marker = list(size = 5), text = ~id) %>%
-            plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
-                           title = title)
+
+        if (interactive) {
+            gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
+                                                              mode = "markers",
+                                                              marker = list(size = 5), text = ~id) %>%
+                plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
+                               title = title)
+        } else {
+            gPlot_umap <- ggplot(gPlot_umap_data, aes(x = V1, y = V2)) +
+                geom_point(color = "blue")  +
+                theme_bw() +
+                labs(title = title)
+        }
 
     } else if (!is.na(id_anno_color) & !is.na(id_anno_shape)) {
         nodes_anno <- nodes_anno %>% select(id_name, id_anno_color, id_anno_shape)
@@ -49,11 +58,19 @@ plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_s
         umap_coord <- umap::umap(d = matrix)
         gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id") %>%
             dplyr::left_join(nodes_anno, by = "id")
-        gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
-                                                          color = ~group1, mode = "markers", symbol = ~group2,
-                                                          marker = list(size = 5), text = ~id) %>%
-            plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
-                           title = title)
+
+        if (interactive) {
+            gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
+                                                              color = ~group1, mode = "markers", symbol = ~group2,
+                                                              marker = list(size = 5), text = ~id) %>%
+                plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
+                               title = title)
+        } else {
+            gPlot_umap <- ggplot(gPlot_umap_data, aes(x = V1, y = V2)) +
+                geom_point(aes(color = group1, shape = group2))  +
+                theme_bw() +
+                labs(title = title)
+        }
 
     } else if (!is.na(id_anno_color)) {
         nodes_anno <- nodes_anno %>% select(id_name, id_anno_color)
@@ -61,11 +78,19 @@ plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_s
         umap_coord <- umap::umap(d = matrix)
         gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id") %>%
             dplyr::left_join(nodes_anno, by = "id")
-        gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
-                                                          color = ~group1, mode = "markers",
-                                                          marker = list(size = 5), text = ~id) %>%
-            plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
-                           title = title)
+
+        if (interactive) {
+            gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
+                                                              color = ~group1, mode = "markers",
+                                                              marker = list(size = 5), text = ~id) %>%
+                plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
+                               title = title)
+        } else {
+            gPlot_umap <- ggplot(gPlot_umap_data, aes(x = V1, y = V2)) +
+                geom_point(aes(color = group1))  +
+                theme_bw()  +
+                labs(title = title)
+        }
 
     } else if (!is.na(id_anno_shape)) {
         nodes_anno <- nodes_anno %>% select(id_name, id_anno_shape)
@@ -73,11 +98,19 @@ plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_s
         umap_coord <- umap::umap(d = matrix)
         gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id") %>%
             dplyr::left_join(nodes_anno, by = "id")
-        gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
-                                                          symbol = ~group2, mode = "markers",
-                                                          marker = list(size = 5), text = ~id) %>%
-            plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
-                           title = title)
+
+        if (interactive) {
+            gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
+                                                              symbol = ~group2, mode = "markers",
+                                                              marker = list(size = 5), text = ~id) %>%
+                plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
+                               title = title)
+        } else {
+            gPlot_umap <- ggplot(gPlot_umap_data, aes(x = V1, y = V2)) +
+                geom_point(color = "blue", aes(shape = group2))  +
+                theme_bw() +
+                labs(title = title)
+        }
 
     }
 

@@ -10,6 +10,7 @@ plot_umap(
   id_name,
   id_anno_color = NA,
   id_anno_shape = NA,
+  interactive = TRUE,
   title = ""
 )
 }
@@ -23,6 +24,10 @@ plot_umap(
 \item{id_anno_color}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case}
 
 \item{id_anno_shape}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case}
+
+\item{interactive}{A boolean flag, it TRUE returns an interactive plot}
+
+\item{title}{Title of the plot}
 }
 \value{
 A plot
