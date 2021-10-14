@@ -36,7 +36,7 @@ k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_
         id = index@NAMES[knns$index[i,which(knns$index[i,] == i)]]
         delta = knns$distance[i,-which(knns$index[i,] == i)]
 
-        if (k_start)
+        if (k_star)
             search_k_star_nn(id = id, ids = ids, delta = delta, sparsity = sparsity)
         else
             tibble::tibble(source = id, dest = ids, weight = delta)
