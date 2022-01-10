@@ -11,6 +11,7 @@
 #' @import ggfortify
 #' @import survival
 #' @import survminer
+#' @import ggplot2
 #' @import plotly
 #' @import umap
 #' @import dplyr

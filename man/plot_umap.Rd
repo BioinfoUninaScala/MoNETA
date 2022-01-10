@@ -11,6 +11,7 @@ plot_umap(
   id_anno_color = NA,
   id_anno_shape = NA,
   interactive = TRUE,
+  wo_legend = FALSE,
   title = ""
 )
 }
@@ -23,9 +24,11 @@ plot_umap(
 
 \item{id_anno_color}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case}
 
-\item{id_anno_shape}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case}
+\item{id_anno_shape}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case, it must be associated to a discrete variable}
 
-\item{interactive}{A boolean flag, it TRUE returns an interactive plot}
+\item{interactive}{A boolean flag, if TRUE returns an interactive plot}
+
+\item{wo_legend}{A boolean flag, if TRUE returns the plot without legend}
 
 \item{title}{Title of the plot}
 }

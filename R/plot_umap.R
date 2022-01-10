@@ -15,17 +15,20 @@
 #' @import umap
 #' @import dplyr
 #' @import tibble
+#' @import ggplot2
 #' @param matrix A Matrix with samples on rows that has to be plotted
 #' @param nodes_anno Annotation DataFrame with all the information for each sample
 #' @param id_name String for identification of sample in nodes_anno
 #' @param id_anno_color String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case
-#' @param id_anno_shape String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case
-#' @param interactive A boolean flag, it TRUE returns an interactive plot
+#' @param id_anno_shape String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case, it must be associated to a discrete variable
+#' @param interactive A boolean flag, if TRUE returns an interactive plot
+#' @param wo_legend A boolean flag, if TRUE returns the plot without legend
 #' @param title Title of the plot
 #' @return A plot
 #' @export
 
-plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_shape = NA, interactive = TRUE, title = "") {
+plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_shape = NA,
+                      interactive = TRUE, wo_legend = FALSE, title = "") {
 
     matrix <- t(matrix)
 
@@ -53,7 +56,7 @@ plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_s
         }
 
     } else if (!is.na(id_anno_color) & !is.na(id_anno_shape)) {
-        nodes_anno <- nodes_anno %>% select(id_name, id_anno_color, id_anno_shape)
+        nodes_anno <- nodes_anno %>% dplyr::select(id_name, id_anno_color, id_anno_shape)
         colnames(nodes_anno) <- c("id", "group1", "group2")
         umap_coord <- umap::umap(d = matrix)
         gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id") %>%
@@ -73,7 +76,7 @@ plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_s
         }
 
     } else if (!is.na(id_anno_color)) {
-        nodes_anno <- nodes_anno %>% select(id_name, id_anno_color)
+        nodes_anno <- nodes_anno %>% dplyr::select(id_name, id_anno_color)
         colnames(nodes_anno) <- c("id", "group1")
         umap_coord <- umap::umap(d = matrix)
         gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id") %>%
@@ -110,12 +113,17 @@ plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_s
                 geom_point(color = "blue", aes(shape = group2))  +
                 theme_bw() +
                 labs(title = title)
+            if (scale_type(gPlot_umap_data$group2) $ length(unique(gPlot_umap_data$group2)) > 10 ) {
+                gPlot_umap <- gPlot_umap + theme(legend.position = "none")
+            }
         }
 
     }
 
+    if (!interactive & wo_legend) {
+        gPlot_umap <- gPlot_umap + theme(legend.position = "none")
+    }
+
     gPlot_umap
-
-
 
 }
