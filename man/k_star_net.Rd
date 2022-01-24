@@ -2,7 +2,7 @@
 % Please edit documentation in R/k_star_net.R
 \name{k_star_net}
 \alias{k_star_net}
-\title{Apply K Start algorithm in order to find knn nearest neighbors for each node, using Vantage-point tree}
+\title{Apply K Star algorithm in order to find knn nearest neighbors for each node, using Vantage-point tree}
 \usage{
 k_star_net(
   matrix,
@@ -30,5 +30,5 @@ k_star_net(
 A Tibble with three columns : source node, destination node, weight of connection
 }
 \description{
-Apply K Start algorithm in order to find knn nearest neighbors for each node, using Vantage-point tree
+Apply K Star algorithm in order to find knn nearest neighbors for each node, using Vantage-point tree
 }

@@ -1,4 +1,4 @@
-#' Apply K Start algorithm in order to find knn nearest neighbors for each node, using Vantage-point tree
+#' Apply K Star algorithm in order to find knn nearest neighbors for each node, using Vantage-point tree
 #'
 #' @importFrom purrr array_branch map_dbl pmap_df map_chr
 #' @import dplyr
@@ -56,7 +56,7 @@ k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_
         my_vp <- build_Vptreefrom_mat(matrix, distFun_bin)
 
         knn_elems <- matrix %>% purrr::array_branch(2) %>% list(as.list(names(.)), . ) %>%
-            pmap_df(get_neigh, vp_t = my_vp, k = knn, distFun = distFun_bin, sparsity = sparsity)
+            pmap_df(get_neigh, vp_t = my_vp, k = knn + 1, distFun = distFun_bin, sparsity = sparsity)
     }
 
 

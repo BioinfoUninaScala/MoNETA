@@ -4,10 +4,12 @@
 \alias{create_jump_matrix}
 \title{Create jump matrix containing the probabilities to switch from one omics to another}
 \usage{
-create_jump_matrix(multiplex)
+create_jump_matrix(multiplex, omics_list)
 }
 \arguments{
 \item{multiplex}{A multiplex, an object that comprises different omics. It is a DataFrame containing these information: EdgeType, source, target, weight}
+
+\item{omics_list}{A list of DataFrames containings omics data, each is a DataFrame with three columns: source, destination, weight}
 }
 \value{
 A Matrix containing the probabilities to switch from one omics to another
