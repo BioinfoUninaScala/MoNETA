@@ -1,4 +1,10 @@
 #' Generate similarity matrix
+#' Package downloaded from:
+#' https://github.com/LPioL/MultiVERSE/blob/master/RWR/Functions_RWRM.R
+#' https://github.com/LPioL/MultiVERSE/blob/master/RWR/GenerateSimMatrix.R
+#'
+#' Research group:  Léo Pio-Lopez, Alberto Valdeolivas, Laurent Tichit, Élisabeth Remy, Anaïs Baudot
+#' Publication:     https://arxiv.org/abs/2008.10085
 #'
 #' @import doFuture
 #' @import igraph

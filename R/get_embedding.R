@@ -1,4 +1,8 @@
-#' Create jump matrix
+#' Compute an embedding of the multi-omics matrix
+#'
+#' Code inspired from:
+#' Research group:  Léo Pio-Lopez, Alberto Valdeolivas, Laurent Tichit, Élisabeth Remy, Anaïs Baudot
+#' Publication:     https://arxiv.org/abs/2008.10085
 #'
 #' @import foreach
 #' @import doParallel

@@ -1,4 +1,4 @@
-#' Create a multiplex, a DataFrane that comprises different omics with these information: EdgeType, source, target, weight
+#' Create a multiplex, a DataFrame that comprises different omics with these information: EdgeType, source, target, weight
 #'
 #' @importFrom dplyr bind_rows select mutate
 #' @importFrom purrr map
