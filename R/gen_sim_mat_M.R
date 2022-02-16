@@ -1,5 +1,5 @@
 #' Generate similarity matrix
-#' Package downloaded from:
+#' Adapted from:
 #' https://github.com/LPioL/MultiVERSE/blob/master/RWR/Functions_RWRM.R
 #' https://github.com/LPioL/MultiVERSE/blob/master/RWR/GenerateSimMatrix.R
 #'
