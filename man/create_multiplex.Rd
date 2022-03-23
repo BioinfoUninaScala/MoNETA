@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_multiplex.R
 \name{create_multiplex}
 \alias{create_multiplex}
-\title{Create a multiplex, a DataFrane that comprises different omics with these information: EdgeType, source, target, weight}
+\title{Create a multiplex, a DataFrame that comprises different omics with these information: EdgeType, source, target, weight}
 \usage{
 create_multiplex(omics_list)
 }
@@ -13,5 +13,5 @@ create_multiplex(omics_list)
 A DataFrame that comprises each DataFrame with these columns: EdgeType, source, target, weight
 }
 \description{
-Create a multiplex, a DataFrane that comprises different omics with these information: EdgeType, source, target, weight
+Create a multiplex, a DataFrame that comprises different omics with these information: EdgeType, source, target, weight
 }

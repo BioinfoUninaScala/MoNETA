@@ -7,7 +7,7 @@
 plot_umap_db(matrix, type = "data", k = 1, interactive = TRUE)
 }
 \arguments{
-\item{matrix}{A Matrix with samples on rows that has to be plotted}
+\item{matrix}{A Matrix with samples on columns that has to be plotted}
 
 \item{type}{Type of matrix, used as input for umap, see umap documentation}
 

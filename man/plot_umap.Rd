@@ -16,7 +16,7 @@ plot_umap(
 )
 }
 \arguments{
-\item{matrix}{A Matrix with samples on rows that has to be plotted}
+\item{matrix}{A Matrix with samples on columns that has to be plotted}
 
 \item{nodes_anno}{Annotation DataFrame with all the information for each sample}
 

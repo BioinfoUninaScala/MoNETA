@@ -12,21 +12,22 @@
 #' @import wordspace
 #' @importFrom doMC registerDoMC
 #' @importFrom foreach registerDoSEQ %dopar%
-#' @param matrix A squared numeric matrix with values in the range 0-1
+#' @param matrix A squared numeric matrix with values in the range 0-1, with samples on columns
 #' @param embedding_size Size of the output embedding
 #' @param num_steps Number of total epoches
 #' @param cores Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed
-#' @return An embedding of the input Matrix: on the rows there are the samples, the number of columns are specified by embedding_size
+#' @return An embedding of the input Matrix: on the columns there are the samples, the number of rows are specified by embedding_size
 #' @export
 #'
 #'
 get_embedding <- function(matrix, embedding_size, num_steps = 10 ^ 7, cores = 20) {
 
-    rows <- base::rownames(matrix)
+    cols <- base::colnames(matrix)
     base::colnames(matrix) <- 1:ncol(matrix)#as.character(1:ncol(RWR_mat_plot))
     base::rownames(matrix) <- 1:nrow(matrix)#as.character(1:nrow(RWR_mat_plot))
     embedding <- get_embed(matrix, embedding_size, num_steps, cores)
-    base::rownames(embedding) <- rows
+    embedding <- t(embedding)
+    base::colnames(embedding) <- cols
     embedding
 }
 

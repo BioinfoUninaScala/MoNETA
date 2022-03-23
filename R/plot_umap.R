@@ -16,7 +16,7 @@
 #' @import dplyr
 #' @import tibble
 #' @import ggplot2
-#' @param matrix A Matrix with samples on rows that has to be plotted
+#' @param matrix A Matrix with samples on columns that has to be plotted
 #' @param nodes_anno Annotation DataFrame with all the information for each sample
 #' @param id_name String for identification of sample in nodes_anno
 #' @param id_anno_color String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case

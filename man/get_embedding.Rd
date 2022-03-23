@@ -2,12 +2,12 @@
 % Please edit documentation in R/get_embedding.R
 \name{get_embedding}
 \alias{get_embedding}
-\title{Create jump matrix}
+\title{Compute an embedding of the multi-omics matrix}
 \usage{
 get_embedding(matrix, embedding_size, num_steps = 10^7, cores = 20)
 }
 \arguments{
-\item{matrix}{A squared numeric matrix with values in the range 0-1}
+\item{matrix}{A squared numeric matrix with values in the range 0-1, with samples on columns}
 
 \item{embedding_size}{Size of the output embedding}
 
@@ -16,8 +16,10 @@ get_embedding(matrix, embedding_size, num_steps = 10^7, cores = 20)
 \item{cores}{Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed}
 }
 \value{
-An embedding of the input Matrix: on the rows there are the samples, the number of columns are specified by embedding_size
+An embedding of the input Matrix: on the columns there are the samples, the number of rows are specified by embedding_size
 }
 \description{
-Create jump matrix
+Adapted from:
+Research group:  Léo Pio-Lopez, Alberto Valdeolivas, Laurent Tichit, Élisabeth Remy, Anaïs Baudot
+Publication:     https://arxiv.org/abs/2008.10085
 }

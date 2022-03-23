@@ -15,7 +15,7 @@
 #' @import plotly
 #' @import umap
 #' @import dplyr
-#' @param matrix A Matrix with samples on rows that has to be plotted
+#' @param matrix A Matrix with samples on columns that has to be plotted
 #' @param type Type of matrix, used as input for umap, see umap documentation
 #' @param k Reachability distance, dbscan
 #' @param interactive A boolean flag, it TRUE returns an interactive plot

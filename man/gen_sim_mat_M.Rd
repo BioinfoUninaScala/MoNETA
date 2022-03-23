@@ -2,7 +2,10 @@
 % Please edit documentation in R/gen_sim_mat_M.R
 \name{gen_sim_mat_M}
 \alias{gen_sim_mat_M}
-\title{Generate similarity matrix}
+\title{Generate similarity matrix
+Adapted from:
+https://github.com/LPioL/MultiVERSE/blob/master/RWR/Functions_RWRM.R
+https://github.com/LPioL/MultiVERSE/blob/master/RWR/GenerateSimMatrix.R}
 \usage{
 gen_sim_mat_M(
   network,
@@ -30,5 +33,6 @@ gen_sim_mat_M(
 RWRM_similarity
 }
 \description{
-Generate similarity matrix
+Research group:  Léo Pio-Lopez, Alberto Valdeolivas, Laurent Tichit, Élisabeth Remy, Anaïs Baudot
+Publication:     https://arxiv.org/abs/2008.10085
 }
