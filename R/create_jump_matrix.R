@@ -1,14 +1,15 @@
 #' Create jump matrix containing the probabilities to switch from one omics to another
 #'
 #' @importFrom dplyr inner_join
-#' @param multiplex A multiplex, an object that comprises different omics. It is a DataFrame containing these information: EdgeType, source, target, weight
 #' @param omics_list A list of DataFrames containings omics data, each is a DataFrame with three columns: source, destination, weight
 #' @return A Matrix containing the probabilities to switch from one omics to another
 #' @export
 
-create_jump_matrix <- function(multiplex, omics_list) {
+create_jump_matrix <- function(omics_list) {
 
-    layers <- unique(multiplex$EdgeType)
+    # @param multiplex A multiplex, an object that comprises different omics. It is a DataFrame containing these information: EdgeType, source, target, weight
+    #layers <- unique(multiplex$EdgeType)
+    layers <- names(omics_list)
     jump_mat <- matrix(0, nrow = length(layers), ncol = length(layers), dimnames = list(layers,layers))
 
     comb <- utils::combn(layers,2)
