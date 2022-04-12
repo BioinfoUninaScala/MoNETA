@@ -10,7 +10,7 @@ get_umap_embedding <- function(matrix, embedding_size) {
     config = umap.defaults
     config$n_components = embedding_size
 
-    embed = umap(matrix, config = config)
+    embed = umap(t(matrix), config = config)
     embed = t(embed$layout)
     embed
 }
