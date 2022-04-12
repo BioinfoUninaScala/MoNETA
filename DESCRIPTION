@@ -15,7 +15,8 @@ Imports: purrr, dplyr, stats, magrittr, doFuture, foreach, doParallel,
         igraph, visNetwork, tidyverse, network, RColorBrewer, igraph, FNN, 
         ggrepel, fpc, ggfortify, survival, survminer, plotly, umap,
         R.matlab, bc3net, kernlab, mclust, optparse, tibble, methods,
-        doMC, ggplot2
+        doMC, ggplot2,
+        Rcpp, uwot
 Suggests: 
     rmarkdown,
     knitr
