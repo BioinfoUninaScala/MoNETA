@@ -17,7 +17,7 @@
 #' @import dplyr
 #' @import tibble
 #' @import ggplot2
-#' @param matrix A Matrix with samples on columns that has to be plotted
+#' @param matrix A DataFrame with samples on columns that has to be plotted
 #' @param nodes_anno Annotation DataFrame with all the information for each sample
 #' @param id_name String for identification of sample in nodes_anno
 #' @param id_anno_color String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case
@@ -35,9 +35,10 @@
 plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_shape = NA,
                       interactive = TRUE, wo_legend = FALSE, title = "",
                       n_neighbors = 15, n_threads = NULL, n_sgd_threads = 0, grain_size = 1) {
-
+    matrix = as.data.frame(matrix)
     cols = colnames(matrix)
     matrix <- t(matrix)
+    matrix = as.data.frame(matrix)
 
     nodes_anno <- nodes_anno %>% dplyr::filter(nodes_anno[[id_name]] %in%
                                                    base::rownames(matrix))
@@ -68,7 +69,10 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
     } else if (!is.na(id_anno_color) & !is.na(id_anno_shape)) {
         nodes_anno <- nodes_anno %>% dplyr::select(id_name, id_anno_color, id_anno_shape)
         colnames(nodes_anno) <- c("id", "group1", "group2")
-        umap_coord <- umap::umap(d = matrix)
+        umap_coord <- uwot::umap(matrix, n_components = 2, n_neighbors = n_neighbors,
+                                 n_threads = n_threads, n_sgd_threads = n_sgd_threads,
+                                 grain_size = grain_size)
+        rownames(umap_coord) = cols
         gPlot_umap_data <- umap_coord %>% tibble::as_tibble(rownames = "id") %>%
             dplyr::left_join(nodes_anno, by = "id")
 

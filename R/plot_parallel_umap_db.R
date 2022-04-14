@@ -16,7 +16,7 @@
 #' @import plotly
 #' @import umap
 #' @import dplyr
-#' @param matrix A Matrix with samples on columns that has to be plotted
+#' @param matrix A DataFrame with samples on columns that has to be plotted
 #' @param k Reachability distance, dbscan
 #' @param interactive A boolean flag, it TRUE returns an interactive plot
 #' @param n_neighbors The size of local neighborhood. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. In general values should be in the range 2 to 100
@@ -30,7 +30,7 @@
 plot_parallel_umap_db <- function(matrix, k=1, interactive = TRUE,
                                   n_neighbors = 15, n_threads = NULL, n_sgd_threads = 0,
                                   grain_size = 1){
-
+    matrix = as.data.frame(matrix)
     cols = colnames(matrix)
     matrix = t(matrix)
     umap_coord <- uwot::umap(matrix, n_components = 2, n_neighbors = n_neighbors,

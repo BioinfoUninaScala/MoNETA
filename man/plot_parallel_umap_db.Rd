@@ -15,7 +15,7 @@ plot_parallel_umap_db(
 )
 }
 \arguments{
-\item{matrix}{A Matrix with samples on columns that has to be plotted}
+\item{matrix}{A DataFrame with samples on columns that has to be plotted}
 
 \item{k}{Reachability distance, dbscan}
 
