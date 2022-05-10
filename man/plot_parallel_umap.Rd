@@ -16,7 +16,8 @@ plot_parallel_umap(
   n_neighbors = 15,
   n_threads = NULL,
   n_sgd_threads = 0,
-  grain_size = 1
+  grain_size = 1,
+  umap_coord = NULL
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ plot_parallel_umap(
 \item{n_sgd_threads}{Number of thread for stochastic gradient descent, if > 1 it will not be reproducible anyway}
 
 \item{grain_size}{Minimum amount of work to do on each thread}
+
+\item{umap_coord}{It represents previously computed umap coordinates, if not present, it will be computed}
 }
 \value{
 A plot

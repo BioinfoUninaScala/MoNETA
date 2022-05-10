@@ -29,12 +29,14 @@
 #' @param n_threads Number of thread, NULL if single core
 #' @param n_sgd_threads Number of thread for stochastic gradient descent, if > 1 it will not be reproducible anyway
 #' @param grain_size Minimum amount of work to do on each thread
+#' @param umap_coord It represents previously computed umap coordinates, if not present, it will be computed
 #' @return A plot
 #' @export
 
 plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_shape = NA,
-                      interactive = TRUE, wo_legend = FALSE, title = "",
-                      n_neighbors = 15, n_threads = NULL, n_sgd_threads = 0, grain_size = 1) {
+                               interactive = TRUE, wo_legend = FALSE, title = "",
+                               n_neighbors = 15, n_threads = NULL, n_sgd_threads = 0, grain_size = 1,
+                               umap_coord = NULL) {
     matrix = as.data.frame(matrix)
     cols = colnames(matrix)
     matrix <- t(matrix)
@@ -42,17 +44,48 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
 
     nodes_anno <- nodes_anno %>% dplyr::filter(nodes_anno[[id_name]] %in%
                                                    base::rownames(matrix))
-    #base::colnames(nodes_anno)[1:3] <- c("id", "group", "group2")
+
     if (is.na(id_anno_color) & is.na(id_anno_shape)) {
         nodes_anno <- nodes_anno %>% select(id_name)
         colnames(nodes_anno) <- "id"
-        umap_coord <- uwot::umap(matrix, n_components = 2, n_neighbors = n_neighbors,
-                                n_threads = n_threads, n_sgd_threads = n_sgd_threads,
-                                grain_size = grain_size)
-        rownames(umap_coord) = cols
-        gPlot_umap_data <- umap_coord %>% tibble::as_tibble(rownames = "id") %>%
-            dplyr::left_join(nodes_anno, by = "id")
+    } else if (!is.na(id_anno_color) & !is.na(id_anno_shape)) {
+        nodes_anno <- nodes_anno %>% dplyr::select(id_name, id_anno_color, id_anno_shape)
+        colnames(nodes_anno) <- c("id", "group1", "group2")
+    } else if (!is.na(id_anno_color)) {
+        nodes_anno <- nodes_anno %>% dplyr::select(id_name, id_anno_color)
+        colnames(nodes_anno) <- c("id", "group1")
+    } else if (!is.na(id_anno_shape)) {
+        nodes_anno <- nodes_anno %>% select(id_name, id_anno_shape)
+        colnames(nodes_anno) <- c("id", "group2")
+    }
 
+    if(is.null(umap_coord)) {
+        umap_coord <- uwot::umap(matrix, n_components = 2, n_neighbors = n_neighbors,
+                                 n_threads = n_threads, n_sgd_threads = n_sgd_threads,
+                                 grain_size = grain_size)
+        rownames(umap_coord) = cols
+    } else {
+        umap_coord <- t(umap_coord)
+    }
+
+
+    gPlot_umap_data <- umap_coord %>% tibble::as_tibble(rownames = "id") %>%
+        dplyr::left_join(nodes_anno, by = "id")
+
+    if (!is.na(id_anno_shape)) {
+        vals <- plotly::schema(F)$traces$scatter$attributes$marker$symbol$values
+        vals <- grep("-", vals, value = T)
+
+        gPlot_umap_data = gPlot_umap_data %>% dplyr::group_by(group1) %>%
+            dplyr::summarise(id = id,
+                             group1 = group1,
+                             g = match(group2, sort(unique(group2))),
+                             group2 = group2,
+                             V1 = V1, V2 = V2)
+    }
+
+
+    if (is.na(id_anno_color) & is.na(id_anno_shape)) {
         if (interactive) {
             gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
                                                               mode = "markers",
@@ -65,21 +98,14 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
                 theme_bw() +
                 labs(title = title)
         }
-
     } else if (!is.na(id_anno_color) & !is.na(id_anno_shape)) {
-        nodes_anno <- nodes_anno %>% dplyr::select(id_name, id_anno_color, id_anno_shape)
-        colnames(nodes_anno) <- c("id", "group1", "group2")
-        umap_coord <- uwot::umap(matrix, n_components = 2, n_neighbors = n_neighbors,
-                                 n_threads = n_threads, n_sgd_threads = n_sgd_threads,
-                                 grain_size = grain_size)
-        rownames(umap_coord) = cols
-        gPlot_umap_data <- umap_coord %>% tibble::as_tibble(rownames = "id") %>%
-            dplyr::left_join(nodes_anno, by = "id")
-
         if (interactive) {
-            gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
-                                                              color = ~group1, mode = "markers", symbol = ~group2,
-                                                              marker = list(size = 5), text = ~id) %>%
+            gPlot_umap <- gPlot_umap_data %>%
+                plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
+                                color = ~group1, mode = "markers", symbol = ~g,
+                                symbols = vals,
+                                marker = list(size = 5), text = ~id,
+                                name = paste0(gPlot_umap_data$group1, "\n", gPlot_umap_data$group2)) %>%
                 plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
                                title = title)
         } else {
@@ -88,17 +114,7 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
                 theme_bw() +
                 labs(title = title)
         }
-
     } else if (!is.na(id_anno_color)) {
-        nodes_anno <- nodes_anno %>% dplyr::select(id_name, id_anno_color)
-        colnames(nodes_anno) <- c("id", "group1")
-        umap_coord <- uwot::umap(matrix, n_components = 2, n_neighbors = n_neighbors,
-                                 n_threads = n_threads, n_sgd_threads = n_sgd_threads,
-                                 grain_size = grain_size)
-        rownames(umap_coord) = cols
-        gPlot_umap_data <- umap_coord %>% tibble::as_tibble(rownames = "id") %>%
-            dplyr::left_join(nodes_anno, by = "id")
-
         if (interactive) {
             gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
                                                               color = ~group1, mode = "markers",
@@ -111,21 +127,14 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
                 theme_bw()  +
                 labs(title = title)
         }
-
     } else if (!is.na(id_anno_shape)) {
-        nodes_anno <- nodes_anno %>% select(id_name, id_anno_shape)
-        colnames(nodes_anno) <- c("id", "group2")
-        umap_coord <- uwot::umap(matrix, n_components = 2, n_neighbors = n_neighbors,
-                                 n_threads = n_threads, n_sgd_threads = n_sgd_threads,
-                                 grain_size = grain_size)
-        rownames(umap_coord) = cols
-        gPlot_umap_data <- umap_coord %>% tibble::as_tibble(rownames = "id") %>%
-            dplyr::left_join(nodes_anno, by = "id")
-
         if (interactive) {
-            gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
-                                                              symbol = ~group2, mode = "markers",
-                                                              marker = list(size = 5), text = ~id) %>%
+            gPlot_umap <- gPlot_umap_data %>%
+                plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
+                                color = ~group1, mode = "markers", symbol = ~g,
+                                symbols = vals,
+                                marker = list(size = 5), text = ~id,
+                                name = paste0(gPlot_umap_data$group1, "\n", gPlot_umap_data$group2)) %>%
                 plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
                                title = title)
         } else {
@@ -137,8 +146,8 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
                 gPlot_umap <- gPlot_umap + theme(legend.position = "none")
             }
         }
-
     }
+
 
     if (!interactive & wo_legend) {
         gPlot_umap <- gPlot_umap + theme(legend.position = "none")
