@@ -75,6 +75,9 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
     if (!is.na(id_anno_shape)) {
         vals <- plotly::schema(F)$traces$scatter$attributes$marker$symbol$values
         vals <- grep("-", vals, value = T)
+        vals = vals[!(str_ends(vals, "down") | str_ends(vals, "up") |
+                           str_ends(vals, "left") | str_ends(vals, "right") |
+                           str_ends(vals, "open") | str_ends(vals, "up"))]
 
         gPlot_umap_data = gPlot_umap_data %>% dplyr::group_by(group1) %>%
             dplyr::summarise(id = id,
@@ -131,10 +134,10 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
         if (interactive) {
             gPlot_umap <- gPlot_umap_data %>%
                 plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
-                                color = ~group1, mode = "markers", symbol = ~g,
+                                mode = "markers", symbol = ~g,
                                 symbols = vals,
                                 marker = list(size = 5), text = ~id,
-                                name = paste0(gPlot_umap_data$group1, "\n", gPlot_umap_data$group2)) %>%
+                                name = paste0(gPlot_umap_data$group2)) %>%
                 plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
                                title = title)
         } else {

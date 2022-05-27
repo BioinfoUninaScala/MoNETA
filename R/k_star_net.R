@@ -16,10 +16,11 @@
 #' @param knn An integer, it is the number of neighbors to be considered
 #' @param k_star A boolean that specifies if k_star must be performed
 #' @param cores Number of threads for parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed
+#' @param MAX_ASSOC Number of maximum incoming edges that a node can have
 #' @return A Tibble with three columns : source node, destination node, weight of connection
 #' @export
 
-k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_star = TRUE, cores = 1) {
+k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_star = TRUE, cores = 1, MAX_ASSOC = Inf) {
     if (distFun != "Binary") {
         index <- BiocNeighbors::buildIndex(t(matrix), BNPARAM = BiocNeighbors::VptreeParam(distance=distFun))
 
@@ -61,7 +62,15 @@ k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_
     }
 
 
-    dplyr::bind_rows(knn_elems)
+    knn_elems = dplyr::bind_rows(knn_elems)
+
+    if (is.infinite(MAX_ASSOC)) {
+        MAX_ASSOC = nrow(knn_elems)
+    }
+
+    knn_elems %>% group_by(dest) %>%
+        arrange(weight, .by_group = TRUE) %>%
+        dplyr::slice(1:MAX_ASSOC)
 
 }
 

@@ -11,7 +11,8 @@ k_star_net(
   sparsity = 1,
   knn = 25,
   k_star = TRUE,
-  cores = 1
+  cores = 1,
+  MAX_ASSOC = Inf
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ k_star_net(
 \item{k_star}{A boolean that specifies if k_star must be performed}
 
 \item{cores}{Number of threads for parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed}
+
+\item{MAX_ASSOC}{Number of maximum incoming edges that a node can have}
 }
 \value{
 A Tibble with three columns : source node, destination node, weight of connection
