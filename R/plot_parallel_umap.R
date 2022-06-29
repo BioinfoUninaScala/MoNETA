@@ -66,7 +66,10 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
         rownames(umap_coord) = cols
     } else {
         umap_coord <- t(umap_coord)
+        colnames(umap_coord) <- c("V1","V2")
     }
+
+
 
 
     gPlot_umap_data <- umap_coord %>% tibble::as_tibble(rownames = "id") %>%
