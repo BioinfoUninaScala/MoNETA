@@ -1,5 +1,5 @@
 <p align="right">
- <img src="https://github.com/BioinfoUninaScala/MoNETA/blob/main/Moneta%20-%20icon.jpg" width="150" alt="EpiStatProfiler Logo">
+ <img src="https://github.com/BioinfoUninaScala/MoNETA/blob/main/Moneta%20-%20icon.jpg" width="250" alt="EpiStatProfiler Logo">
 </p>
 
 # MoNETA
