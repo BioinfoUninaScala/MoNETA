@@ -18,7 +18,7 @@ k_star_net(
 \arguments{
 \item{matrix}{A numeric Matrix representing a particular omics, rows are genes and columns are samples}
 
-\item{distFun}{A string that represents a distance function, two possible choices: "Manhattan" and "Euclidean"}
+\item{distFun}{A string that represents a distance function, two possible choices: "Binary", "Euclidean" and "Jaccard"}
 
 \item{sparsity}{A positive real}
 

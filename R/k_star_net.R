@@ -11,7 +11,7 @@
 #' @importFrom BiocNeighbors buildIndex queryKNN VptreeParam KmknnParam
 #' @importFrom foreach registerDoSEQ %dopar%
 #' @param matrix A numeric Matrix representing a particular omics, rows are genes and columns are samples
-#' @param distFun A string that represents a distance function, two possible choices: "Manhattan" and "Euclidean"
+#' @param distFun A string that represents a distance function, two possible choices: "Binary", "Euclidean" and "Jaccard"
 #' @param sparsity A positive real
 #' @param knn An integer, it is the number of neighbors to be considered
 #' @param k_star A boolean that specifies if k_star must be performed
@@ -21,7 +21,7 @@
 #' @export
 
 k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_star = TRUE, cores = 1, MAX_ASSOC = Inf) {
-    if (distFun != "Binary") {
+    if (distFun == "Euclidean") {
         index <- BiocNeighbors::buildIndex(t(matrix), BNPARAM = BiocNeighbors::VptreeParam(distance=distFun))
 
         if (cores > 1) {
@@ -49,7 +49,7 @@ k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_
         if (cores > 1) {
             foreach::registerDoSEQ()
         }
-    } else {
+    } else if (distFun == "Binary") {
 
         distFun_bin <- function(x, y){
             as.numeric(dist(rbind(x, y), method = "binary"))
@@ -59,6 +59,19 @@ k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_
 
         knn_elems <- matrix %>% purrr::array_branch(2) %>% list(as.list(names(.)), . ) %>%
             pmap_df(get_neigh, vp_t = my_vp, k = knn + 1, distFun = distFun_bin, sparsity = sparsity)
+    } else if (distFun == "Jaccard") {
+
+        distFun_jacc <- function(x, y){
+            as.numeric(1 - (sum(x & y)/sum(x | y)))
+        }
+
+        my_vp <- build_Vptreefrom_mat(matrix, distFun_bin)
+
+        knn_elems <- matrix %>% purrr::array_branch(2) %>% list(as.list(names(.)), . ) %>%
+            pmap_df(get_neigh, vp_t = my_vp, k = knn + 1, distFun = distFun_jacc, sparsity = sparsity)
+
+    } else {
+        stop("Distance function not available")
     }
 
 
