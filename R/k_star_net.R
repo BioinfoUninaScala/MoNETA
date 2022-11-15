@@ -67,6 +67,7 @@ k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_
 
         my_vp <- build_Vptreefrom_mat(matrix, distFun_bin)
 
+
         knn_elems <- matrix %>% purrr::array_branch(2) %>% list(as.list(names(.)), . ) %>%
             pmap_df(get_neigh, vp_t = my_vp, k = knn + 1, distFun = distFun_jacc, sparsity = sparsity)
 
