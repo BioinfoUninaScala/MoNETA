@@ -17,15 +17,12 @@ plot_net <- function (edgeList, nodes_anno, title, html = FALSE)
 {
     base::colnames(edgeList) <- c("from", "to")
     graph <- igraph::graph_from_data_frame(edgeList, directed = FALSE)
-    cluster <- igraph::cluster_louvain(graph)
-    cluster_df <- igraph::membership(cluster) %>% tibble::enframe()
-    base::colnames(cluster_df) <- c("id", "group")
     nodes_anno <- nodes_anno %>% dplyr::filter(nodes_anno[[1]] %in%
                                             base::union(edgeList[[1]], edgeList[[2]]))
     nodes <- data.frame(id = nodes_anno[[1]], anno = nodes_anno[[2]])
-    nodes <- dplyr::left_join(nodes, cluster_df)
-    nodes$color <- RColorBrewer::brewer.pal(n = length(unique(network::as.color(nodes$anno))),
-                              name = "Dark2")[network::as.color(nodes$anno)]
+    colors_disp = RColorBrewer::brewer.pal(n = length(unique(network::as.color(nodes$anno))),
+                                           name = "Dark2")
+    nodes$color <- colors_disp[network::as.color(nodes$anno) %% length(colors_disp) +1]
     if (!(html)) {
         visNetwork::visNetwork(nodes, edgeList, main = title) %>% visNetwork::visIgraphLayout() %>%
             visNetwork::visOptions(highlightNearest = list(enabled = TRUE,
