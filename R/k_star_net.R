@@ -65,7 +65,7 @@ k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_
             as.numeric(1 - (sum(x & y)/sum(x | y)))
         }
 
-        my_vp <- build_Vptreefrom_mat(matrix, distFun_bin)
+        my_vp <- build_Vptreefrom_mat(matrix, distFun_jacc)
 
 
         knn_elems <- matrix %>% purrr::array_branch(2) %>% list(as.list(names(.)), . ) %>%
