@@ -3,7 +3,7 @@
 </p>
 
 ## MoNETA
-#### A new R package for the qualitative analysis of DNA methylation
+#### A new R package for the multi-omics data integration 
 
 ## About
 MoNETA is a tool designed to **compress multi-omic** data into a single matrix of reduced size. 
