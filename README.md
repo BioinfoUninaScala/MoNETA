@@ -70,7 +70,9 @@ Input data consist of the matrices with samples on columns
 
 **2. Generation of similarity matrix using multi-omics data**
 
-
+First apply `k_star_net` function to each omics data. 
+After with `create_multiplex` and `create_jump_matrix` the networks will be combined. 
+Finally use `gen_sim_mat_M` to generate the similarity matrix that describes the multi-omics integration.
 
 * `k_star_net` : applies [K\*nn greedy algorithm](https://papers.nips.cc/paper/2016/file/2c6ae45a3e88aee548c0714fad7f8269-Paper.pdf) to dynamically find nearest neighbors for each node 
 
