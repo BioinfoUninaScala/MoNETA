@@ -2,7 +2,8 @@
  <img src="https://github.com/BioinfoUninaScala/MoNETA/blob/main/Moneta%20-%20icon.jpg" width="250" alt="EpiStatProfiler Logo">
 </p>
 
-# MoNETA
+## MoNETA
+#### A new R package for the qualitative analysis of DNA methylation
 
 ## About
 MoNETA is a tool designed to **compress multi-omic** data into a single matrix of reduced size. 
