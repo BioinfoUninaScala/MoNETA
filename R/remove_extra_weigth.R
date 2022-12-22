@@ -1,4 +1,4 @@
-#' Create jump matrix
+#' Remove extra weigth
 #'
 #' @param network a network with three columns
 #' @param weight_remv the weight to be removed in the network
