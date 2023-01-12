@@ -4,10 +4,12 @@
 \alias{create_multiplex}
 \title{Create a multiplex, a DataFrame that comprises different omics with these information: EdgeType, source, target, weight}
 \usage{
-create_multiplex(omics_list)
+create_multiplex(omics_list, weighted = FALSE)
 }
 \arguments{
 \item{omics_list}{A list of DataFrames containings omics data, each is a DataFrame with three columns: source, destination, weight}
+
+\item{weighted}{A boolean, based on this, a weighted multiplex is returned}
 }
 \value{
 A DataFrame that comprises each DataFrame with these columns: EdgeType, source, target, weight

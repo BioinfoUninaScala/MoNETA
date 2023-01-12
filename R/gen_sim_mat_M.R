@@ -24,13 +24,16 @@
 #' @param restart A real in the range of 0-1, it is the probability to restart the algorithm in the starting point
 #' @param delta delta
 #' @param cond_jump cond_jump
+#' @param jump_neighborhood A boolean, if true, the nodes between omics will be connected if they are the same, if false, the nodes will be connected with itself and its neighborhood but in the other omics
+#' @param weighted_multiplex A boolean, if true, the edge between omics will be weighted
 #' @param cores Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed
 #' @return RWRM_similarity
 #' @export
 
 #source("Functions_RWRM.R")
 
-gen_sim_mat_M <- function(network, tau = NA, restart = 0.7, delta = 0.5, cond_jump = NULL, cores = 1){
+gen_sim_mat_M <- function(network, tau = NA, restart = 0.7, delta = 0.5, cond_jump = NULL,
+                          jump_neighborhood = FALSE, weighted_multiplex = FALSE, cores = 1){
 
     InputNetwork <- network
 
@@ -107,7 +110,29 @@ gen_sim_mat_M <- function(network, tau = NA, restart = 0.7, delta = 0.5, cond_ju
     ## multiplex network and its normalalisation)
 
     MultiplexObject <- create.multiplex(Layers)
-    AdjMatrix <- compute.adjacency.matrix2(MultiplexObject, delta, cond_jump)
+
+    jump_mat_nodes = NULL
+    if (jump_neighborhood) {
+        jump_mat_nodes = list()
+        for (mo_name in names(Layers)) {
+            mo = Layers[[mo_name]]
+
+
+            adjacency = as_adjacency_matrix(mo, attr = ifelse(weighted_multiplex, "weight", NULL),sparse = T)
+
+            rsum = rowSums(adjacency)
+            rsum[rsum == 0] = 1
+            wadj = adjacency/(rsum * 2)
+
+
+            diag(wadj) = 0.5
+
+            jump_mat_nodes[[mo_name]] = wadj
+        }
+    }
+
+
+    AdjMatrix <- compute.adjacency.matrix2(MultiplexObject, delta, cond_jump, jump_mat_nodes)
     AdjMatrixNorm <- normalize.multiplex.adjacency(AdjMatrix)
     Allnodes <- MultiplexObject$Pool_of_Nodes
     numberNodes <- length(Allnodes)
@@ -228,7 +253,7 @@ isMultiplexHet <- function(x)
 
 
 
-compute.adjacency.matrix2 <- function(x, delta = 0.5, cond_jump = NULL)
+compute.adjacency.matrix2 <- function(x, delta = 0.5, cond_jump = NULL, jump_mat_nodes = NULL)
 {
     if (!isMultiplex(x) & !isMultiplexHet(x)) {
         stop("Not a Multiplex or Multiplex Heterogeneous object")
@@ -260,7 +285,9 @@ compute.adjacency.matrix2 <- function(x, delta = 0.5, cond_jump = NULL)
 
     diag(cond_jump) <- 0
     ## IDEM_MATRIX.
-    Idem_Matrix <- Matrix::Diagonal(N, x = 1)
+    if (is.null(jump_mat_nodes)) {
+        Idem_Matrix <- Matrix::Diagonal(N, x = 1)
+    }
 
     counter <- 0
     Layers_List <- lapply(x[Layers_Names], function(x){
@@ -308,8 +335,10 @@ compute.adjacency.matrix2 <- function(x, delta = 0.5, cond_jump = NULL)
     for (i in seq_len(L)){
         for (j in seq_len(L)){
             if (j != i){
+
                 SupraAdjacencyMatrix[(Position_ini_row[i]:Position_end_row[i]),
-                                     (Position_ini_col[j]:Position_end_col[j])] <- delta * cond_jump[i,j] * Idem_Matrix
+                                     (Position_ini_col[j]:Position_end_col[j])] <- delta * cond_jump[i,j] *
+                                                        ifelse(is.null(jump_mat_nodes), Idem_Matrix, jump_mat_nodes[[i]])
             }
         }
     }
