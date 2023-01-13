@@ -24,8 +24,8 @@
 #' @param restart A real in the range of 0-1, it is the probability to restart the algorithm in the starting point
 #' @param delta delta
 #' @param cond_jump cond_jump
-#' @param jump_neighborhood A boolean, if true, the nodes between omics will be connected if they are the same, if false, the nodes will be connected with itself and its neighborhood but in the other omics
-#' @param weighted_multiplex A boolean, if true, the edge between omics will be weighted
+#' @param jump_neighborhood A boolean, if false, the nodes between omics will be connected if they are the same, if true, the nodes will be connected with itself and its neighborhood but in the other omics
+#' @param weighted_multiplex A boolean, if true, the edge between omics will be weighted. It is considered only if jump_neighborhood is true
 #' @param cores Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed
 #' @return RWRM_similarity
 #' @export
@@ -114,11 +114,15 @@ gen_sim_mat_M <- function(network, tau = NA, restart = 0.7, delta = 0.5, cond_ju
     jump_mat_nodes = NULL
     if (jump_neighborhood) {
         jump_mat_nodes = list()
-        for (mo_name in names(Layers)) {
-            mo = Layers[[mo_name]]
+        attr = NULL
+        if (weighted_multiplex) {
+            attr = "weight"
+        }
+        for (mo_name in names(MultiplexObject)[seq(MultiplexObject$Number_of_Layers)]) {
+            mo = MultiplexObject[[mo_name]]
 
 
-            adjacency = as_adjacency_matrix(mo, attr = ifelse(weighted_multiplex, "weight", NULL),sparse = T)
+            adjacency = as_adjacency_matrix(mo, attr = attr, sparse = T)
 
             rsum = rowSums(adjacency)
             rsum[rsum == 0] = 1
@@ -126,6 +130,8 @@ gen_sim_mat_M <- function(network, tau = NA, restart = 0.7, delta = 0.5, cond_ju
 
 
             diag(wadj) = 0.5
+
+            wadj[rowSums(wadj) == 0.5 & wadj == 0.5] = 1
 
             jump_mat_nodes[[mo_name]] = wadj
         }
@@ -333,12 +339,16 @@ compute.adjacency.matrix2 <- function(x, delta = 0.5, cond_jump = NULL, jump_mat
     Position_end_col <- N + (j - 1) * N
 
     for (i in seq_len(L)){
+        if (is.null(jump_mat_nodes)) {
+            mat_tmp = Idem_Matrix
+        } else {
+            mat_tmp = jump_mat_nodes[[i]]
+        }
         for (j in seq_len(L)){
             if (j != i){
 
                 SupraAdjacencyMatrix[(Position_ini_row[i]:Position_end_row[i]),
-                                     (Position_ini_col[j]:Position_end_col[j])] <- delta * cond_jump[i,j] *
-                                                        ifelse(is.null(jump_mat_nodes), Idem_Matrix, jump_mat_nodes[[i]])
+                                     (Position_ini_col[j]:Position_end_col[j])] <- delta * cond_jump[i,j] * mat_tmp
             }
         }
     }

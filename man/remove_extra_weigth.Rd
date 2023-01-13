@@ -2,7 +2,7 @@
 % Please edit documentation in R/remove_extra_weigth.R
 \name{remove_extra_weigth}
 \alias{remove_extra_weigth}
-\title{Create jump matrix}
+\title{Remove extra weigth}
 \usage{
 remove_extra_weigth(network, weight_remv = NULL)
 }
@@ -15,5 +15,5 @@ remove_extra_weigth(network, weight_remv = NULL)
 network with weigths strictly less than weight_remv
 }
 \description{
-Create jump matrix
+Remove extra weigth
 }

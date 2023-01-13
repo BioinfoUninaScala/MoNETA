@@ -29,9 +29,9 @@ gen_sim_mat_M(
 
 \item{cond_jump}{cond_jump}
 
-\item{jump_neighborhood}{A boolean, if true, the nodes between omics will be connected if they are the same, if false, the nodes will be connected with itself and its neighborhood but in the other omics}
+\item{jump_neighborhood}{A boolean, if false, the nodes between omics will be connected if they are the same, if true, the nodes will be connected with itself and its neighborhood but in the other omics}
 
-\item{weighted_multiplex}{A boolean, if true, the edge between omics will be weighted}
+\item{weighted_multiplex}{A boolean, if true, the edge between omics will be weighted. It is considered only if jump_neighborhood is true}
 
 \item{cores}{Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed}
 }
