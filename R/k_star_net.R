@@ -24,6 +24,7 @@ k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_
 
     index <- BiocNeighbors::buildIndex(t(matrix), BNPARAM = BiocNeighbors::VptreeParam(distance=distFun))
 
+
     if (cores > 1) {
         doMC::registerDoMC(cores)
         knns <- BiocNeighbors::queryKNN(BNINDEX = index, query = t(matrix), k = knn + 1,
