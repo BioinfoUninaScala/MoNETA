@@ -11,7 +11,7 @@
 #' @importFrom BiocNeighbors buildIndex queryKNN VptreeParam KmknnParam
 #' @importFrom foreach registerDoSEQ %dopar%
 #' @param matrix A numeric Matrix representing a particular omics, rows are genes and columns are samples
-#' @param distFun A string that represents a distance function, two possible choices: "Binary", "Euclidean" and "Jaccard"
+#' @param distFun A string that represents a distance function, example: "Euclidean", "Manhattan", "Cosine"
 #' @param sparsity A positive real
 #' @param knn An integer, it is the number of neighbors to be considered
 #' @param k_star A boolean that specifies if k_star must be performed
@@ -21,58 +21,33 @@
 #' @export
 
 k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_star = TRUE, cores = 1, MAX_ASSOC = Inf) {
-    if (distFun == "Euclidean") {
-        index <- BiocNeighbors::buildIndex(t(matrix), BNPARAM = BiocNeighbors::VptreeParam(distance=distFun))
 
-        if (cores > 1) {
-            doMC::registerDoMC(cores)
-            knns <- BiocNeighbors::queryKNN(BNINDEX = index, query = t(matrix), k = knn + 1,
-                                            BPPARAM = BiocParallel::MulticoreParam(cores))
-        } else {
-            foreach::registerDoSEQ()
-            knns <- BiocNeighbors::queryKNN(BNINDEX = index, query = t(matrix), k = knn + 1)
-        }
+    index <- BiocNeighbors::buildIndex(t(matrix), BNPARAM = BiocNeighbors::VptreeParam(distance=distFun))
 
-        knn_elems <- foreach::foreach(i=1:dim(knns$index)[1], .export = c("search_k_star_nn")) %dopar% {
-            ids = index@NAMES[knns$index[i,-which(knns$index[i,] == i)]]
-            id = index@NAMES[knns$index[i,which(knns$index[i,] == i)]]
-            delta = knns$distance[i,-which(knns$index[i,] == i)]
-
-            if (k_star)
-                search_k_star_nn(id = id, ids = ids, delta = delta, sparsity = sparsity)
-            else
-                tibble::tibble(source = id, dest = ids, weight = delta)
-
-        }
-
-
-        if (cores > 1) {
-            foreach::registerDoSEQ()
-        }
-    } else if (distFun == "Binary") {
-
-        distFun_bin <- function(x, y){
-            as.numeric(dist(rbind(x, y), method = "binary"))
-        }
-
-        my_vp <- build_Vptreefrom_mat(matrix, distFun_bin)
-
-        knn_elems <- matrix %>% purrr::array_branch(2) %>% list(as.list(names(.)), . ) %>%
-            pmap_df(get_neigh, vp_t = my_vp, k = knn + 1, distFun = distFun_bin, sparsity = sparsity)
-    } else if (distFun == "Jaccard") {
-
-        distFun_jacc <- function(x, y){
-            as.numeric(1 - (sum(x & y)/sum(x | y)))
-        }
-
-        my_vp <- build_Vptreefrom_mat(matrix, distFun_jacc)
-
-
-        knn_elems <- matrix %>% purrr::array_branch(2) %>% list(as.list(names(.)), . ) %>%
-            pmap_df(get_neigh, vp_t = my_vp, k = knn + 1, distFun = distFun_jacc, sparsity = sparsity)
-
+    if (cores > 1) {
+        doMC::registerDoMC(cores)
+        knns <- BiocNeighbors::queryKNN(BNINDEX = index, query = t(matrix), k = knn + 1,
+                                        BPPARAM = BiocParallel::MulticoreParam(cores))
     } else {
-        stop("Distance function not available")
+        foreach::registerDoSEQ()
+        knns <- BiocNeighbors::queryKNN(BNINDEX = index, query = t(matrix), k = knn + 1)
+    }
+
+    knn_elems <- foreach::foreach(i=1:dim(knns$index)[1], .export = c("search_k_star_nn")) %dopar% {
+        ids = index@NAMES[knns$index[i,-which(knns$index[i,] == i)]]
+        id = index@NAMES[knns$index[i,which(knns$index[i,] == i)]]
+        delta = knns$distance[i,-which(knns$index[i,] == i)]
+
+        if (k_star)
+            search_k_star_nn(id = id, ids = ids, delta = delta, sparsity = sparsity)
+        else
+            tibble::tibble(source = id, dest = ids, weight = delta)
+
+    }
+
+
+    if (cores > 1) {
+        foreach::registerDoSEQ()
     }
 
 
