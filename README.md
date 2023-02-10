@@ -104,11 +104,8 @@ It is possible to choose different kind of dimensionality reduction algorithm.
 
 * `plot_umap` : plot the similarity matrix, reducing the dimensionality in a two-dimensional space
 
-* `plot_umap_db` : plot the similarity matrix, reducing the dimensionality in a two-dimensional space, and appliyng DBSCAN clustering algorithm
-
 * `plot_parallel_umap` : parallelized version of `plot_umap` 
 
-* `plot_parallel_umap_db` : parallelized version of `plot_parallel_umap_db` 
 
 
 

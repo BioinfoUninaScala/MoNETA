@@ -7,16 +7,15 @@
 #' Publication:     https://arxiv.org/abs/2008.10085
 #'
 #' @import doFuture
-#' @import igraph
-#' @import mclust
 #' @import Matrix
-#' @import kernlab
+#' @importFrom kernlab buffer
 #' @import R.matlab
 #' @import bc3net
 #' @import optparse
 #' @import parallel
 #' @import tidyverse
 #' @import doParallel
+#' @importFrom igraph V is.igraph add_vertices
 #' @importFrom doMC registerDoMC
 #' @importFrom foreach registerDoSEQ %dopar%
 #' @param network a network

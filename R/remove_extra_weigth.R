@@ -5,10 +5,12 @@
 #' @return network with weigths strictly less than weight_remv
 #' @export
 
-remove_extra_weigth <- function(network, weight_remv = NULL){
+remove_extra_weigth <- function(network, weight_remv = NULL) {
+
     if (is.null(weight_remv)) {
-        weight_remv <- max(network[, 3])
+        weight_remv <- max(network[, "weight"])
     }
 
-    network[network[, 3] < weigth_remv,]
+    network[network[, "weight"] < weight_remv,]
+
 }

@@ -1,6 +1,6 @@
 #' Compute an embedding of the multi-omics matrix using uwot umap
 #'
-#' @importFrom uwot umap
+#' @importFrom uwot tumap
 #' @param matrix A squared numeric matrix with values in the range 0-1, with samples on columns
 #' @param embedding_size Size of the output embedding
 #' @param n_neighbors The size of local neighborhood. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. In general values should be in the range 2 to 100

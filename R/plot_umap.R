@@ -1,9 +1,8 @@
 #' Plot umap
 #'
-#' @import igraph
+#' @importFrom igraph V
 #' @import visNetwork
 #' @import tidyverse
-#' @import network
 #' @import RColorBrewer
 #' @import FNN
 #' @import ggrepel
@@ -11,11 +10,11 @@
 #' @import ggfortify
 #' @import survival
 #' @import survminer
-#' @import plotly
-#' @import umap
+#' @importFrom plotly orca
 #' @import dplyr
 #' @import tibble
-#' @import ggplot2
+#' @importFrom ggplot2 aes ggplot geom_point theme_bw labs theme
+#' @importFrom umap umap.knn
 #' @param matrix A Matrix with samples on columns that has to be plotted
 #' @param nodes_anno Annotation DataFrame with all the information for each sample
 #' @param id_name String for identification of sample in nodes_anno
@@ -39,13 +38,16 @@ plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_s
         nodes_anno <- nodes_anno %>% select(id_name)
         colnames(nodes_anno) <- "id"
         umap_coord <- umap::umap(d = matrix)
-        gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id") %>%
+        gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id", .name_repair = 'unique')
+        colnames(gPlot_umap_data) = c("id", "V1", "V2")
+        gPlot_umap_data <- gPlot_umap_data %>%
             dplyr::left_join(nodes_anno, by = "id")
 
         if (interactive) {
             gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
                                                               mode = "markers",
-                                                              marker = list(size = 5), text = ~id) %>%
+                                                              marker = list(size = 5), text = ~id,
+                                                              colors = "Set2") %>%
                 plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
                                title = title)
         } else {
@@ -59,13 +61,15 @@ plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_s
         nodes_anno <- nodes_anno %>% dplyr::select(id_name, id_anno_color, id_anno_shape)
         colnames(nodes_anno) <- c("id", "group1", "group2")
         umap_coord <- umap::umap(d = matrix)
-        gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id") %>%
-            dplyr::left_join(nodes_anno, by = "id")
+        gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id", .name_repair = 'unique')
+        colnames(gPlot_umap_data) = c("id", "V1", "V2")
+        gPlot_umap_data = gPlot_umap_data %>% dplyr::left_join(nodes_anno, by = "id")
 
         if (interactive) {
             gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
                                                               color = ~group1, mode = "markers", symbol = ~group2,
-                                                              marker = list(size = 5), text = ~id) %>%
+                                                              marker = list(size = 5), text = ~id,
+                                                              colors = "Set2") %>%
                 plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
                                title = title)
         } else {
@@ -79,13 +83,15 @@ plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_s
         nodes_anno <- nodes_anno %>% dplyr::select(id_name, id_anno_color)
         colnames(nodes_anno) <- c("id", "group1")
         umap_coord <- umap::umap(d = matrix)
-        gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id") %>%
-            dplyr::left_join(nodes_anno, by = "id")
+        gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id", .name_repair = 'unique')
+        colnames(gPlot_umap_data) = c("id", "V1", "V2")
+        gPlot_umap_data = gPlot_umap_data %>% dplyr::left_join(nodes_anno, by = "id")
 
         if (interactive) {
             gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
                                                               color = ~group1, mode = "markers",
-                                                              marker = list(size = 5), text = ~id) %>%
+                                                              marker = list(size = 5), text = ~id,
+                                                              colors = "Set2") %>%
                 plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
                                title = title)
         } else {
@@ -99,13 +105,15 @@ plot_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_s
         nodes_anno <- nodes_anno %>% select(id_name, id_anno_shape)
         colnames(nodes_anno) <- c("id", "group2")
         umap_coord <- umap::umap(d = matrix)
-        gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id") %>%
-            dplyr::left_join(nodes_anno, by = "id")
+        gPlot_umap_data <- umap_coord$layout %>% tibble::as_tibble(rownames = "id", .name_repair = 'unique')
+        colnames(gPlot_umap_data) = c("id", "V1", "V2")
+        gPlot_umap_data = gPlot_umap_data %>% dplyr::left_join(nodes_anno, by = "id")
 
         if (interactive) {
             gPlot_umap <- gPlot_umap_data %>% plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
                                                               symbol = ~group2, mode = "markers",
-                                                              marker = list(size = 5), text = ~id) %>%
+                                                              marker = list(size = 5), text = ~id,
+                                                              colors = "Set2") %>%
                 plotly::layout(xaxis = list(zeroline = F), yaxis = list(zeroline = F),
                                title = title)
         } else {
