@@ -123,22 +123,21 @@ ppca_emb = get_parallel_umap_embedding(RWR_mat, 2, n_neighbors = 15, n_threads =
 
 -   The `plot_net` function is used to plot the network representation
 
-```{r, out.width="100%"}
+```{r}
 
-plot_net(edgeList = net_list$Expr_norm, nodes_anno = anno_df, id_name = "case_id", id_anno_color = "gender", id_anno_shape = "ethnicity_self_identify", html = FALSE, wo_legend = FALSE, title = "EXPR")
+plot_net(net_list$Expr_norm, anno_df, "EXPR")
 
 ```
 
 -   The `plot_umap` and its parallelized version `plot_parallel_umap` functions is used to visualize the results of the UMAP reduction in two dimensions
 
-```{r, out.width="100%"}
+```{r}
 
-plot_umap(matrix = RWR_mat, nodes_anno = anno_df, id_name = "case_id", interactive = TRUE,
-                   id_anno_color = "gender", id_anno_shape = "ethnicity_self_identify", wo_legend = FALSE)
-
+plot_umap(matrix = RWR_mat, nodes_anno = anno_df, id_name = "case_id", interactive = FALSE,
+                   id_anno_color = "gender", id_anno_shape = "ethnicity_self_identify", wo_legend = TRUE)
 
 plot_parallel_umap(RWR_mat, anno_df, "case_id", id_anno_color = "ethnicity_self_identify",
-                   id_anno_shape = "gender", n_threads = 50, interactive = TRUE)
+                   id_anno_shape = "gender", n_threads = 50, interactive = F)
 
 ```
 

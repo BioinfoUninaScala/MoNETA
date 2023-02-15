@@ -4,16 +4,33 @@
 \alias{plot_net}
 \title{Plot network}
 \usage{
-plot_net(edgeList, nodes_anno, title, html = FALSE)
+plot_net(
+  edgeList,
+  nodes_anno,
+  id_name,
+  id_anno_color = NA,
+  id_anno_shape = NA,
+  title = "",
+  html = FALSE,
+  wo_legend = TRUE
+)
 }
 \arguments{
 \item{edgeList}{DataFrame representing a graph}
 
 \item{nodes_anno}{Annotation DataFrame with all the information for each sample}
 
+\item{id_name}{String for identification of sample in nodes_anno}
+
+\item{id_anno_color}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case}
+
+\item{id_anno_shape}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case, it must be associated to a discrete variable}
+
 \item{title}{Title of plot to be displayed}
 
 \item{html}{Boolean, if you want to save the plot in a html file}
+
+\item{wo_legend}{A boolean flag, if TRUE returns the plot without legend}
 }
 \description{
 Plot network

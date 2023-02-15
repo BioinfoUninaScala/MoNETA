@@ -17,7 +17,8 @@ plot_parallel_umap(
   n_threads = NULL,
   n_sgd_threads = 0,
   grain_size = 1,
-  umap_coord = NULL
+  umap_coord = NULL,
+  shapes = NULL
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ plot_parallel_umap(
 \item{grain_size}{Minimum amount of work to do on each thread}
 
 \item{umap_coord}{It represents previously computed umap coordinates, if not present, it will be computed}
+
+\item{shapes}{It is possible to give the shapes list for plotting, id_anno_shape is not NA}
 }
 \value{
 A plot

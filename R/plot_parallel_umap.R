@@ -29,13 +29,14 @@
 #' @param n_sgd_threads Number of thread for stochastic gradient descent, if > 1 it will not be reproducible anyway
 #' @param grain_size Minimum amount of work to do on each thread
 #' @param umap_coord It represents previously computed umap coordinates, if not present, it will be computed
+#' @param shapes It is possible to give the shapes list for plotting, id_anno_shape is not NA
 #' @return A plot
 #' @export
 
 plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, id_anno_shape = NA,
                                interactive = TRUE, wo_legend = FALSE, title = "",
                                n_neighbors = 15, n_threads = NULL, n_sgd_threads = 0, grain_size = 1,
-                               umap_coord = NULL) {
+                               umap_coord = NULL, shapes = NULL) {
     matrix = as.data.frame(matrix)
     cols = colnames(matrix)
     matrix <- t(matrix)
@@ -45,16 +46,16 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
                                                    base::rownames(matrix))
 
     if (is.na(id_anno_color) & is.na(id_anno_shape)) {
-        nodes_anno <- nodes_anno %>% select(id_name)
+        nodes_anno <- nodes_anno %>% dplyr::select(dplyr::all_of(id_name))
         colnames(nodes_anno) <- "id"
     } else if (!is.na(id_anno_color) & !is.na(id_anno_shape)) {
-        nodes_anno <- nodes_anno %>% dplyr::select(id_name, id_anno_color, id_anno_shape)
+        nodes_anno <- nodes_anno %>% dplyr::select(dplyr::all_of( c(id_name, id_anno_color, id_anno_shape) ))
         colnames(nodes_anno) <- c("id", "group1", "group2")
     } else if (!is.na(id_anno_color)) {
-        nodes_anno <- nodes_anno %>% dplyr::select(id_name, id_anno_color)
+        nodes_anno <- nodes_anno %>% dplyr::select(dplyr::all_of( c(id_name, id_anno_color) ))
         colnames(nodes_anno) <- c("id", "group1")
     } else if (!is.na(id_anno_shape)) {
-        nodes_anno <- nodes_anno %>% select(id_name, id_anno_shape)
+        nodes_anno <- nodes_anno %>% dplyr::select(dplyr::all_of( c(id_name, id_anno_shape) ))
         colnames(nodes_anno) <- c("id", "group2")
     }
 
@@ -65,28 +66,50 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
         rownames(umap_coord) = cols
     } else {
         umap_coord <- t(umap_coord)
-        colnames(umap_coord) <- c("V1","V2")
     }
 
+    colnames(umap_coord) <- c("V1","V2")
 
 
 
-    gPlot_umap_data <- umap_coord %>% tibble::as_tibble(rownames = "id") %>%
+    gPlot_umap_data <- umap_coord %>% tibble::as_tibble(rownames = "id", .name_repair = 'unique') %>%
         dplyr::left_join(nodes_anno, by = "id")
 
     if (!is.na(id_anno_shape)) {
-        vals <- plotly::schema(F)$traces$scatter$attributes$marker$symbol$values
-        vals <- grep("-", vals, value = T)
-        vals = vals[!(stringr::str_ends(vals, "down") | stringr::str_ends(vals, "up") |
-                          stringr::str_ends(vals, "left") | stringr::str_ends(vals, "right") |
-                          stringr::str_ends(vals, "open") | stringr::str_ends(vals, "up"))]
+        if (is.null(shapes)) {
+            vals <- plotly::schema(F)$traces$scatter$attributes$marker$symbol$values
+            vals <- grep("[a-z]", vals, value = T)
 
-        gPlot_umap_data = gPlot_umap_data %>% dplyr::group_by(group1) %>%
-            dplyr::summarise(id = id,
-                             group1 = group1,
-                             g = match(group2, sort(unique(group2))),
-                             group2 = group2,
-                             V1 = V1, V2 = V2, .groups = "drop")
+            split_pos <- grep("-open-dot", vals)
+            opendot = vals[split_pos]
+            vals = vals[-split_pos]
+
+            split_pos <- grep("-dot", vals)
+            dot = vals[split_pos]
+            vals = vals[-split_pos]
+
+            split_pos <- grep("-open", vals)
+            open = vals[split_pos]
+            vals = vals[-split_pos]
+
+            px = which(vals == "x")
+            psq = which(vals == "square")
+
+            vals[px] = "square"
+            vals[psq] = "x"
+
+            vals = c(vals, opendot, dot, open)
+
+            vals = vals[!(stringr::str_ends(vals, "down") | stringr::str_ends(vals, "up") |
+                              stringr::str_ends(vals, "left") | stringr::str_ends(vals, "right") |
+                              stringr::str_ends(vals, "open") | stringr::str_ends(vals, "up") |
+                              stringr::str_ends(vals, "ne") | stringr::str_ends(vals, "se") |
+                              stringr::str_ends(vals, "sw") | stringr::str_ends(vals, "nw") )]
+        } else {
+            vals = shapes
+        }
+
+
     }
 
 
@@ -108,7 +131,7 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
         if (interactive) {
             gPlot_umap <- gPlot_umap_data %>%
                 plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
-                                color = ~group1, mode = "markers", symbol = ~g,
+                                color = ~group1, mode = "markers", symbol = ~group2,
                                 symbols = vals,
                                 marker = list(size = 5), text = ~id,
                                 name = paste0(gPlot_umap_data$group1, "\n", gPlot_umap_data$group2),
@@ -139,7 +162,7 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
         if (interactive) {
             gPlot_umap <- gPlot_umap_data %>%
                 plotly::plot_ly(x = ~V1, y = ~V2, type = "scatter",
-                                mode = "markers", symbol = ~g,
+                                mode = "markers", symbol = ~group2,
                                 symbols = vals,
                                 marker = list(size = 5), text = ~id,
                                 name = paste0(gPlot_umap_data$group2),
@@ -151,9 +174,6 @@ plot_parallel_umap <- function(matrix, nodes_anno, id_name, id_anno_color = NA, 
                 geom_point(color = "blue", aes(shape = group2))  +
                 theme_bw() +
                 labs(title = title)
-            if (scale_type(gPlot_umap_data$group2) $ length(unique(gPlot_umap_data$group2)) > 10 ) {
-                gPlot_umap <- gPlot_umap + theme(legend.position = "none")
-            }
         }
     }
 

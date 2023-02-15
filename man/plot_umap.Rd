@@ -12,7 +12,9 @@ plot_umap(
   id_anno_shape = NA,
   interactive = TRUE,
   wo_legend = FALSE,
-  title = ""
+  title = "",
+  umap_coord = NULL,
+  shapes = NULL
 )
 }
 \arguments{
@@ -31,6 +33,10 @@ plot_umap(
 \item{wo_legend}{A boolean flag, if TRUE returns the plot without legend}
 
 \item{title}{Title of the plot}
+
+\item{umap_coord}{It represents previously computed umap coordinates, if not present, it will be computed}
+
+\item{shapes}{It is possible to give the shapes list for plotting, id_anno_shape is not NA}
 }
 \value{
 A plot
