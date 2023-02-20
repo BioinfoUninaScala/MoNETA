@@ -14,10 +14,11 @@
 #' @param title Title of plot to be displayed
 #' @param html Boolean, if you want to save the plot in a html file
 #' @param wo_legend A boolean flag, if TRUE returns the plot without legend
+#' @param interactive A boolean flag, if TRUE returns an interactive plot
 #' @export
 
 
-plot_net <- function (edgeList, nodes_anno, id_name, id_anno_color = NA, id_anno_shape = NA, title = "", html = FALSE, wo_legend = TRUE)
+plot_net <- function (edgeList, nodes_anno, id_name, id_anno_color = NA, id_anno_shape = NA, title = "", html = FALSE, wo_legend = TRUE, interactive = TRUE)
 {
     base::colnames(edgeList)[1:2] <- c("from", "to")
     graph <- igraph::graph_from_data_frame(edgeList, directed = FALSE)
@@ -67,6 +68,11 @@ plot_net <- function (edgeList, nodes_anno, id_name, id_anno_color = NA, id_anno
     }
     if(!wo_legend) {
         p = p %>% visNetwork::visLegend(useGroups = FALSE, addNodes = lnodes)
+    }
+
+    if (!interactive) {
+        p = p %>%
+            visInteraction(dragNodes = FALSE, dragView = FALSE, zoomView = FALSE)
     }
 
     if(html) {

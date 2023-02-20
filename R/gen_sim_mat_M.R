@@ -22,7 +22,7 @@
 #' @param tau tau
 #' @param restart A real in the range of 0-1, it is the probability to restart the algorithm in the starting point
 #' @param delta delta
-#' @param cond_jump cond_jump
+#' @param layer_transition cond_jump
 #' @param jump_neighborhood A boolean, if false, the nodes between omics will be connected if they are the same, if true, the nodes will be connected with itself and its neighborhood but in the other omics
 #' @param weighted_multiplex A boolean, if true, the edge between omics will be weighted. It is considered only if jump_neighborhood is true
 #' @param cores Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed
@@ -31,9 +31,10 @@
 
 #source("Functions_RWRM.R")
 
-gen_sim_mat_M <- function(network, tau = NA, restart = 0.7, delta = 0.5, cond_jump = NULL,
+gen_sim_mat_M <- function(network, tau = NA, restart = 0.7, delta = 0.5, layer_transition = NULL,
                           jump_neighborhood = FALSE, weighted_multiplex = FALSE, cores = 1){
 
+    cond_jump = layer_transition
     InputNetwork <- network
 
     if (ncol(InputNetwork) != 4){

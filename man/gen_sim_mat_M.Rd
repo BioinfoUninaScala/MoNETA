@@ -12,7 +12,7 @@ gen_sim_mat_M(
   tau = NA,
   restart = 0.7,
   delta = 0.5,
-  cond_jump = NULL,
+  layer_transition = NULL,
   jump_neighborhood = FALSE,
   weighted_multiplex = FALSE,
   cores = 1
@@ -27,7 +27,7 @@ gen_sim_mat_M(
 
 \item{delta}{delta}
 
-\item{cond_jump}{cond_jump}
+\item{layer_transition}{cond_jump}
 
 \item{jump_neighborhood}{A boolean, if false, the nodes between omics will be connected if they are the same, if true, the nodes will be connected with itself and its neighborhood but in the other omics}
 

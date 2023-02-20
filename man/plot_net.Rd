@@ -12,7 +12,8 @@ plot_net(
   id_anno_shape = NA,
   title = "",
   html = FALSE,
-  wo_legend = TRUE
+  wo_legend = TRUE,
+  interactive = TRUE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ plot_net(
 \item{html}{Boolean, if you want to save the plot in a html file}
 
 \item{wo_legend}{A boolean flag, if TRUE returns the plot without legend}
+
+\item{interactive}{A boolean flag, if TRUE returns an interactive plot}
 }
 \description{
 Plot network
