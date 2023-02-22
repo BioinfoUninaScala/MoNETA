@@ -31,7 +31,7 @@ install_github("BioinfoUninaScala/MoNETA",
 * `normalize_omics`
 * `get_intersection_matrices`
 * `remove_zeros_cols`
-* `remove_extra_weigth`
+* `remove_extra_weigth2`
 
 * `k_star_net`
 * `create_multiplex`
