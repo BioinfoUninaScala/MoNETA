@@ -7,6 +7,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
 # MoNETA: MultiOmics Network Embedding for SubType Analysis
 
 Patient stratification is a critical step in the field of oncology that helps healthcare professionals categorize patients based on specific features related to their cancer. With the advent of advanced technologies in genomics, transcriptomics, proteomics, and other omics fields, it has become increasingly possible to gather multi-omics data from cancer patients, which can provide a comprehensive understanding of the molecular characteristics of the disease.

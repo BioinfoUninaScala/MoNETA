@@ -31,11 +31,11 @@ install_github("BioinfoUninaScala/MoNETA",
 * `normalize_omics`
 * `get_intersection_matrices`
 * `remove_zeros_cols`
-* `remove_extra_weigth2`
+* `prune_multiplex_network`
 
 * `k_star_net`
 * `create_multiplex`
-* `create_jump_matrix`
+* `create_layer_transition_matrix`
 * `gen_sim_mat_M`
 
 * `get_embedding`
@@ -44,10 +44,7 @@ install_github("BioinfoUninaScala/MoNETA",
 * `get_parallel_umap_embedding`
 
 * `plot_net`
-* `plot_parallel_umap`
-* `plot_parallel_umap_db`
-* `plot_umap`
-* `plot_umap_db`
+* `plot_2D_matrix`
 
 ### Workflow 
 
@@ -64,21 +61,21 @@ Input data consist of the matrices with samples on columns
 
 * `remove_zeros_cols` : cleans a Matrix removing the columns with all zeros
 
-* `remove_extra_weigth` : returns network with weigths strictly less than a given threshold
+* `prune_multiplex_network` : returns network with weigths strictly less than a given threshold
 
 
 
 **2. Generation of similarity matrix using multi-omics data**
 
 First apply `k_star_net` function to each omics data. 
-After with `create_multiplex` and `create_jump_matrix` the networks will be combined. 
+After with `create_multiplex` and `create_layer_transition_matrix` the networks will be combined. 
 Finally use `gen_sim_mat_M` to generate the similarity matrix that describes the multi-omics integration.
 
 * `k_star_net` : applies [K\*nn greedy algorithm](https://papers.nips.cc/paper/2016/file/2c6ae45a3e88aee548c0714fad7f8269-Paper.pdf) to dynamically find nearest neighbors for each node 
 
 * `create_multiplex` : creates a multiplex, which corresponds to a DataFrame that comprises different omics with these information: EdgeType, source, target, weight
 
-* `create_jump_matrix` : creates jump matrix containing the probabilities to switch from one omics to another
+* `create_layer_transition_matrix` : creates jump matrix containing the probabilities to switch from one omics to another
 
 * `gen_sim_mat_M` : generates similarity matrix using a random walker with restart
 
@@ -102,9 +99,7 @@ It is possible to choose different kind of dimensionality reduction algorithm.
 
 * `plot_net` : plot the networks created by `k_star_net`
 
-* `plot_umap` : plot the similarity matrix, reducing the dimensionality in a two-dimensional space
-
-* `plot_parallel_umap` : parallelized version of `plot_umap` 
+* `plot_2D_matrix` : plot the a 2D matrix with two rows representing the coordinates
 
 
 
