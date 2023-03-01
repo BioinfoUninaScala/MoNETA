@@ -16,7 +16,7 @@ Imports: purrr, dplyr, stats, magrittr, doFuture, foreach, doParallel,
         ggrepel, fpc, ggfortify, survival, survminer, plotly, umap,
         R.matlab, bc3net, kernlab, optparse, tibble, methods,
         doMC, ggplot2,
-        Rcpp, uwot
+        Rcpp, uwot, Rtsne
 Suggests: 
     rmarkdown,
     knitr

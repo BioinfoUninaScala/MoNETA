@@ -203,10 +203,15 @@ print(RWR_mat[1:5,1:5])
 
 The similarity matrix generated in step 2 is then used for dimensionality reduction. In this section, we use four different algorithms to reduce the dimensionality of the similarity matrix:
 
--   `get_embedding`: This function uses the [MultiVERSE](https://arxiv.org/abs/2008.10085) algorithm for multiplex and multiplex-heterogeneous network embedding. MultiVERSE is an algorithm that helps in preserving the graph structure in lower dimensional space;
+-   `get_embedding`: This function uses the [MultiVERSE](https://arxiv.org/abs/2008.10085) algorithm for multiplex and multiplex-heterogeneous network embedding. MultiVERSE is an algorithm that helps in preserving the graph structure in lower dimensional space
     -   `embedding_size`: size of the output embedding;
     -   `num_steps`: number of total epoches;
     -   `cores`: number of threads for parallelization;
+-   `get_tsne_embedding`: This function uses the t-SNE (t-distributed stochastic neighbor embedding) embedding to perform dimensionality reduction
+    -   `embedding_size`: size of the output embedding;
+    -   `perplexity`: perplexity parameter;
+    -   `max_iter`: number of total iteration;
+    -   `num_threads`: number of threads for parallelization;
 -   `get_umap_embedding`: This function uses the UMAP (Uniform Manifold Approximation and Projection) algorithm to perform dimensionality reduction
     -   `embedding_size`: size of the output embedding;
 -   `get_parallel_umap_embedding`: This function uses the parallelized version of umap from the uwot package to perform dimensionality reduction
@@ -221,6 +226,8 @@ The similarity matrix generated in step 2 is then used for dimensionality reduct
 
 
 ```{r embedding}
+
+tsne_emb = get_tsne_embedding(RWR_mat, 2, 70, 20000, 50)
 
 multiverse_emb       = get_embedding(RWR_mat, 64, num_steps = 10 ^ 5, cores = 50)
 
@@ -286,11 +293,10 @@ Moreover, our tool can effectively distinguish between macro classes identified 
 
 ```{r plot-2d-matrix, fig.width = 7, fig.height = 4}
 
-multiverse_pca_emb   = get_pca_embedding(multiverse_emb, 2)
 
-plot_2D_matrix(coord = multiverse_pca_emb, nodes_anno = pdata, id_name = "Case", interactive = FALSE,
+plot_2D_matrix(coord = tsne_emb, nodes_anno = pdata, id_name = "Case", interactive = FALSE,
                    id_anno_color = "Supervised.DNA.Methylation.Cluster", id_anno_shape = "IDH.status",
-                   wo_legend = FALSE, title = "Embedding MultiVERSE with first two PC")
+                   wo_legend = FALSE, title = "t-SNE embedding")
 
 ```
 
