@@ -1,8 +1,8 @@
 ---
-title: "demo"
+title: "MoNETA"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{demo}
+  %\VignetteIndexEntry{MoNETA}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
