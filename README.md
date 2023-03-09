@@ -40,6 +40,7 @@ install_github("BioinfoUninaScala/MoNETA",
 
 * `get_embedding`
 * `get_pca_embedding`
+* `get_tsne_embedding`
 * `get_umap_embedding`
 * `get_parallel_umap_embedding`
 
@@ -88,6 +89,8 @@ It is possible to choose different kind of dimensionality reduction algorithm.
 * `get_embedding` : computes an embedding of the similarity matrix with [MultiVERSE algorithm](https://github.com/Lpiol/MultiVERSE) described by [Léo Pio-Lopez, et al.](https://arxiv.org/abs/2008.10085)
 
 * `get_pca_embedding` : computes an embedding of the similarity matrix using Principal Component Analysis (PCA)
+
+* `get_tsne_embedding` : computes an embedding of the similarity matrix using t-distributed stochastic neighbor embedding (t-SNE)
 
 * `get_umap_embedding` : computes an embedding of the similarity matrix using Uniform Manifold Approximation and Projection for Dimension Reduction (UMAP)
 
