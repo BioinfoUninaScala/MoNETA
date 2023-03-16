@@ -8,7 +8,7 @@ vignette: >
 ---
 
 
-# MoNETA: MultiOmics Network Embedding for SubType Analysis
+# MultiOmics Network Embedding for SubType Analysis
 
 Patient stratification is a critical step in the field of oncology that helps healthcare professionals categorize patients based on specific features related to their cancer. With the advent of advanced technologies in genomics, transcriptomics, proteomics, and other omics fields, it has become increasingly possible to gather multi-omics data from cancer patients, which can provide a comprehensive understanding of the molecular characteristics of the disease.
 
@@ -26,7 +26,7 @@ devtools::install_github("BioinfoUninaScala/MoNETA")
 
 # Workflow
 
-Here we describe the workflow of the data integration using MoNETA. We present an example of its usage, performing patient stratification in the context of glioblastoma multiforme (GBM), a highly aggressive and lethal brain tumor. The GBM multi-omics dataset used in this package consists of CNV, mutations, methylation, and expression data for 788 patients, with 24776, 101, 12985 genes for CNV, mutations and expression respectively, and 1300 cg bases for methylation. This dataset is publicly available on a
+Here we describe the workflow of the data integration using MoNETA. We present an example of its usage, performing patient stratification in the context of glioblastoma multiforme (GBM), a highly aggressive and lethal brain tumor. The GBM multi-omics dataset used in this package consists of CNV, methylation, and expression data for 788 patients, with 24776 and 12985 genes for CNV and expression respectively, and 1300 cg bases for methylation. This dataset is publicly available on a
 [The Cancer Genome Atlas (TCGA)](https://www.cancer.gov/tcga) and was analyzed in a previous study ([Ceccarelli et al.](https://www.cell.com/cell/fulltext/S0092-8674(15)01692-X?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS009286741501692X%3Fshowall%3Dtrue)).
 
 
@@ -44,8 +44,9 @@ Input data consist of omics matrices with samples on columns and features on row
 
 library(MoNETA)
 
-pdata <- readRDS("pdata.RDS")
-GBM_mtx <- readRDS("GBM_mtx.RDS")
+data(pdata)
+data(GBM_mtx)
+
 
 ```
 
@@ -53,8 +54,7 @@ GBM_mtx <- readRDS("GBM_mtx.RDS")
 message("Multi-omic \t # of patients \t # of features",
         "\nCNV\t\t\t\t", ncol(GBM_mtx$GliomaCNV_norm), "\t\t\t\t", nrow(GBM_mtx$GliomaCNV_norm),
         "\nMethylation\t\t", ncol(GBM_mtx$GliomaMethylation_norm), "\t\t\t\t", nrow(GBM_mtx$GliomaMethylation_norm),
-        "\nExpression\t\t", ncol(GBM_mtx$GliomaExpression_norm), "\t\t\t\t", nrow(GBM_mtx$GliomaExpression_norm),
-        "\nMutation\t\t\t", ncol(GBM_mtx$GliomaMUT_norm), "\t\t\t\t", nrow(GBM_mtx$GliomaMUT_norm))
+        "\nExpression\t\t", ncol(GBM_mtx$GliomaExpression_norm), "\t\t\t\t", nrow(GBM_mtx$GliomaExpression_norm))
 ```
 
 This is how the data should look like:
@@ -77,28 +77,6 @@ GBM_mtx$GliomaMethylation_norm <- normalize_omics(GBM_mtx$GliomaMethylation_norm
 
 ```
 
-```{r preprocessing2}
-
-GBM_mtx$GliomaMUT_norm = remove_zeros_cols(GBM_mtx$GliomaMUT_norm)
-
-```
-
-```{r preprocessing3}
-
-GBM_mtx <- get_intersection_matrices(GBM_mtx)
-
-```
-
-After preprocessing, the resulting matrices contain 775 samples, which is less than the original number of samples (788). Additionally, the matrices have been normalized.
-
-```{r dim-data2}
-message("Multi-omic \t # of patients \t # of features",
-        "\nCNV\t\t\t\t", ncol(GBM_mtx$GliomaCNV_norm), "\t\t\t\t", nrow(GBM_mtx$GliomaCNV_norm),
-        "\nMethylation\t\t", ncol(GBM_mtx$GliomaMethylation_norm), "\t\t\t\t", nrow(GBM_mtx$GliomaMethylation_norm),
-        "\nExpression\t\t", ncol(GBM_mtx$GliomaExpression_norm), "\t\t\t\t", nrow(GBM_mtx$GliomaExpression_norm),
-        "\nMutation\t\t\t", ncol(GBM_mtx$GliomaMUT_norm), "\t\t\t\t", nrow(GBM_mtx$GliomaMUT_norm))
-```
-
 ## 2. Generation of similarity matrix using multi-omics data
 
 The `k_star_net` function generates a weighted adjacency list based on the k-nearest neighbors (knn) algorithm, using the vp tree (Vantage Point tree) data structure. This list represents the network for each omics with most similar patient connected. The parameters are:
@@ -119,10 +97,7 @@ net_list <- list(CNV_norm = k_star_net(matrix = GBM_mtx$GliomaCNV_norm,
                                         distFun = "Euclidean", cores = 50),
                  Expr_norm = k_star_net(matrix = GBM_mtx$GliomaExpression_norm,
                                         sparsity = .7,
-                                        distFun = "Euclidean", cores = 50),
-                 MUT_norm = k_star_net(matrix = GBM_mtx$GliomaMUT_norm,
-                                       sparsity = .1,
-                                       distFun = "Manhattan", knn = 10, cores = 50)
+                                        distFun = "Euclidean", cores = 50)
 )
 
 ```
@@ -271,17 +246,17 @@ Both function share the following arguments:
 
 ```{r plot-net, out.width="100%"}
 
-plot_net(edgeList = net_list$MUT_norm, nodes_anno = pdata,
+plot_net(edgeList = net_list$METH_norm, nodes_anno = pdata,
          interactive = FALSE, id_name = "Case",
          id_anno_color = "Supervised.DNA.Methylation.Cluster",
-         id_anno_shape = "IDH.status", html = FALSE, wo_legend = FALSE, title = "MUT_norm")
+         id_anno_shape = "IDH.status", html = FALSE, wo_legend = FALSE, title = "METH_norm")
 
 ```
 
 
-In our particular scenario, one could leverage the `plot_net` function to visualize the mutation omics network and explore the IDH status (wild type versus mutated) by setting the node shapes accordingly. Notably, the IDH status divides the network into two distinct sub-networks.
+In our particular scenario, one could leverage the `plot_net` function to visualize the methylation omics network and explore the IDH status (wild type versus mutated) by setting the node shapes accordingly. Notably, the IDH status divides the network into two distinct sub-networks.
 
-Moreover, our tool can effectively distinguish between macro classes identified by [Ceccarelli et al.](https://www.cell.com/cell/fulltext/S0092-8674(15)01692-X?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS009286741501692X%3Fshowall%3Dtrue), which investigated the impact of methylation status on GBM, solely based on mutation information.
+Moreover, our tool can effectively distinguish between macro classes identified by [Ceccarelli et al.](https://www.cell.com/cell/fulltext/S0092-8674(15)01692-X?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS009286741501692X%3Fshowall%3Dtrue), which investigated the impact of methylation status on GBM.
 
 
 
