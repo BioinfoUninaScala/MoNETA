@@ -1,5 +1,5 @@
 <p align="right">
- <img src="https://github.com/BioinfoUninaScala/MoNETA/blob/main/Moneta%20-%20icon.jpg" width="250" alt="EpiStatProfiler Logo">
+ <img src="https://github.com/BioinfoUninaScala/MoNETA/blob/main/Moneta%20-%20icon.jpg" width="250" alt="MoNETA Logo">
 </p>
 
 ## MoNETA
@@ -25,6 +25,9 @@ install_github("BioinfoUninaScala/MoNETA",
 ----------
 
 ### Usage 
+
+We provide an example of the workflow for our project. To access it, follow the link : [MoNETA use case](https://bioinfouninascala.github.io/MoNETA/inst/doc/MoNETA_use_case.html).
+
 
 #### Main functions
 
