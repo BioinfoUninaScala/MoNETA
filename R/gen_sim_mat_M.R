@@ -122,7 +122,7 @@ gen_sim_mat_M <- function(network, tau = NA, restart = 0.7, delta = 0.5, layer_t
             mo = MultiplexObject[[mo_name]]
 
 
-            adjacency = as_adjacency_matrix(mo, attr = attr, sparse = T)
+            adjacency = igraph::as_adjacency_matrix(mo, attr = attr, sparse = T)
 
             rsum = rowSums(adjacency)
             rsum[rsum == 0] = 1
