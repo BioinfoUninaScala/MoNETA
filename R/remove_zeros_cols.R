@@ -1,7 +1,7 @@
-#' This function clean a Matrix removing the columns with all zeros
+#' Remove zero columns from a matrix
 #'
-#' @param matrix A Matrix
-#' @return A Matrix of the same type of mtx without columns with all zeros
+#' @param matrix a numeric matrix
+#' @return a matrix of the same type of \emph{matrix} with columns containing all zero removed
 #' @export
 
 

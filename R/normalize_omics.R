@@ -1,7 +1,7 @@
-#' normalize_omics takes in input a Matrix that has to be centered and scaled along the columns
+#' Center and scale an omic matrix along its columns
 #'
-#' @param matrix A numeric Matrix representing a particular omics, rows are genes and columns are samples
-#' @return An object of the same type as mtx. The matrix mtx is normalize along the columns
+#' @param matrix a numeric matrix representing a particular omics, features are on rows and samples are on columns
+#' @return a matrix center and scaled along its columns
 #' @export
 
 normalize_omics <- function(matrix) {

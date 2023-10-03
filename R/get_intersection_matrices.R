@@ -1,6 +1,7 @@
 #' Get intersection between cancer matrices
 #'
-#' @param omics_list a list of omics
+#' @param omics_list a list of matrices with observations on columns
+#' @return a list of matrices sharing the same column ids
 #' @export
 
 get_intersection_matrices <- function(omics_list) {

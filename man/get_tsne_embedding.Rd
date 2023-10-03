@@ -2,24 +2,24 @@
 % Please edit documentation in R/get_tsne_embedding.R
 \name{get_tsne_embedding}
 \alias{get_tsne_embedding}
-\title{Compute an embedding of the multi-omics matrix using t-SNE}
+\title{TSNE embedding of matrix}
 \usage{
 get_tsne_embedding(matrix, embedding_size, perplexity, max_iter, num_threads)
 }
 \arguments{
-\item{matrix}{A squared numeric matrix with values in the range 0-1, with samples on columns}
+\item{matrix}{a squared n n x n numeric matrix with values in the range 0-1, with observations on columns}
 
-\item{embedding_size}{Size of the output embedding}
+\item{embedding_size}{size of the output embedding}
 
-\item{perplexity}{Perplexity parameter}
+\item{perplexity}{perplexity parameter}
 
-\item{max_iter}{Number of iterations}
+\item{max_iter}{number of iterations}
 
-\item{num_threads}{Number of threads for parallelization. It has to be positive integer or 0, if all available cores must be used. If it is equal to 1, no parallelization is not performed}
+\item{num_threads}{number of threads for parallelization. It has to be positive integer or 0, if all available cores must be used. If it is equal to 1, no parallelization is not performed}
 }
 \value{
-An embedding of the input Matrix: on the columns there are the samples, the number of rows are specified by embedding_size
+a \emph{embedding_size} x n matrix having observations on columns
 }
 \description{
-Compute an embedding of the multi-omics matrix using t-SNE
+TSNE embedding of matrix
 }

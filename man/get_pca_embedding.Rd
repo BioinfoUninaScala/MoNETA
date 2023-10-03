@@ -2,18 +2,18 @@
 % Please edit documentation in R/get_pca_embedding.R
 \name{get_pca_embedding}
 \alias{get_pca_embedding}
-\title{Compute an embedding of the multi-omics matrix using pca}
+\title{PCA embedding of matrix}
 \usage{
 get_pca_embedding(matrix, embedding_size)
 }
 \arguments{
-\item{matrix}{A squared numeric matrix with values in the range 0-1, with samples on columns}
+\item{matrix}{a squared n n x n numeric matrix with values in the range 0-1, with observations on columns}
 
-\item{embedding_size}{Size of the output embedding}
+\item{embedding_size}{size of the output embedding}
 }
 \value{
-An embedding of the input Matrix: on the columns there are the samples, the number of rows are specified by embedding_size
+a \emph{embedding_size} x n matrix having observations on columns
 }
 \description{
-Compute an embedding of the multi-omics matrix using pca
+PCA embedding of matrix
 }

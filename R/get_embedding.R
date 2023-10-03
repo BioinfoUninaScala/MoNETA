@@ -1,4 +1,4 @@
-#' Compute an embedding of the multi-omics matrix
+#' Multi-omics matrix embedding
 #'
 #' Adapted from:
 #' Research group:  Léo Pio-Lopez, Alberto Valdeolivas, Laurent Tichit, Élisabeth Remy, Anaïs Baudot
@@ -12,11 +12,11 @@
 #' @import wordspace
 #' @importFrom doMC registerDoMC
 #' @importFrom foreach registerDoSEQ %dopar%
-#' @param matrix A squared numeric matrix with values in the range 0-1, with samples on columns
-#' @param embedding_size Size of the output embedding
-#' @param num_steps Number of total epoches
-#' @param cores Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed
-#' @return An embedding of the input Matrix: on the columns there are the samples, the number of rows are specified by embedding_size
+#' @param matrix a n x n squared numeric similarity matrix with values in the range 0-1
+#' @param embedding_size size of the output embedding
+#' @param num_steps number of total epoches
+#' @param cores number of threads for parallelization. It has to be positive integer. If it is equal to 1, no parallelization is performed
+#' @return a \emph{embedding_size} x n numerical matrix
 #' @export
 #'
 #'

@@ -2,7 +2,7 @@
 % Please edit documentation in R/create_layer_transition_matrix.R
 \name{create_layer_transition_matrix}
 \alias{create_layer_transition_matrix}
-\title{Creates a matrix containing transition probabilities between omics layers of multiples network.}
+\title{Create transition probabilities matrix}
 \usage{
 create_layer_transition_matrix(omics_list)
 }
@@ -15,5 +15,5 @@ and one column named weight containing edge weights.}
 A squared n x n matrix (where n is the number of omics layers) containing  transition probabilities between omics layers.
 }
 \description{
-Creates a matrix containing transition probabilities between omics layers of multiples network.
+Create transition probabilities matrix
 }

@@ -7,7 +7,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-
 # MultiOmics Network Embedding for SubType Analysis
 
 Patient stratification is a critical step in the field of oncology that helps healthcare professionals categorize patients based on specific features related to their cancer. With the advent of advanced technologies in genomics, transcriptomics, proteomics, and other omics fields, it has become increasingly possible to gather multi-omics data from cancer patients, which can provide a comprehensive understanding of the molecular characteristics of the disease.
@@ -26,11 +25,7 @@ devtools::install_github("BioinfoUninaScala/MoNETA")
 
 # Workflow
 
-Here we describe the workflow of the data integration using MoNETA. We present an example of its usage, performing patient stratification in the context of glioblastoma multiforme (GBM), a highly aggressive and lethal brain tumor. The GBM multi-omics dataset used in this package consists of CNV, methylation, and expression data for 788 patients, with 24776 and 12985 genes for CNV and expression respectively, and 1300 cg bases for methylation. This dataset is publicly available on a
-[The Cancer Genome Atlas (TCGA)](https://www.cancer.gov/tcga) and was analyzed in a previous study ([Ceccarelli et al.](https://www.cell.com/cell/fulltext/S0092-8674(15)01692-X?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS009286741501692X%3Fshowall%3Dtrue)).
-
-
-
+Here we describe the workflow of the data integration using MoNETA. We present an example of its usage, performing patient stratification in the context of glioblastoma multiforme (GBM), a highly aggressive and lethal brain tumor. The GBM multi-omics dataset used in this package consists of CNV, methylation, and expression data for 788 patients, with 24776 and 12985 genes for CNV and expression respectively, and 1300 cg bases for methylation. This dataset is publicly available on a [The Cancer Genome Atlas (TCGA)](https://www.cancer.gov/tcga) and was analyzed in a previous study ([Ceccarelli et al.](https://www.cell.com/cell/fulltext/S0092-8674(15)01692-X?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS009286741501692X%3Fshowall%3Dtrue)).
 
 MoNETA functions can be summarized in:
 
@@ -44,7 +39,7 @@ Input data consist of omics matrices with samples on columns and features on row
 
 library(MoNETA)
 
-data(pdata)
+data(GBM_pdata)
 data(GBM_mtx)
 
 
@@ -193,12 +188,10 @@ The similarity matrix generated in step 2 is then used for dimensionality reduct
     -   `embedding_size`: size of the output embedding;
     -   `n_neighbors`: the size of local neighborhood. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. In general values should be in the range 2 to 100;
     -   `n_threads`: number of threads for parallelization;
-    -   `n_sgd_threads`: number of thread for stochastic gradient descent, if > 1 it will not be reproducible anyway;
+    -   `n_sgd_threads`: number of thread for stochastic gradient descent, if \> 1 it will not be reproducible anyway;
     -   `grain_size`: minimum amount of work to do on each thread;
 -   `get_pca_embedding`: This function uses the Principal Component Analysis (PCA) algorithm to perform dimensionality reduction
     -   `embedding_size`: size of the output embedding.
-
-
 
 ```{r embedding}
 
@@ -214,88 +207,63 @@ pumap_emb  = get_parallel_umap_embedding(RWR_mat, 2, n_neighbors = 15, n_threads
 
 ```
 
-
 ```{r show-emb}
 
 print(multiverse_emb[1:5,1:5])
 
 ```
 
-
-
-
 ## 4. Plots
 
-MoNETA includes two different function for plotting: 
+MoNETA includes two different function for plotting:
 
-*   `plot_net`: used to plot the network representation;
-*   `plot_2D_matrix`: used to visualize the results of the dimensionality reduction in two dimensions.
+-   `plot_net`: used to plot the network representation;
+-   `plot_2D_matrix`: used to visualize the results of the dimensionality reduction in two dimensions.
 
 Both function share the following arguments:
 
-*   `nodes_anno`: annotation DataFrame with all the information for each sample;
-*   `id_name`: string for identification of sample in `nodes_anno`, it corresponds to a column in `nodes_anno`;
-*   `id_anno_color`: string for the column necessary for distinguish cases in the `nodes_anno`, it corresponds to a column in `nodes_anno`. It will be used for giving a specific color for each case;
-*   `id_anno_shape`: string for the column necessary for distinguish cases in the `nodes_anno`, it corresponds to a column in `nodes_anno`. It will be used for giving a specific shape for each case, it must be associated to a discrete variable;
-*   `title`: a string used as title of the plot;
-*   `wo_legend`: a boolean flag, if TRUE returns the plot without legend;
-*   `interactive`: a boolean indicating wheter the plot should be interactive or static.
-
-
-
+-   `nodes_anno`: annotation DataFrame with all the information for each sample;
+-   `id_name`: string for identification of sample in `nodes_anno`, it corresponds to a column in `nodes_anno`;
+-   `id_anno_color`: string for the column necessary for distinguish cases in the `nodes_anno`, it corresponds to a column in `nodes_anno`. It will be used for giving a specific color for each case;
+-   `id_anno_shape`: string for the column necessary for distinguish cases in the `nodes_anno`, it corresponds to a column in `nodes_anno`. It will be used for giving a specific shape for each case, it must be associated to a discrete variable;
+-   `title`: a string used as title of the plot;
+-   `wo_legend`: a boolean flag, if TRUE returns the plot without legend;
+-   `interactive`: a boolean indicating wheter the plot should be interactive or static.
 
 ```{r plot-net, out.width="100%"}
 
-plot_net(edgeList = net_list$METH_norm, nodes_anno = pdata,
+plot_net(edgeList = net_list$METH_norm, nodes_anno = GBM_pdata,
          interactive = FALSE, id_name = "Case",
          id_anno_color = "Supervised.DNA.Methylation.Cluster",
          id_anno_shape = "IDH.status", html = FALSE, wo_legend = FALSE, title = "METH_norm")
 
 ```
 
-
 In our particular scenario, one could leverage the `plot_net` function to visualize the methylation omics network and explore the IDH status (wild type versus mutated) by setting the node shapes accordingly. Notably, the IDH status divides the network into two distinct sub-networks.
 
 Moreover, our tool can effectively distinguish between macro classes identified by [Ceccarelli et al.](https://www.cell.com/cell/fulltext/S0092-8674(15)01692-X?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS009286741501692X%3Fshowall%3Dtrue), which investigated the impact of methylation status on GBM.
 
-
-
-
-
-
-
-
-
 ```{r plot-2d-matrix, fig.width = 7, fig.height = 4}
 
 
-plot_2D_matrix(coord = tsne_emb, nodes_anno = pdata, id_name = "Case", interactive = FALSE,
+plot_2D_matrix(coord = tsne_emb, nodes_anno = GBM_pdata, id_name = "Case", interactive = FALSE,
                    id_anno_color = "Supervised.DNA.Methylation.Cluster", id_anno_shape = "IDH.status",
                    wo_legend = FALSE, title = "t-SNE embedding")
 
 ```
 
+Furthermore, we utilized the `plot_2D_matrix` function to visualize the similarity matrix, which was generated by first reducing the dimensionality of the data using `get_embedding` and then applying `get_pca_embedding` to obtain a matrix, with two cordinates for each sample.
 
-Furthermore, we utilized the `plot_2D_matrix` function to visualize the similarity matrix, which was generated by first reducing the dimensionality of the data using `get_embedding` and then applying `get_pca_embedding` to obtain a matrix, with two cordinates for each sample. 
+Our MoNETA tool successfully identified three macro groups, which were previously reported by [Ceccarelli et al.](https://www.cell.com/cell/fulltext/S0092-8674(15)01692-X?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS009286741501692X%3Fshowall%3Dtrue). These groups correspond to:
 
-Our MoNETA tool successfully identified three macro groups, which were previously reported by [Ceccarelli et al.](https://www.cell.com/cell/fulltext/S0092-8674(15)01692-X?_returnURL=https%3A%2F%2Flinkinghub.elsevier.com%2Fretrieve%2Fpii%2FS009286741501692X%3Fshowall%3Dtrue). 
-These groups correspond to:
-
-*   classical-like, LGm6, Mesenchymal-like, PA-like;
-*   Codel;
-*   G-CIMP-high, G-CIMP-low.
-
-
-
+-   classical-like, LGm6, Mesenchymal-like, PA-like;
+-   Codel;
+-   G-CIMP-high, G-CIMP-low.
 
 ```{r plot-2d-matrix2, fig.width = 7, fig.height = 4}
 
-plot_2D_matrix(coord = pca_emb, nodes_anno = pdata, id_name = "Case", interactive = FALSE,
+plot_2D_matrix(coord = pca_emb, nodes_anno = GBM_pdata, id_name = "Case", interactive = FALSE,
                    id_anno_color = "Supervised.DNA.Methylation.Cluster", id_anno_shape = "IDH.status",
                    wo_legend = FALSE, title = "First two PC")
 
 ```
-
-
-
-

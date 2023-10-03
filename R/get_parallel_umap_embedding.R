@@ -1,13 +1,13 @@
-#' Compute an embedding of the multi-omics matrix using uwot umap
+#' UMAP embedding of matrix using uwot umap
 #'
 #' @importFrom uwot tumap
-#' @param matrix A squared numeric matrix with values in the range 0-1, with samples on columns
-#' @param embedding_size Size of the output embedding
-#' @param n_neighbors The size of local neighborhood. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. In general values should be in the range 2 to 100
-#' @param n_threads Number of thread, NULL if single core
-#' @param n_sgd_threads Number of thread for stochastic gradient descent, if > 1 it will not be reproducible anyway
-#' @param grain_size Minimum amount of work to do on each thread
-#' @return An embedding of the input Matrix: on the columns there are the samples, the number of rows are specified by embedding_size
+#' @param matrix a squared n n x n numeric matrix with values in the range 0-1, with observations on columns
+#' @param embedding_size size of the output embedding
+#' @param n_neighbors size of local neighborhood. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. In general values should be in the range 2 to 100
+#' @param n_threads number of threads, NULL if single core
+#' @param n_sgd_threads number of thread for stochastic gradient descent, if > 1 it will not be reproducible
+#' @param grain_size minimum amount of work to do on each thread
+#' @return a \emph{embedding_size} x n matrix having observations on columns
 #' @export
 
 get_parallel_umap_embedding <- function(matrix, embedding_size, n_neighbors = 15, n_threads = NULL, n_sgd_threads = 0, grain_size = 1) {

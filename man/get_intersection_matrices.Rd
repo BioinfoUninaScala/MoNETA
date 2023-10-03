@@ -7,7 +7,10 @@
 get_intersection_matrices(omics_list)
 }
 \arguments{
-\item{omics_list}{a list of omics}
+\item{omics_list}{a list of matrices with observations on columns}
+}
+\value{
+a list of matrices sharing the same column ids
 }
 \description{
 Get intersection between cancer matrices

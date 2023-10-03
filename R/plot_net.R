@@ -1,4 +1,4 @@
-#' Plot network
+#' Plot omics network with annotations
 #'
 #' @importFrom igraph V
 #' @importFrom network as.color
@@ -6,15 +6,15 @@
 #' @import tidyverse
 #' @import RColorBrewer
 #' @import dplyr
-#' @param edgeList DataFrame representing a graph
-#' @param nodes_anno Annotation DataFrame with all the information for each sample
-#' @param id_name String for identification of sample in nodes_anno
-#' @param id_anno_color String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case
-#' @param id_anno_shape String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case, it must be associated to a discrete variable
-#' @param title Title of plot to be displayed
-#' @param html Boolean, if you want to save the plot in a html file
-#' @param wo_legend A boolean flag, if TRUE returns the plot without legend
-#' @param interactive A boolean flag, if TRUE returns an interactive plot
+#' @param edgeList a data frame containing the edge list of a network in the first two columns containing node ids.
+#' @param nodes_anno annotation data frame with nodes on rows and annotations on columns
+#' @param id_name name of the column in \emph{nodes_anno} containing unique sample ids
+#' @param id_anno_color name of the column in \emph{nodes_anno} whose values are mapped to colors to observations. Notice that colors can be recycled it eh number of distinct values exceed available shapes
+#' @param id_anno_shape name of the column in \emph{nodes_anno} whose values are mapped to shapes to observations. Notice that shapes can be recycled it eh number of distinct values exceed available shapes
+#' @param title title of plot
+#' @param html logical, if TRUE the plot is produced in html format
+#' @param wo_legend logical, if TRUE returns the plot without legend
+#' @param interactive logical, if TRUE returns an interactive plot
 #' @export
 
 

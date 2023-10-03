@@ -2,7 +2,7 @@
 % Please edit documentation in R/k_star_net.R
 \name{k_star_net}
 \alias{k_star_net}
-\title{Apply K Star algorithm in order to find knn nearest neighbors for each node, using Vantage-point tree
+\title{Build omic similarity network
 Publication: https://papers.nips.cc/paper/2016/file/2c6ae45a3e88aee548c0714fad7f8269-Paper.pdf}
 \usage{
 k_star_net(
@@ -16,24 +16,26 @@ k_star_net(
 )
 }
 \arguments{
-\item{matrix}{A numeric Matrix representing a particular omics, rows are genes and columns are samples}
+\item{matrix}{a numeric matrix representing a particular omics, features are on rows and samples are on columns}
 
-\item{distFun}{A string that represents a distance function, example: "Euclidean", "Manhattan", "Cosine"}
+\item{distFun}{a distance function chosen among: "Euclidean", "Manhattan", "Cosine"}
 
-\item{sparsity}{A positive real}
+\item{sparsity}{a positive real value guiding the choice of the number of neighbors for each node based on the distribution of distances of its neighbors}
 
-\item{knn}{An integer, it is the number of neighbors to be considered}
+\item{knn}{an integer, it is the maximum number of neighbors to be considered as candidate neighbors for each node}
 
-\item{k_star}{A boolean that specifies if k_star must be performed}
+\item{k_star}{if TRUE  the number of neighbors id dynamically determined for each node using kstar algorithm ( https://papers.nips.cc/paper/2016/file/2c6ae45a3e88aee548c0714fad7f8269-Paper.pdf),
+if FALSE k closest neighbors are chosen for each node}
 
-\item{cores}{Number of threads for parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed}
+\item{cores}{number of threads for parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed}
 
-\item{MAX_ASSOC}{Number of maximum incoming edges that a node can have}
+\item{MAX_ASSOC}{number of maximum incoming edges that a node can have}
 }
 \value{
-A Tibble with three columns : source node, destination node, weight of connection
+a tibble containing the edge list of output network with the following columns: source, dest, weight.
+Source and dest represent the edges and contain node ids, weight contains edge weights.
 }
 \description{
-Apply K Star algorithm in order to find knn nearest neighbors for each node, using Vantage-point tree
+Build omic similarity network
 Publication: https://papers.nips.cc/paper/2016/file/2c6ae45a3e88aee548c0714fad7f8269-Paper.pdf
 }

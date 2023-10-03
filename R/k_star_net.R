@@ -1,4 +1,4 @@
-#' Apply K Star algorithm in order to find knn nearest neighbors for each node, using Vantage-point tree
+#' Build omic similarity network
 #' Publication: https://papers.nips.cc/paper/2016/file/2c6ae45a3e88aee548c0714fad7f8269-Paper.pdf
 #'
 #' @importFrom purrr array_branch map_dbl pmap_df map_chr
@@ -10,14 +10,16 @@
 #' @importFrom BiocParallel MulticoreParam
 #' @importFrom BiocNeighbors buildIndex queryKNN VptreeParam KmknnParam
 #' @importFrom foreach registerDoSEQ %dopar%
-#' @param matrix A numeric Matrix representing a particular omics, rows are genes and columns are samples
-#' @param distFun A string that represents a distance function, example: "Euclidean", "Manhattan", "Cosine"
-#' @param sparsity A positive real
-#' @param knn An integer, it is the number of neighbors to be considered
-#' @param k_star A boolean that specifies if k_star must be performed
-#' @param cores Number of threads for parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed
-#' @param MAX_ASSOC Number of maximum incoming edges that a node can have
-#' @return A Tibble with three columns : source node, destination node, weight of connection
+#' @param matrix a numeric matrix representing a particular omics, features are on rows and samples are on columns
+#' @param distFun a distance function chosen among: "Euclidean", "Manhattan", "Cosine"
+#' @param sparsity a positive real value guiding the choice of the number of neighbors for each node based on the distribution of distances of its neighbors
+#' @param knn an integer, it is the maximum number of neighbors to be considered as candidate neighbors for each node
+#' @param k_star if TRUE  the number of neighbors id dynamically determined for each node using kstar algorithm ( https://papers.nips.cc/paper/2016/file/2c6ae45a3e88aee548c0714fad7f8269-Paper.pdf),
+#' if FALSE k closest neighbors are chosen for each node
+#' @param cores number of threads for parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed
+#' @param MAX_ASSOC number of maximum incoming edges that a node can have
+#' @return a tibble containing the edge list of output network with the following columns: source, dest, weight.
+#' Source and dest represent the edges and contain node ids, weight contains edge weights.
 #' @export
 
 k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_star = TRUE, cores = 1, MAX_ASSOC = Inf) {

@@ -1,4 +1,4 @@
-#' Plot bidimensional matrix
+#' Plot bimedinational reduction of a matrix
 #'
 #' @importFrom igraph V
 #' @import visNetwork
@@ -15,16 +15,16 @@
 #' @import tibble
 #' @importFrom ggplot2 aes scale_color_brewer ggplot geom_point theme_bw labs theme
 #' @importFrom stringr str_ends
-#' @param coord A DataFrame with samples on columns that has to be plotted
-#' @param nodes_anno Annotation DataFrame with all the information for each sample
-#' @param id_name String for identification of sample in nodes_anno
-#' @param id_anno_color String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case
-#' @param id_anno_shape String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case, it must be associated to a discrete variable
-#' @param interactive A boolean flag, if TRUE returns an interactive plot
-#' @param wo_legend A boolean flag, if TRUE returns the plot without legend
-#' @param title Title of the plot
-#' @param shapes It is possible to give the shapes list for plotting, id_anno_shape is not NA
-#' @return A plot
+#' @param coord a data frame with x and y coordinates on rows and observations on columns
+#' @param nodes_anno annotation data frame with observations on rows and annotations on columns
+#' @param id_name name of the column in \emph{nodes_anno} containing unique sample ids. There has to be correspondence on \emph{coord} columns names
+#' @param id_anno_color  name of the column in \emph{nodes_anno} whose values are mapped to colors to observations. Notice that colors can be recycled it eh number of distinct values exceed available shapes
+#' @param id_anno_shape name of the column in \emph{nodes_anno} whose values are mapped to shapes to observations. Notice that shapes can be recycled it eh number of distinct values exceed available shapes
+#' @param interactive logical, if TRUE returns a plotly interactive plot, otherwise a standard ggplot is returned
+#' @param wo_legend logical, if TRUE returns the plot without legend
+#' @param title title of the plot
+#' @param shapes  shapes list to be used for plotting, id_anno_shape is not NA
+#' @return a ggplot or a plotly object
 #' @export
 
 plot_2D_matrix <- function(coord, nodes_anno, id_name, id_anno_color = NA, id_anno_shape = NA,

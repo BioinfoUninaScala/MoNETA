@@ -2,21 +2,21 @@
 % Please edit documentation in R/get_embedding.R
 \name{get_embedding}
 \alias{get_embedding}
-\title{Compute an embedding of the multi-omics matrix}
+\title{Multi-omics matrix embedding}
 \usage{
 get_embedding(matrix, embedding_size, num_steps = 10^7, cores = 20)
 }
 \arguments{
-\item{matrix}{A squared numeric matrix with values in the range 0-1, with samples on columns}
+\item{matrix}{a n x n squared numeric similarity matrix with values in the range 0-1}
 
-\item{embedding_size}{Size of the output embedding}
+\item{embedding_size}{size of the output embedding}
 
-\item{num_steps}{Number of total epoches}
+\item{num_steps}{number of total epoches}
 
-\item{cores}{Number of threads for Parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed}
+\item{cores}{number of threads for parallelization. It has to be positive integer. If it is equal to 1, no parallelization is performed}
 }
 \value{
-An embedding of the input Matrix: on the columns there are the samples, the number of rows are specified by embedding_size
+a \emph{embedding_size} x n numerical matrix
 }
 \description{
 Adapted from:

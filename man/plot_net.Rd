@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_net.R
 \name{plot_net}
 \alias{plot_net}
-\title{Plot network}
+\title{Plot omics network with annotations}
 \usage{
 plot_net(
   edgeList,
@@ -17,24 +17,24 @@ plot_net(
 )
 }
 \arguments{
-\item{edgeList}{DataFrame representing a graph}
+\item{edgeList}{a data frame containing the edge list of a network in the first two columns containing node ids.}
 
-\item{nodes_anno}{Annotation DataFrame with all the information for each sample}
+\item{nodes_anno}{annotation data frame with nodes on rows and annotations on columns}
 
-\item{id_name}{String for identification of sample in nodes_anno}
+\item{id_name}{name of the column in \emph{nodes_anno} containing unique sample ids}
 
-\item{id_anno_color}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case}
+\item{id_anno_color}{name of the column in \emph{nodes_anno} whose values are mapped to colors to observations. Notice that colors can be recycled it eh number of distinct values exceed available shapes}
 
-\item{id_anno_shape}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case, it must be associated to a discrete variable}
+\item{id_anno_shape}{name of the column in \emph{nodes_anno} whose values are mapped to shapes to observations. Notice that shapes can be recycled it eh number of distinct values exceed available shapes}
 
-\item{title}{Title of plot to be displayed}
+\item{title}{title of plot}
 
-\item{html}{Boolean, if you want to save the plot in a html file}
+\item{html}{logical, if TRUE the plot is produced in html format}
 
-\item{wo_legend}{A boolean flag, if TRUE returns the plot without legend}
+\item{wo_legend}{logical, if TRUE returns the plot without legend}
 
-\item{interactive}{A boolean flag, if TRUE returns an interactive plot}
+\item{interactive}{logical, if TRUE returns an interactive plot}
 }
 \description{
-Plot network
+Plot omics network with annotations
 }

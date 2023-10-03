@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_2D_matrix.R
 \name{plot_2D_matrix}
 \alias{plot_2D_matrix}
-\title{Plot bidimensional matrix}
+\title{Plot bimedinational reduction of a matrix}
 \usage{
 plot_2D_matrix(
   coord,
@@ -17,27 +17,27 @@ plot_2D_matrix(
 )
 }
 \arguments{
-\item{coord}{A DataFrame with samples on columns that has to be plotted}
+\item{coord}{a data frame with x and y coordinates on rows and observations on columns}
 
-\item{nodes_anno}{Annotation DataFrame with all the information for each sample}
+\item{nodes_anno}{annotation data frame with observations on rows and annotations on columns}
 
-\item{id_name}{String for identification of sample in nodes_anno}
+\item{id_name}{name of the column in \emph{nodes_anno} containing unique sample ids. There has to be correspondence on \emph{coord} columns names}
 
-\item{id_anno_color}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific color for each case}
+\item{id_anno_color}{name of the column in \emph{nodes_anno} whose values are mapped to colors to observations. Notice that colors can be recycled it eh number of distinct values exceed available shapes}
 
-\item{id_anno_shape}{String for the column necessary for distinguish cases in the nodes_anno, it will be used for giving a specific shape for each case, it must be associated to a discrete variable}
+\item{id_anno_shape}{name of the column in \emph{nodes_anno} whose values are mapped to shapes to observations. Notice that shapes can be recycled it eh number of distinct values exceed available shapes}
 
-\item{interactive}{A boolean flag, if TRUE returns an interactive plot}
+\item{interactive}{logical, if TRUE returns a plotly interactive plot, otherwise a standard ggplot is returned}
 
-\item{wo_legend}{A boolean flag, if TRUE returns the plot without legend}
+\item{wo_legend}{logical, if TRUE returns the plot without legend}
 
-\item{title}{Title of the plot}
+\item{title}{title of the plot}
 
-\item{shapes}{It is possible to give the shapes list for plotting, id_anno_shape is not NA}
+\item{shapes}{shapes list to be used for plotting, id_anno_shape is not NA}
 }
 \value{
-A plot
+a ggplot or a plotly object
 }
 \description{
-Plot bidimensional matrix
+Plot bimedinational reduction of a matrix
 }

@@ -1,8 +1,8 @@
-#' Remove extra weigth
+#' Prune low weight edges from network
 #'
-#' @param network a network with three columns
-#' @param weight_remv the weight to be removed in the network
-#' @return network with weigths strictly less than weight_remv
+#' @param networka data frame containing the edge list of a network with two columns containing nodes ids and one column named weight containing edge weights
+#' @param weight_remv a threshold value on the edge weight. Edges with weight less then \emph{weight_remv} will be removed from the network.
+#' @return data frame contianing pruned network as an edge list
 #' @export
 
 prune_multiplex_network <- function(network, weight_remv = NULL) {

@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_parallel_umap_embedding.R
 \name{get_parallel_umap_embedding}
 \alias{get_parallel_umap_embedding}
-\title{Compute an embedding of the multi-omics matrix using uwot umap}
+\title{UMAP embedding of matrix using uwot umap}
 \usage{
 get_parallel_umap_embedding(
   matrix,
@@ -14,21 +14,21 @@ get_parallel_umap_embedding(
 )
 }
 \arguments{
-\item{matrix}{A squared numeric matrix with values in the range 0-1, with samples on columns}
+\item{matrix}{a squared n n x n numeric matrix with values in the range 0-1, with observations on columns}
 
-\item{embedding_size}{Size of the output embedding}
+\item{embedding_size}{size of the output embedding}
 
-\item{n_neighbors}{The size of local neighborhood. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. In general values should be in the range 2 to 100}
+\item{n_neighbors}{size of local neighborhood. Larger values result in more global views of the manifold, while smaller values result in more local data being preserved. In general values should be in the range 2 to 100}
 
-\item{n_threads}{Number of thread, NULL if single core}
+\item{n_threads}{number of threads, NULL if single core}
 
-\item{n_sgd_threads}{Number of thread for stochastic gradient descent, if > 1 it will not be reproducible anyway}
+\item{n_sgd_threads}{number of thread for stochastic gradient descent, if > 1 it will not be reproducible}
 
-\item{grain_size}{Minimum amount of work to do on each thread}
+\item{grain_size}{minimum amount of work to do on each thread}
 }
 \value{
-An embedding of the input Matrix: on the columns there are the samples, the number of rows are specified by embedding_size
+a \emph{embedding_size} x n matrix having observations on columns
 }
 \description{
-Compute an embedding of the multi-omics matrix using uwot umap
+UMAP embedding of matrix using uwot umap
 }

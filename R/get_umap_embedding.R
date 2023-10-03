@@ -1,9 +1,9 @@
-#' Compute an embedding of the multi-omics matrix using umap
+#' UMAP embedding of matrix
 #'
 #' @importFrom umap umap.knn umap.defaults
-#' @param matrix A squared numeric matrix with values in the range 0-1, with samples on columns
-#' @param embedding_size Size of the output embedding
-#' @return An embedding of the input Matrix: on the columns there are the samples, the number of rows are specified by embedding_size
+#' @param matrix a squared n n x n numeric matrix with values in the range 0-1, with observations on columns
+#' @param embedding_size size of the output embedding
+#' @return  a \emph{embedding_size} x n matrix having observations on columns
 #' @export
 
 get_umap_embedding <- function(matrix, embedding_size) {

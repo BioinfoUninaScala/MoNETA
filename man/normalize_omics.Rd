@@ -2,16 +2,16 @@
 % Please edit documentation in R/normalize_omics.R
 \name{normalize_omics}
 \alias{normalize_omics}
-\title{normalize_omics takes in input a Matrix that has to be centered and scaled along the columns}
+\title{Center and scale an omic matrix along its columns}
 \usage{
 normalize_omics(matrix)
 }
 \arguments{
-\item{matrix}{A numeric Matrix representing a particular omics, rows are genes and columns are samples}
+\item{matrix}{a numeric matrix representing a particular omics, features are on rows and samples are on columns}
 }
 \value{
-An object of the same type as mtx. The matrix mtx is normalize along the columns
+a matrix center and scaled along its columns
 }
 \description{
-normalize_omics takes in input a Matrix that has to be centered and scaled along the columns
+Center and scale an omic matrix along its columns
 }

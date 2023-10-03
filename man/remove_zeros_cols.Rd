@@ -2,16 +2,16 @@
 % Please edit documentation in R/remove_zeros_cols.R
 \name{remove_zeros_cols}
 \alias{remove_zeros_cols}
-\title{This function clean a Matrix removing the columns with all zeros}
+\title{Remove zero columns from a matrix}
 \usage{
 remove_zeros_cols(matrix)
 }
 \arguments{
-\item{matrix}{A Matrix}
+\item{matrix}{a numeric matrix}
 }
 \value{
-A Matrix of the same type of mtx without columns with all zeros
+a matrix of the same type of \emph{matrix} with columns containing all zero removed
 }
 \description{
-This function clean a Matrix removing the columns with all zeros
+Remove zero columns from a matrix
 }

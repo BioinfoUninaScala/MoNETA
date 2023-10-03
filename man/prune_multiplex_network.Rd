@@ -2,18 +2,18 @@
 % Please edit documentation in R/prune_multiplex_network.R
 \name{prune_multiplex_network}
 \alias{prune_multiplex_network}
-\title{Remove extra weigth}
+\title{Prune low weight edges from network}
 \usage{
 prune_multiplex_network(network, weight_remv = NULL)
 }
 \arguments{
-\item{network}{a network with three columns}
+\item{weight_remv}{a threshold value on the edge weight. Edges with weight less then \emph{weight_remv} will be removed from the network.}
 
-\item{weight_remv}{the weight to be removed in the network}
+\item{networka}{data frame containing the edge list of a network with two columns containing nodes ids and one column named weight containing edge weights}
 }
 \value{
-network with weigths strictly less than weight_remv
+data frame contianing pruned network as an edge list
 }
 \description{
-Remove extra weigth
+Prune low weight edges from network
 }
