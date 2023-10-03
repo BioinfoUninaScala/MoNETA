@@ -1,13 +1,17 @@
-#' Create jump matrix containing the probabilities to switch from one omics to another
+#' Creates matrix containing transition probabilities between omics layers of multiples network.
 #'
 #' @importFrom dplyr inner_join
-#' @param omics_list A list of DataFrames containings omics data, each is a DataFrame with three columns: source, destination, weight
-#' @return A Matrix containing the probabilities to switch from one omics to another
+#' @param omics_list
+#' a named list of data frames containing an omics multiplex network.
+#' Each data frame in the list is required to have at least two columns containing nodes ids respectively named source and destination
+#' and one column named weight containing edge weights.
+#' @return A squared n x n matrix (where n is the number of omics layers) containing  transition probabilities between omics layers.
 #' @export
 
 create_layer_transition_matrix <- function(omics_list) {
 
-    # @param multiplex A multiplex, an object that comprises different omics. It is a DataFrame containing these information: EdgeType, source, target, weight
+    # @param multiplex A multiplex, an object that comprises different omics.
+
     #layers <- unique(multiplex$EdgeType)
     layers <- names(omics_list)
     jump_mat <- matrix(0, nrow = length(layers), ncol = length(layers), dimnames = list(layers,layers))
