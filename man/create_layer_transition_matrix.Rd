@@ -2,16 +2,18 @@
 % Please edit documentation in R/create_layer_transition_matrix.R
 \name{create_layer_transition_matrix}
 \alias{create_layer_transition_matrix}
-\title{Create jump matrix containing the probabilities to switch from one omics to another}
+\title{Creates a matrix containing transition probabilities between omics layers of multiples network.}
 \usage{
 create_layer_transition_matrix(omics_list)
 }
 \arguments{
-\item{omics_list}{A list of DataFrames containings omics data, each is a DataFrame with three columns: source, destination, weight}
+\item{omics_list}{a named list of data frames containing an omics multiplex network.
+Each data frame in the list is required to have at least two columns containing nodes ids respectively named source and destination
+and one column named weight containing edge weights.}
 }
 \value{
-A Matrix containing the probabilities to switch from one omics to another
+A squared n x n matrix (where n is the number of omics layers) containing  transition probabilities between omics layers.
 }
 \description{
-Create jump matrix containing the probabilities to switch from one omics to another
+Creates a matrix containing transition probabilities between omics layers of multiples network.
 }

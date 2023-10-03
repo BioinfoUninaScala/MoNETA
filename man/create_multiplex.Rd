@@ -2,18 +2,20 @@
 % Please edit documentation in R/create_multiplex.R
 \name{create_multiplex}
 \alias{create_multiplex}
-\title{Create a multiplex, a DataFrame that comprises different omics with these information: EdgeType, source, target, weight}
+\title{Creates a data frame containing the adjacency list of a multiplex omic network starting from a list of single omics networks.}
 \usage{
 create_multiplex(omics_list, weighted = FALSE)
 }
 \arguments{
-\item{omics_list}{A list of DataFrames containings omics data, each is a DataFrame with three columns: source, destination, weight}
+\item{omics_list}{a named list of data frames containing adjacency lists for different omics networks sharing node ids.
+Each data frame in the list is required to have at least two columns containing nodes ids respectively named source and destination and one column named weight containing edge weights.}
 
-\item{weighted}{A boolean, based on this, a weighted multiplex is returned}
+\item{weighted}{logical. If TRUE then a weighted multiplex is returned, otherwise weights are all set to 1. FALSE by default.}
 }
 \value{
-A DataFrame that comprises each DataFrame with these columns: EdgeType, source, target, weight
+A data frame representing the edje list of a multiplex network with the following four columns: EdgeType , source, target, weight.
+EdgeType is a character representing the layers in the multiplex, source and target represent the edges and contains node ids, weight containd edje weights in the multiplex network.
 }
 \description{
-Create a multiplex, a DataFrame that comprises different omics with these information: EdgeType, source, target, weight
+Creates a data frame containing the adjacency list of a multiplex omic network starting from a list of single omics networks.
 }

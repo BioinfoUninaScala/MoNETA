@@ -1,4 +1,4 @@
-#' Creates matrix containing transition probabilities between omics layers of multiples network.
+#' Creates a matrix containing transition probabilities between omics layers of multiples network.
 #'
 #' @importFrom dplyr inner_join
 #' @param omics_list

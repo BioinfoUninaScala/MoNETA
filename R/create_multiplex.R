@@ -1,12 +1,12 @@
-#' Creates a data frame containing the adjacency list of a multiplex omic network starting from a list of single omics networks.
+#' Creates a data frame containing the adjacency list of a multiplex omic network starting from a list of single omics networks
 #'
 #' @importFrom dplyr bind_rows select mutate
 #' @importFrom purrr map
 #' @param omics_list a named list of data frames containing adjacency lists for different omics networks sharing node ids.
 #'  Each data frame in the list is required to have at least two columns containing nodes ids respectively named source and destination and one column named weight containing edge weights.
 #' @param weighted logical. If TRUE then a weighted multiplex is returned, otherwise weights are all set to 1. FALSE by default.
-#' @return A data frame representing the edje list of a multiplex network with the following four columns: EdgeType , source, target, weight.
-#' EdgeType is a character representing the layers in the multiplex, source and target represent the edges and contains node ids, weight containd edje weights in the multiplex network.
+#' @return A data frame representing the edge list of a multiplex network with the following four columns: EdgeType , source, target, weight.
+#' EdgeType is a character representing the layers in the multiplex, source and target represent the edges and contains node ids, weight contains edge weights in the multiplex network.
 #' @export
 
 
