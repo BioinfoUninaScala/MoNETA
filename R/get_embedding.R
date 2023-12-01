@@ -20,7 +20,7 @@
 #' @return a \emph{embedding_size} x n numerical matrix
 #' @export
 
-new_get_embedding <- function(matrix, embedding_size, num_steps = NA, cores = 20) {
+get_embedding <- function(matrix, embedding_size, num_steps = NA, cores = 20) {
 
     cols <- base::colnames(matrix)
     base::colnames(matrix) <- 1:ncol(matrix)#as.character(1:ncol(RWR_mat_plot))
