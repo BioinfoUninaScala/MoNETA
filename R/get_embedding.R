@@ -9,6 +9,7 @@
 #' @import bigmemory
 #' @import bigstatsr
 #' @import Matrix
+
 #' @import wordspace
 #' @importFrom doMC registerDoMC
 #' @importFrom foreach registerDoSEQ %dopar%
@@ -18,9 +19,8 @@
 #' @param cores number of threads for parallelization. It has to be positive integer. If it is equal to 1, no parallelization is performed
 #' @return a \emph{embedding_size} x n numerical matrix
 #' @export
-#'
-#'
-get_embedding <- function(matrix, embedding_size, num_steps = 10 ^ 7, cores = 20) {
+
+new_get_embedding <- function(matrix, embedding_size, num_steps = NA, cores = 20) {
 
     cols <- base::colnames(matrix)
     base::colnames(matrix) <- 1:ncol(matrix)#as.character(1:ncol(RWR_mat_plot))
@@ -32,16 +32,18 @@ get_embedding <- function(matrix, embedding_size, num_steps = 10 ^ 7, cores = 20
 }
 
 
-get_embed <- function(matrix, embedding_size, num_steps = 10 ^ 7, cores) {
-    CLOSEST_NODES = 20
-    NUM_SAMPLED = 3
+get_embed <- function(matrix, embedding_size, num_steps = NA, cores) {
     LEARNING_RATE = 0.01
     NB_CHUNK = 1
-    CHUNK_SIZE = 10
 
-    r_DistancematrixPPI <- matrix #read_csv("data/mat_1.csv")
+    CLOSEST_NODES = ifelse(ncol(matrix) >= 5000, 300, round((ncol(matrix)*15)/100))
+    NUM_SAMPLED = ifelse(ncol(matrix) >= 5000, 10, 3) # s
+    CHUNK_SIZE = ifelse(ncol(matrix) >= 5000, 100, 10)
+    if (is.na(num_steps)) {num_steps = (10^8)/CHUNK_SIZE}
 
-    lst <- preprocess(r_DistancematrixPPI, CLOSEST_NODES)
+    r_DistancematrixPPI <- matrix
+
+    lst <- netpreprocess(r_DistancematrixPPI, CLOSEST_NODES)
 
     nodes <- lst$nodes
     neighborhood <- lst$neighborhood
@@ -58,14 +60,13 @@ get_embed <- function(matrix, embedding_size, num_steps = 10 ^ 7, cores) {
     emb
 }
 
-preprocess <- function(r_DistancematrixPPI, CLOSEST_NODES) {
+
+netpreprocess <- function(r_DistancematrixPPI, CLOSEST_NODES) {
     rawdata_DistancematrixPPI <- t(as.matrix(r_DistancematrixPPI))
     node_size <- nrow(rawdata_DistancematrixPPI)
 
-
-    #neighborhood : a list representing the size of neighborhoob of each node which are significantly similar
+    #neighborhood : a named vector representing the size of neighborhood of each node which are significantly similar
     neighborhood <- apply(rawdata_DistancematrixPPI, 1, function(x) sum(x > 1/node_size))
-
 
     #change the diagonal as the lowest positive score of each node
     rawdata_DistancematrixPPI <- as.matrix(r_DistancematrixPPI)
@@ -73,27 +74,29 @@ preprocess <- function(r_DistancematrixPPI, CLOSEST_NODES) {
 
     rawdata_DistancematrixPPI <- t(rawdata_DistancematrixPPI)
 
-    # ?normalize.rows
     rawdata_DistancematrixPPI <- wordspace::normalize.rows(rawdata_DistancematrixPPI, method = "manhattan")
-
 
     nodes <- base::colnames(r_DistancematrixPPI)
 
     #list_neighbours : list of neighbours sorted from the most similar ones to each node
+    pre_sort_genes <- apply(rawdata_DistancematrixPPI, 1, order, decreasing = TRUE)
+    base::colnames(pre_sort_genes) <-  NULL
+    sort_genes <- apply(pre_sort_genes, 1, function(x) nodes[x])
+    list_neighbours <- sort_genes
+
     #reverse_data : list of maximum similarity (length CLOSEST_NODES) scores for each node
-    sort_genes <- apply(rawdata_DistancematrixPPI, 1, order, decreasing = TRUE)
-    base::colnames(sort_genes) <-  NULL
-    sort_genes <- apply(sort_genes, 1, function(x) nodes[x])
-    list_neighbours <- sort_genes#[,1:CLOSEST_NODES]
-
-
     sort_values <- apply(rawdata_DistancematrixPPI, 1, sort, decreasing = TRUE)
     base::colnames(sort_values) <-  NULL
-    reverse_data_DistancematrixPPI <- sort_values[, 1:CLOSEST_NODES]
+
+    reverse_data_DistancematrixPPI <- sort_values[1:CLOSEST_NODES,]
+    reverse_data_DistancematrixPPI <- t(reverse_data_DistancematrixPPI)
+    reverse_data_DistancematrixPPI <- wordspace::normalize.rows(reverse_data_DistancematrixPPI, method = "manhattan")
+
 
     return(list("neighborhood" = neighborhood, "nodes" = nodes,
                 "list_neighbours" = list_neighbours, "reverse_data_DistancematrixPPI" = reverse_data_DistancematrixPPI))
 }
+
 
 node_positive_weighted <- function(u, list_neighbours, CLOSEST_NODES, reverse_data_DistancematrixPPI) {
     #if the similarities of a node are all zeros, it takes one randomly
@@ -102,13 +105,15 @@ node_positive_weighted <- function(u, list_neighbours, CLOSEST_NODES, reverse_da
         as.integer(list_neighbours[u, sample(1:CLOSEST_NODES, 1)])
     } else {
         probas = reverse_data_DistancematrixPPI[u, 1:CLOSEST_NODES]
-        as.integer(sample(list_neighbours[u, 1:CLOSEST_NODES], 1, prob = probas))
+        as.integer(sample(list_neighbours[u, 1:CLOSEST_NODES], 1, prob = probas)) # list_neigh contiene stringe non numeri, quello era pre_sort_genes
     }
 }
+
 
 sigmoid <- function(x) {
     1 / (1 + exp(-x))
 }
+
 
 update <- function(W_u, W_v, D, learning_rate, bias) {
     sim <- sigmoid(W_u %*% W_v - bias)
@@ -140,8 +145,9 @@ train <- function(neighborhood, nodes, list_neighbours, NUM_STEPS, NUM_SAMPLED, 
 
     #lock <- tempfile()
 
-
-    foreach (steps = 1:cores, .export = c("update", "sigmoid", "node_positive_weighted")) %dopar% {
+    foreach (steps = 1:cores,
+             .export = c("update", "sigmoid", "node_positive_weighted")
+    ) %dopar% {
 
         for (k in 1:floor(NUM_STEPS/cores)) {
             # select randomly CHUNK_SIZE nodes
@@ -159,8 +165,10 @@ train <- function(neighborhood, nodes, list_neighbours, NUM_STEPS, NUM_SAMPLED, 
                 #flock::unlock(locked)
 
                 for (j in 1:NUM_SAMPLED) {
-                    v_neg <- as.integer(list_neighbours[u, sample(CLOSEST_NODES+1:nb_nodes-CLOSEST_NODES,
+
+                    v_neg <- as.integer(list_neighbours[u, sample((CLOSEST_NODES+1):(nb_nodes-CLOSEST_NODES),
                                                                   1, replace = FALSE)])
+
                     tmp_lst <- update(embeddings[u,], embeddings[v_neg,], 0, LEARNING_RATE, nce_bias_neg)
                     #locked <- flock::lock(lock)
                     embeddings[u,] <- tmp_lst$W_u
