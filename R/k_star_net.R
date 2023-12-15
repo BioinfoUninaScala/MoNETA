@@ -1,5 +1,5 @@
 #' Build omic similarity network
-#' Publication: https://papers.nips.cc/paper/2016/file/2c6ae45a3e88aee548c0714fad7f8269-Paper.pdf
+#'
 #'
 #' @importFrom purrr array_branch map_dbl pmap_df map_chr
 #' @import dplyr
