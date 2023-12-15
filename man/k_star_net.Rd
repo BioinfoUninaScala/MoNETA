@@ -33,7 +33,7 @@ if FALSE k closest neighbors are chosen for each node}
 }
 \value{
 a tibble containing the edge list of output network with the following columns: source, dest, weight.
-Source and dest represent the edges and contain node ids, weight contains edge weights.
+Source and dest represent the edges and contain node ids, weight contains edge weights representing nodes similarity.
 }
 \description{
 Build omic similarity network

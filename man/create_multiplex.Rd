@@ -14,7 +14,7 @@ Each data frame in the list is required to have at least two columns containing 
 }
 \value{
 A data frame representing the edge list of a multiplex network with the following four columns: EdgeType , source, target, weight.
-EdgeType is a character representing the layers in the multiplex, source and target represent the edges and contain node ids, weight contains edge weights in the multiplex network.
+EdgeType is a character representing the layers in the multiplex, source and target represent the edges and contain node ids, weight contains edge weights representing node similarity in the multiplex network.
 }
 \description{
 Create a multiplex omic network

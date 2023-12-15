@@ -19,7 +19,7 @@
 #' @param cores number of threads for parallelization. It has to be positive integer. If it is equal to 1, no parallelization is not performed
 #' @param MAX_ASSOC number of maximum incoming edges that a node can have
 #' @return a tibble containing the edge list of output network with the following columns: source, dest, weight.
-#' Source and dest represent the edges and contain node ids, weight contains edge weights.
+#' Source and dest represent the edges and contain node ids, weight contains edge weights representing nodes similarity.
 #' @export
 
 k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_star = TRUE, cores = 1, MAX_ASSOC = Inf) {
@@ -60,9 +60,8 @@ k_star_net <- function(matrix, distFun = "Euclidean", sparsity = 1, knn = 25, k_
         MAX_ASSOC = nrow(knn_elems)
     }
 
-    knn_elems %>% group_by(dest) %>%
-        arrange(weight, .by_group = TRUE) %>%
-        dplyr::slice(1:MAX_ASSOC)
+    knn_elems  %>%  group_by(dest) %>% arrange(weight, .by_group = TRUE) %>%
+        dplyr::slice(1:MAX_ASSOC) %>% mutate(weight = 1 / (1+weight) )
 
 }
 

@@ -4,7 +4,7 @@
 \alias{get_embedding}
 \title{Multi-omics matrix embedding}
 \usage{
-get_embedding(matrix, embedding_size, num_steps = 10^7, cores = 20)
+get_embedding(matrix, embedding_size, num_steps = NA, cores = 20)
 }
 \arguments{
 \item{matrix}{a n x n squared numeric similarity matrix with values in the range 0-1}
