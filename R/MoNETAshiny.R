@@ -22,9 +22,10 @@
 
 
 MoNETAshiny = function() {
+    options(shiny.maxRequestSize = 200 * 1024^2)
+
     shiny::shinyApp(ui, server)
 
-    options(shiny.maxRequestSize = 200 * 1024^2)
 }
 
 
