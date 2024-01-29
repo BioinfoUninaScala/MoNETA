@@ -3,7 +3,7 @@ Type: Package
 Title: MoNETA: MultiOmics Network Embedding for SubType Analysis
 Version: 1.0.0
 Author: Luigi Ferraro, Michele Ceccarelli, Giovanni Scala
-Maintainer: Luigi Ferraro <luigi.ferraro2@unina.it>
+Maintainer: Luigi Ferraro <lf758@miami.edu>
 Description: Tool for patient stratification using multi-omics data,
     exploiting k-nearest neighbors algorithm and VP tree data structure.
 License: GPL (>= 3)
@@ -16,7 +16,9 @@ Imports: purrr, dplyr, stats, magrittr, doFuture, foreach, doParallel,
         ggrepel, fpc, ggfortify, survival, survminer, plotly, umap,
         R.matlab, bc3net, kernlab, optparse, tibble, methods,
         doMC, ggplot2,
-        Rcpp, uwot, Rtsne
+        Rcpp, uwot, Rtsne,
+        shiny, shinydashboard, shinyalert, shinyFiles, shinyMatrix, DT,
+        readr, glue, conflicted, dendextend
 Suggests: 
     rmarkdown,
     knitr

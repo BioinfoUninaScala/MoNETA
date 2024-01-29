@@ -2,8 +2,7 @@
 % Please edit documentation in R/k_star_net.R
 \name{k_star_net}
 \alias{k_star_net}
-\title{Build omic similarity network
-Publication: https://papers.nips.cc/paper/2016/file/2c6ae45a3e88aee548c0714fad7f8269-Paper.pdf}
+\title{Build omic similarity network}
 \usage{
 k_star_net(
   matrix,
@@ -37,5 +36,4 @@ Source and dest represent the edges and contain node ids, weight contains edge w
 }
 \description{
 Build omic similarity network
-Publication: https://papers.nips.cc/paper/2016/file/2c6ae45a3e88aee548c0714fad7f8269-Paper.pdf
 }
