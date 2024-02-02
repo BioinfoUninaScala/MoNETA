@@ -21,11 +21,32 @@
 #' @export
 
 
-MoNETAshiny = function() {
-    options(shiny.maxRequestSize = 200 * 1024^2)
+MoNETAshiny = function(max_request = 10000) {
+    options(shiny.maxRequestSize = max_request * 1024^2)
 
     shiny::shinyApp(ui, server)
 
+}
+
+
+netSummary <- function(network){
+    # -------------------------------------------------------------------------
+    #  This function outputs a summary for a given network, like the network
+    #  dimension, the number of genes and edges, the nodes with the highest degree
+    #  and their degree.
+    # -------------------------------------------------------------------------
+    nodes <- c(network$source, network$dest)
+    degree <- table(nodes) %>%
+        tidyr::as_tibble(.) %>%
+        dplyr::arrange(desc(n))
+    top10 <- c(degree[c(1:10), 'nodes'])
+    netSummary_list <- list( 'dim'= dim(network),
+                             'edges'= dim(network)[1],
+                             'nodes'= length(unique(nodes)),
+                             'maxConnections'= degree[[1, 'n']],
+                             'maxDegreeNodes'= top10$nodes
+    )
+    return(netSummary_list)
 }
 
 
@@ -56,19 +77,34 @@ ui <- shinydashboard ::dashboardPage(
             shinydashboard::tabItem(tabName = "mat_sub_1",
                                     shiny::fluidRow(
                                         shinydashboard::box(
-                                            shiny::fileInput(inputId = "omics_files",
-                                                             label = shiny::h4(shiny::span("Upload omics matrices", style = "font-weight: bold")),
-                                                             multiple = TRUE),
-                                            shiny::uiOutput('omics_names'),
+                                            shiny::h4(shiny::span("Upload omics matrices", style = "font-weight: bold")),
+                                            shiny::radioButtons(inputId = 'omics_example_opt', label = 'Load the example dataset',
+                                                                choices = c('Yes', 'No'), selected = 'No'),
+                                            conditionalPanel(
+                                                condition = 'input.omics_example_opt == "Yes"',
+                                                shiny::checkboxGroupInput(inputId = 'omics_example_files', label = 'Select one or more omics matrices',
+                                                                          choices = names(MoNETA::GBM_mtx), selected = names(MoNETA::GBM_mtx))
+                                                             ),
+                                            conditionalPanel(
+                                                condition = 'input.omics_example_opt == "No"',
+                                                shiny::fileInput(inputId = "omics_files", label = 'Select one or more files' ,
+                                                                 multiple = TRUE),
+                                                shiny::uiOutput('omics_names')
+                                            ),
                                             shiny::actionButton('load_mat_button', 'Load')
                                         ),
                                         shiny::htmlOutput(outputId = "omics_sum_info")
                                     ),
                                     shiny::fluidRow(
                                         shinydashboard::box(
-                                            shiny::fileInput(inputId = "anno_file",
-                                                             label = shiny::h4(shiny::span("Upload annotation file", style = "font-weight: bold")),
-                                                             multiple = FALSE),
+                                            shiny::h4(shiny::span("Upload annotation file", style = "font-weight: bold")),
+                                            shiny::radioButtons(inputId = 'anno_example_opt', label = 'Load the example annotation file',
+                                                                choices = c('Yes', 'No'), selected = 'No'),
+                                            conditionalPanel(
+                                                condition = 'input.anno_example_opt == "No"',
+                                                 shiny::fileInput(inputId = "anno_file", label = 'Select a file',
+                                                             multiple = FALSE)
+                                            ),
                                             shiny::actionButton('load_anno_button', 'Load')
                                         ),
                                         shiny::htmlOutput(outputId = "anno_info"),
@@ -218,8 +254,6 @@ ui <- shinydashboard ::dashboardPage(
 
 server <- function(input, output, session) {
 
-    #shinyjs::runjs('Shiny.maxRequestSize = 200 * 1024 * 1024;')  # 200 MB
-
     ############################################################################################
     #                            OMICS DATA: LOADING DATA (INPUT)                       #
     ############################################################################################
@@ -229,54 +263,68 @@ server <- function(input, output, session) {
     ### Load omics matrices
     omics_files <- shiny::eventReactive(input$load_mat_button, {
         omicsFiles <- list()
-        inFiles <- input$omics_files
-        if (is.null(inFiles))
-            return(NULL)
-        for (i in 1:nrow(inFiles)) {
-            name <- tools::file_path_sans_ext(inFiles$name[i])
-            input_name <- input[[paste0('name', i)]]
-            new_name <- ifelse(nchar(input_name) == 0, name, input_name)
 
-            ext <- tools::file_ext(inFiles$name[i])
-            file <- switch(ext,
-                           csv = vroom::vroom(inFiles$datapath[i], delim = ","),
-                           tsv = vroom::vroom(inFiles$datapath[i], delim = "\t"),
-                           RDS = readRDS(inFiles$datapath[i]),
-                           validate("Invalid file; Please upload a .csv, .tsv or .RDS file")
-            )
-            if (is.numeric(file)){
-                sorted_file <- file[, sort(colnames(file))]
-                omicsFiles[[new_name]] <- sorted_file
-            }else{
-                shinyalert("Type Error", "Uploaded Data is not a numeric matrix", type = "error")
-                returnValue()
+        if (input$omics_example_opt == 'No'){
+            inFiles <- input$omics_files
+            if (is.null(inFiles))
+                return(NULL)
+            for (i in 1:nrow(inFiles)) {
+                name <- tools::file_path_sans_ext(inFiles$name[i])
+                input_name <- input[[paste0('name', i)]]
+                new_name <- ifelse(nchar(input_name) == 0, name, input_name)
+
+                ext <- tools::file_ext(inFiles$name[i])
+                file <- switch(ext,
+                               csv = vroom::vroom(inFiles$datapath[i], delim = ","),
+                               tsv = vroom::vroom(inFiles$datapath[i], delim = "\t"),
+                               RDS = readRDS(inFiles$datapath[i]),
+                               validate("Invalid file; Please upload a .csv, .tsv or .RDS file")
+                )
+                if (is.numeric(file)){
+                    sorted_file <- file[, sort(colnames(file))]
+                    omicsFiles[[new_name]] <- sorted_file
+                }else{
+                    shinyalert::shinyalert("Type Error", "Uploaded Data is not a numeric matrix", type = "error")
+                    returnValue()
+                }
             }
+
+        } else {
+            req(input$omics_example_files)
+            example_data <- MoNETA::GBM_mtx[input$omics_example_files]
+            omicsFiles <- example_data
         }
+
         omicsFiles
     })
 
     ### Load annotation file
     annotation <- shiny::eventReactive(input$load_anno_button, {
-        req(input$anno_file)
         listFiles <- list()
-        inFiles <- input$anno_file
-        if (is.null(inFiles)){
-            return(NULL)
-        } else {
-            ext <- tools::file_ext(inFiles$name)
-            file <- switch(ext,
-                           csv = vroom::vroom(inFiles$datapath, delim = ","),
-                           RDS = readRDS(inFiles$datapath),
-                           validate("Invalid file; Please upload a .csv or .RDS file")
-            )
-            if (is.data.frame(file)){
-                listFiles[['annotation']] <- file
-            }else {
-                shinyalert("Type Error", "Uploaded Data is not a dataframe", type = "error")
-                returnValue()
+
+        if (input$anno_example_opt == 'No'){
+            inFiles <- input$anno_file
+            if (is.null(inFiles)){
+                return(NULL)
+            }else{
+                ext <- tools::file_ext(inFiles$name)
+                file <- switch(ext,
+                               csv = vroom::vroom(inFiles$datapath, delim = ","),
+                               RDS = readRDS(inFiles$datapath),
+                               validate("Invalid file; Please upload a .csv or .RDS file")
+                )
+                if (is.data.frame(file)){
+                    listFiles[['annotation']] <- file
+                    return(listFiles)
+                }else {
+                    shinyalert::shinyalert("Type Error", "Uploaded Data is not a dataframe", type = "error")
+                    returnValue()
+                }
             }
+        }else{
+           listFiles[['annotation']] <- MoNETA::GBM_pdata
+           return(listFiles)
         }
-        return(listFiles)
     })
 
 
@@ -353,10 +401,10 @@ server <- function(input, output, session) {
                 if (is.data.frame(file) & ncol(file) == 3){
                     listFiles[[new_name]] <- file
                 }else if (!is.data.frame(file) ){
-                    shinyalert("Type Error", "Uploaded Data is not a dataframe", type = "error")
+                    shinyalert::shinyalert("Type Error", "Uploaded Data is not a dataframe", type = "error")
                     returnValue()
                 }else if (ncol(file) != 3){
-                    shinyalert("Column Error", "Uploaded Data has not 3 columns", type = "error")
+                    shinyalert::shinyalert("Column Error", "Uploaded Data has not 3 columns", type = "error")
                     returnValue()
                 }
             }
@@ -400,7 +448,7 @@ server <- function(input, output, session) {
             if (is.data.frame(file)){
                 listFiles[[new_name]] <- file
             }else {
-                shinyalert("Type Error", "Uploaded Data is not a dataframe", type = "error")
+                shinyalert::shinyalert("Type Error", "Uploaded Data is not a dataframe", type = "error")
                 returnValue()
             }
         }
@@ -432,8 +480,8 @@ server <- function(input, output, session) {
     shiny::observeEvent(input$gen_multiplex_btn, {
         print('Generating the multiplex network...')
         net_list <- if (!is.null(g_net_list())) g_net_list() else l_net_list()
-        multiplex <-  create_multiplex(net_list, weighted = ifelse(input$weightMultiplex == 'YES', TRUE, FALSE))
-        multiplex_network$multiplex <- multiplex %>% ungroup(.)
+        multiplex <- create_multiplex(net_list, weighted = ifelse(input$weightMultiplex == 'YES', TRUE, FALSE))
+        multiplex_network$multiplex <- multiplex %>% dplyr::ungroup(.)
         if(input$weightMultiplex == 'NO')
             multiplex_network$pruned_multiplex <- multiplex
     })
@@ -605,10 +653,10 @@ server <- function(input, output, session) {
                                           id_name = 'id', interactive = FALSE, wo_legend = FALSE) +
             ggtitle(paste(method, emb)) +
             xlab(paste0(input$dr_method, '1')) + ylab( paste0(input$dr_method, '2')) +
-            theme(text = element_text(family="Times New Roman"),
-                  plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
-                  axis.title.x = element_text(size = 10),
-                  axis.title.y = element_text(size = 10))
+            theme(text = ggplot2::element_text(family="Times New Roman"),
+                  plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
+                  axis.title.x = ggplot2::element_text(size = 10),
+                  axis.title.y = ggplot2::element_text(size = 10))
         return(dr_plot)
     })
 
@@ -647,7 +695,7 @@ server <- function(input, output, session) {
 
             clusters$dr_mat <- shiny::reactiveValuesToList(dr_output)$dr_mat
             t_mat <- t(mat)
-            gPlot_mat <- tibble("id" = rownames(t_mat))
+            gPlot_mat <- tidyr::tibble("id" = rownames(t_mat))
 
             if (input$cluster_method == "kmeans"){
                 to_create(NULL)
@@ -663,14 +711,14 @@ server <- function(input, output, session) {
 
                 progress$inc(1, detail = paste("Done!"))
 
-                if (( shiny::isTruthy(input$anno_file) |  shiny::isTruthy(input$anno_file1)) && ifelse(input$shape_bool == 'YES', TRUE, FALSE)){
-                    anno <- if ( shiny::isTruthy(input$anno_file)) anno() else anno1()
+                if (( shiny::isTruthy(annotation()) |  shiny::isTruthy(input$anno_file1)) && ifelse(input$shape_bool == 'YES', TRUE, FALSE)){
+                    anno <- if ( shiny::isTruthy(annotation())) anno() else anno1()
                     samples <- colnames(mat)
                     id_col_check <- sapply(colnames(anno), FUN = function(x) sum(samples %in% anno[[x]]))
                     id <- colnames(anno)[which.max(id_col_check)]
                     f_anno <- anno[anno[[id]] %in% samples, c(id, input$select_shape)]
                     colnames(f_anno) <- c('id', 'shape')
-                    cluster <- cluster %>% inner_join(f_anno, by = 'id')
+                    cluster <- cluster %>% dplyr::inner_join(f_anno, by = 'id')
                 }
                 clusters$cluster <- cluster
 
@@ -680,20 +728,20 @@ server <- function(input, output, session) {
                 on.exit(progress$close())
                 progress$set(message = "MoNETA", detail = paste("Doing DBSCAN"), value = 0)
 
-                db_clust <- dbscan(t_mat, input$eps)
+                db_clust <- fpc::dbscan(t_mat, input$eps)
                 cluster <- gPlot_mat
                 cluster$clust <- factor(db_clust$cluster)
                 cluster$shape <- NULL
                 progress$inc(1, detail = paste("Done!"))
 
-                if (( shiny::isTruthy(input$anno_file) |  shiny::isTruthy(input$anno_file1)) && ifelse(input$shape_bool == 'YES', TRUE, FALSE)){
-                    anno <- if ( shiny::isTruthy(input$anno_file)) anno() else anno1()
+                if (( shiny::isTruthy(annotation()) |  shiny::isTruthy(input$anno_file1)) && ifelse(input$shape_bool == 'YES', TRUE, FALSE)){
+                    anno <- if ( shiny::isTruthy(annotation())) anno() else anno1()
                     samples <- colnames(mat)
                     id_col_check <- sapply(colnames(anno), FUN = function(x) sum(samples %in% anno[[x]]))
                     id <- colnames(anno)[which.max(id_col_check)]
                     f_anno <- anno[anno[[id]] %in% samples, c(id, input$select_shape)]
                     colnames(f_anno) <- c('id', 'shape')
-                    cluster <- cluster %>% inner_join(f_anno, by = 'id')
+                    cluster <- cluster %>% dplyr::inner_join(f_anno, by = 'id')
                 }
                 clusters$cluster <- cluster
 
@@ -722,14 +770,14 @@ server <- function(input, output, session) {
                     num_clust <- length(unique(cutree_res))
                     cluster <- gPlot_mat
                     cluster$clust <- factor(cutree_res)
-                    if (( shiny::isTruthy(input$anno_file) |  shiny::isTruthy(input$anno_file1)) && ifelse(input$shape_bool == 'YES', TRUE, FALSE)){
-                        anno <- if ( shiny::isTruthy(input$anno_file)) anno() else anno1()
+                    if (( shiny::isTruthy(annotation()) |  shiny::isTruthy(input$anno_file1)) && ifelse(input$shape_bool == 'YES', TRUE, FALSE)){
+                        anno <- if ( shiny::isTruthy(annotation())) anno() else anno1()
                         samples <- colnames(mat)
                         id_col_check <- sapply(colnames(anno), FUN = function(x) sum(samples %in% anno[[x]]))
                         id <- colnames(anno)[which.max(id_col_check)]
                         f_anno <- anno[anno[[id]] %in% samples, c(id, input$select_shape)]
                         colnames(f_anno) <- c('id', 'shape')
-                        cluster <- cluster %>% inner_join(f_anno, by = 'id')
+                        cluster <- cluster %>% dplyr::inner_join(f_anno, by = 'id')
                     }
                 }
 
@@ -786,27 +834,27 @@ server <- function(input, output, session) {
 
     cl_plot <- shiny::reactive({
         clusters <- shiny::reactiveValuesToList(clusters)
-        clu_anno <- clusters$cluster %>% arrange(clust)
+        clu_anno <- clusters$cluster %>% dplyr::arrange(clust)
         if (is.null(clu_anno$shape)){
             cl_plot <- MoNETA::plot_2D_matrix(coord = clusters$dr_mat[1:2,], nodes_anno = clu_anno,
                                               id_name = 'id', id_anno_color = 'clust',
                                               interactive = FALSE, wo_legend = FALSE) +
                 ggtitle(title()) +
                 xlab(paste0(input$dr_method, '1')) + ylab( paste0(input$dr_method, '2')) +
-                theme(text = element_text(family="Times New Roman"),
-                      plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
-                      axis.title.x = element_text(size = 10),
-                      axis.title.y = element_text(size = 10))
+                theme(text = ggplot2::element_text(family="Times New Roman"),
+                      plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
+                      axis.title.x = ggplot2::element_text(size = 10),
+                      axis.title.y = ggplot2::element_text(size = 10))
         } else{
             cl_plot <- MoNETA::plot_2D_matrix(coord = clusters$dr_mat[1:2,], nodes_anno = clu_anno,
                                               id_name = 'id', id_anno_color = 'clust', id_anno_shape = 'shape',
                                               interactive = FALSE, wo_legend = FALSE) +
                 ggtitle(title()) +
                 xlab(paste0(input$dr_method, '1')) + ylab( paste0(input$dr_method, '2')) +
-                theme(text = element_text(family="Times New Roman"),
-                      plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
-                      axis.title.x = element_text(size = 10),
-                      axis.title.y = element_text(size = 10))
+                theme(text = ggplot2::element_text(family="Times New Roman"),
+                      plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
+                      axis.title.x = ggplot2::element_text(size = 10),
+                      axis.title.y = ggplot2::element_text(size = 10))
         }
     })
 
@@ -920,7 +968,7 @@ server <- function(input, output, session) {
                 return(tab)
             })
         thetabs$width <- 6
-        do.call(tabBox, thetabs)
+        do.call(shinydashboard::tabBox, thetabs)
     })
 
     ############## Processed matrices info #############
@@ -1064,7 +1112,7 @@ server <- function(input, output, session) {
                 gene_networks[[paste0(x, '_net')]] <- net
                 print('Omics Network Inference...done!')
 
-                output[[paste0(x, 'plot_net')]] <- renderVisNetwork({
+                output[[paste0(x, 'plot_net')]] <- visNetwork::renderVisNetwork({
                     ids <- data.frame(id = base::union(net$source, net$dest))
                     net_plot <- plot_net(edgeList = net, nodes_anno = ids, id_name = 'id', id_anno_color = 'id')
                     return(net_plot)
@@ -1076,7 +1124,7 @@ server <- function(input, output, session) {
             omics_network_list[[paste0('update_omics_net_plot_', x)]] <-
                 shiny::observeEvent(input[[paste0('update_omics_net_plot_', x)]], {
 
-                    output[[paste0(x, 'plot_net')]] <- renderVisNetwork({
+                    output[[paste0(x, 'plot_net')]] <- visNetwork::renderVisNetwork({
                         shiny::isolate({
                             net <- gene_networks[[paste0(x, '_net')]]
                             anno <- anno()
@@ -1087,7 +1135,7 @@ server <- function(input, output, session) {
                             id_col_check <- sapply(colnames(anno), FUN = function(x) sum(samples %in% anno[[x]]))
                             id <- colnames(anno)[which.max(id_col_check)]
                             f_anno <- anno[anno[[id]] %in% samples, ]
-                            final_anno <- f_anno %>% as_tibble(.) %>% select(id, everything())
+                            final_anno <- f_anno %>% tidyr::as_tibble(.) %>% dplyr::select(id, everything())
 
                             net_plot <- plot_net(edgeList = net, nodes_anno = final_anno,
                                                  id_name = id, id_anno_color = color, id_anno_shape = shape,
@@ -1100,7 +1148,7 @@ server <- function(input, output, session) {
             output[[paste0(x, '_custom_net')]] <- shiny::renderUI({
                 req(input[[paste0('generate_omics_net_', x)]])
                 shiny::isolate({
-                    if ( shiny::isTruthy(input$anno_file)){
+                    if ( shiny::isTruthy(annotation())){
                         output <- tagList()
                         output[[1]] <-
                             shiny::selectInput(inputId = paste0(x, '_net_color'),
@@ -1121,7 +1169,7 @@ server <- function(input, output, session) {
             output[[paste0('update_omics_net_plot_', x)]] <- shiny::renderUI({
                 req(input[[paste0('generate_omics_net_', x)]])
                 shiny::isolate({
-                    if ( shiny::isTruthy(input$anno_file)){
+                    if ( shiny::isTruthy(annotation())){
                         shiny::actionButton(inputId = paste0('update_omics_net_plot_', x), label = 'Update plot')
                     }else{
                         return(NULL)
@@ -1158,7 +1206,7 @@ server <- function(input, output, session) {
                                                      )
                                        ),
                                        shiny::column(width = 8,
-                                                     visNetworkOutput(paste0(x, 'plot_net')),
+                                                     visNetwork::visNetworkOutput(paste0(x, 'plot_net')),
                                                      shiny::uiOutput(paste0(x, '_custom_net'))
                                        )
                                    ), shiny::hr(),
@@ -1170,7 +1218,7 @@ server <- function(input, output, session) {
             return(tab)
         })
         thetabs$width <- 8
-        do.call(tabBox, thetabs)
+        do.call(shinydashboard::tabBox, thetabs)
     })
 
     ############## download networks  #############
@@ -1236,50 +1284,13 @@ server <- function(input, output, session) {
 
         thetabs <- lapply(names(nets), function(x) {
 
-            #output[[paste0(x, "_weightDist")]] <-
-            #  shiny::renderPlotly({
-            #    input[[ paste0('button_', x)]]
-            #    shiny::isolate({
-            #      net <- nets[[x]]
-            #      fnet <- net[net$weight <= input[[paste0('omics_range', x)]],]
-            #      p <- ggplotly(ggplot(fnet, aes(x= weight)) + geom_histogram() +
-            #                      ggtitle('Weight Distribution') +
-            #                      xlab("Weight") + ylab("Counts") +
-            #                      theme(text = element_text(family="LM Roman 10"),
-            #                            plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
-            #                            axis.title.x = element_text(size = 10),
-            #                            axis.title.y = element_text(size = 10))
-            #      )
-            #    })
-            #})
-            #
-            #output[[paste0(x, "_nodeDegreeDist")]] <-
-            #  shiny::renderPlotly({
-            #    input[[ paste0('button_', x)]]
-            #    shiny::isolate({
-            #      net <- nets[[x]]
-            #      fnet <- net
-            #      fnet$weight <- 1
-            #      graph <- graph_from_data_frame(fnet, directed = FALSE)
-            #      degree_table <- data.frame(Degree = degree(graph))
-            #      p <- ggplotly(ggplot(degree_table, aes(x = Degree)) + geom_histogram() +
-            #                      ggtitle('Nodes Degree Distribution') +
-            #                      ylab("Number of nodes") + xlab("Node degree") +
-            #                      theme(text = element_text(family="LM Roman 10"),
-            #                            plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
-            #                            axis.title.x = element_text(size = 10),
-            #                            axis.title.y = element_text(size = 10))
-            #      )
-            #    })
-            #})
-
             output[[paste0(x, '_info')]] <-
                 shiny::renderUI({
                     input[[ paste0('button_', x)]]
                     shiny::isolate({
                         net <- nets[[x]]
                         fnet <- net[net$weight <= input[[paste0('omics_range', x)]],]
-                        summary <- netSummary(tibble(fnet))
+                        summary <- netSummary(tidyr::tibble(fnet))
                         res <- c()
                         for (i in 2:length(summary))
                             res[i-1] <- (paste0(paste('<b>', names(summary)[i], '</b>'), ': ', toString(summary[[i]]), ' <br/>'))
@@ -1291,38 +1302,38 @@ server <- function(input, output, session) {
                 net <- nets[[x]]
                 fnet <- net[net$weight <= input[[paste0('omics_range', x)]],]
 
-                output[[paste0(x, "_weightDist")]] <- shiny::renderPlotly({
+                output[[paste0(x, "_weightDist")]] <- plotly::renderPlotly({
                     shiny::isolate({
-                        ggplotly(ggplot(fnet, aes(x= weight)) + geom_histogram() +
-                                     ggtitle('Weight Distribution') +
-                                     xlab("Weight") + ylab("Counts") +
-                                     theme(text = element_text(family="LM Roman 10"),
-                                           plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
-                                           axis.title.x = element_text(size = 10),
-                                           axis.title.y = element_text(size = 10))
+                        plotly::ggplotly(ggplot2::ggplot(fnet, ggplot2::aes(x= weight)) + ggplot2::geom_histogram() +
+                                     ggplot2::ggtitle('Weight Distribution') +
+                                     ggplot2::xlab("Weight") + ggplot2::ylab("Counts") +
+                                     ggplot2::theme(text = ggplot2::element_text(family="LM Roman 10"),
+                                                    plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
+                                                    axis.title.x = ggplot2::element_text(size = 10),
+                                                    axis.title.y = ggplot2::element_text(size = 10))
                         )
                     })
                 })
 
-                output[[paste0(x, "_nodeDegreeDist")]] <- shiny::renderPlotly({
+                output[[paste0(x, "_nodeDegreeDist")]] <- plotly::renderPlotly({
                     shiny::isolate({
                         fnet1 <- fnet
                         fnet1$weight <- 1
-                        graph <- graph_from_data_frame(fnet1, directed = FALSE)
+                        graph <- igraph::graph_from_data_frame(fnet1, directed = FALSE)
                         degree_table <- data.frame(Degree = igraph::degree(graph))
-                        p <- ggplotly(ggplot(degree_table, aes(x = Degree)) + geom_histogram() +
-                                          ggtitle('Nodes Degree Distribution') +
-                                          ylab("Number of nodes") + xlab("Node degree") +
-                                          theme(text = element_text(family="LM Roman 10"),
-                                                plot.title = element_text(size = 16, hjust = 0.5, face = 'bold'),
-                                                axis.title.x = element_text(size = 10),
-                                                axis.title.y = element_text(size = 10))
+                        p <- plotly::ggplotly(ggplot2::ggplot(degree_table, ggplot2::aes(x = Degree)) + ggplot2::geom_histogram() +
+                                          ggplot2::ggtitle('Nodes Degree Distribution') +
+                                          ggplot2::ylab("Number of nodes") + ggplot2::xlab("Node degree") +
+                                          ggplot2::theme(text = ggplot2::element_text(family="LM Roman 10"),
+                                                         plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
+                                                         axis.title.x = ggplot2::element_text(size = 10),
+                                                         axis.title.y = ggplot2::element_text(size = 10))
                         )
                         return(p)
                     })
                 })
 
-                output[[paste0(x, '_plot_fnet')]] <- renderVisNetwork({
+                output[[paste0(x, '_plot_fnet')]] <- visNetwork::renderVisNetwork({
                     shiny::isolate({
                         ids <- data.frame(id = base::union(fnet$source, fnet$dest))
                         net_plot <- plot_net(edgeList = fnet, nodes_anno = ids, id_name = 'id', id_anno_color = 'id')
@@ -1332,7 +1343,7 @@ server <- function(input, output, session) {
 
                 output[[paste0(x, '_custom_fnet')]] <- shiny::renderUI({
                     #shiny::isolate({
-                    if ( shiny::isTruthy(input$anno_file)){
+                    if ( shiny::isTruthy(annotation())){
                         output <- tagList()
                         output[[1]] <-
                             shiny::selectInput(inputId = paste0(x, '_fnet_color'),
@@ -1365,7 +1376,7 @@ server <- function(input, output, session) {
             filteredOmicsNetworks_list[[paste0('update_f_net_plot_', x)]] <-
                 shiny::observeEvent(input[[paste0('update_f_net_plot_', x)]], {
 
-                    output[[paste0(x, '_plot_fnet')]] <- renderVisNetwork({
+                    output[[paste0(x, '_plot_fnet')]] <- visNetwork::renderVisNetwork({
                         shiny::isolate({
                             net <- nets[[x]]
                             filt_net <- net[net$weight <= input[[paste0('omics_range', x)]],]
@@ -1377,7 +1388,7 @@ server <- function(input, output, session) {
                             id_col_check <- sapply(colnames(anno), FUN = function(x) sum(samples %in% anno[[x]]))
                             id <- colnames(anno)[which.max(id_col_check)]
                             f_anno <- anno[anno[[id]] %in% samples, ]
-                            final_anno <- f_anno %>% as_tibble(.) %>% select(id, everything())
+                            final_anno <- f_anno %>% tidyr::as_tibble(.) %>%  dplyr::select(id, everything())
 
                             net_plot <- plot_net(edgeList = filt_net, nodes_anno = final_anno,
                                                  id_name = id, id_anno_color = color, id_anno_shape = shape,
@@ -1391,7 +1402,7 @@ server <- function(input, output, session) {
             ### Update plot button
             output[[paste0('update_f_net_plot_', x)]] <- shiny::renderUI({
                 #shiny::isolate({
-                if ( shiny::isTruthy(input$anno_file) &  shiny::isTruthy(input[[paste0('button_', x)]])){
+                if ( shiny::isTruthy(annotation()) &  shiny::isTruthy(input[[paste0('button_', x)]])){
                     shiny::actionButton(inputId = paste0('update_f_net_plot_', x), label = 'Update plot')
                 }else{
                     return(NULL)
@@ -1419,14 +1430,14 @@ server <- function(input, output, session) {
                                    shiny::hr(),
                                    shiny::fluidRow(
                                        shiny::column(width = 6,
-                                                     plotlyOutput(paste0(x, "_weightDist"))
+                                                     plotly::plotlyOutput(paste0(x, "_weightDist"))
                                        ),
                                        shiny::column(width = 6,
-                                                     plotlyOutput(paste0(x, "_nodeDegreeDist"))
+                                                     plotly::plotlyOutput(paste0(x, "_nodeDegreeDist"))
                                        )
                                    ),
                                    shiny::fluidRow(
-                                       shiny::column(width = 8,  visNetworkOutput(paste0(x, '_plot_fnet'))),
+                                       shiny::column(width = 8,  visNetwork::visNetworkOutput(paste0(x, '_plot_fnet'))),
                                        shiny::column(width = 4, shiny::uiOutput(paste0(x, '_custom_fnet')))
                                    ),
                                    shiny::hr(),
@@ -1439,7 +1450,7 @@ server <- function(input, output, session) {
         })
 
         thetabs$width <- 8
-        do.call(tabBox, thetabs)
+        do.call(shinydashboard::tabBox, thetabs)
     })
 
     ############## Filtered networks info #############
@@ -1644,7 +1655,7 @@ server <- function(input, output, session) {
             req(multiplex_network)
             multiplex <- shiny::reactiveValuesToList(multiplex_network)$multiplex
             if (!is.null(multiplex)){
-                n_layers <- multiplex %>% select(EdgeType) %>% unique(.) %>% nrow(.)
+                n_layers <- multiplex %>%  dplyr::select(EdgeType) %>% unique(.) %>% nrow(.)
                 n_nodes <- base::union(multiplex$source, multiplex$target) %>% length(.)
                 n_edges <- multiplex %>% nrow(.)
                 weighted <- ifelse(input$weightMultiplex == 'YES', 'Weighted', 'Unweighted')
@@ -1666,7 +1677,7 @@ server <- function(input, output, session) {
         shiny::isolate({
             pruned_multiplex <- shiny::reactiveValuesToList(multiplex_network)$pruned_multiplex
             if (!is.null(pruned_multiplex)){
-                n_layers <- pruned_multiplex %>% select(EdgeType) %>% unique(.) %>% nrow(.)
+                n_layers <- pruned_multiplex %>%  dplyr::select(EdgeType) %>% unique(.) %>% nrow(.)
                 n_nodes <- base::union(pruned_multiplex$source, pruned_multiplex$target) %>% length(.)
                 n_edges <- pruned_multiplex %>% nrow(.)
                 shinydashboard::box(shiny::HTML(paste0(paste("<b>Weighted Multiplex network</b>"), " pruned: <br/>")),
@@ -1719,7 +1730,7 @@ server <- function(input, output, session) {
         })
         output$omics_trans_mat <- shiny::renderUI({
             div(
-                matrixInput(inputId = "editable_trans_mat", value = m(), class = "numeric")
+                shinyMatrix::matrixInput(inputId = "editable_trans_mat", value = m(), class = "numeric")
             )
         })
     })
@@ -1780,7 +1791,7 @@ server <- function(input, output, session) {
                                    xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
                                    yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
                     )%>%
-                    config(
+                    plotly::config(
                         toImageButtonOptions = list(filename = paste('MoNETAshiny', gsub(x = method, replacement = '_', pattern = ' '),
                                                                      gsub(x = emb, replacement = '_', pattern = ' '), 'plot', sep='_'),
                                                     format = "png", width = 1800, height = 800)
@@ -1878,13 +1889,13 @@ server <- function(input, output, session) {
     ############## output cluster box #############
 
     output$cl_opt <- shiny::renderUI({
-        anno_name <- if (! shiny::isTruthy(input$anno_file)) NULL else 'annotation'
+        anno_name <- if (! shiny::isTruthy(annotation())) NULL else 'annotation'
         anno1_name <-  if (! shiny::isTruthy(input$anno_file1)) NULL else 'annotation1'
         anno_list <- list(anno_name, anno1_name)
 
         output$shape_opt <- shiny::renderUI({
-            if ( ( shiny::isTruthy(input$anno_file) |  shiny::isTruthy(input$anno_file1)) & input$cluster_method %in% c('kmeans', 'dbscan', 'hclust') ){
-                anno_table <- if ( shiny::isTruthy(input$anno_file)) anno() else anno1()
+            if ( ( shiny::isTruthy(annotation()) |  shiny::isTruthy(input$anno_file1) ) & input$cluster_method %in% c('kmeans', 'dbscan', 'hclust') ){
+                anno_table <- if ( shiny::isTruthy(annotation())) anno() else anno1()
                 output <-  tagList()
                 output[[1]] <-
                     shiny::radioButtons(inputId = 'shape_bool', label = 'Do you want to use particular shape for points?', c('YES', 'NO'), selected = 'NO')
@@ -1894,7 +1905,7 @@ server <- function(input, output, session) {
                         shiny::selectInput(inputId = 'select_shape', label = 'Select a column to shape data points',  choices = colnames(anno_table))
                     )
                 output
-            }else if (input$cluster_method %in% c('kmeans', 'dbscan', 'hclust') & (! shiny::isTruthy(input$anno_file) & ! shiny::isTruthy(input$anno_file1)) ){
+            }else if (input$cluster_method %in% c('kmeans', 'dbscan', 'hclust') & (! shiny::isTruthy(annotation()) & ! shiny::isTruthy(input$anno_file1)) ){
                 return(NULL)
             }
         })
@@ -1951,7 +1962,7 @@ server <- function(input, output, session) {
                 return(NULL)
             }else{
                 clusters <- shiny::reactiveValuesToList(clusters)
-                clu_anno <- clusters$cluster %>% arrange(clust)
+                clu_anno <- clusters$cluster %>% dplyr::arrange(clust)
                 if (is.null(clu_anno$shape)){
                     cl_plot <- MoNETA::plot_2D_matrix(coord = clusters$dr_mat[1:2,], nodes_anno = clu_anno,
                                                       id_name = 'id', id_anno_color = 'clust',
@@ -1961,7 +1972,7 @@ server <- function(input, output, session) {
                                        xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
                                        yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
                         ) %>%
-                        config(
+                        plotly::config(
                             toImageButtonOptions = list(filename = paste('MoNETAshiny', input$dr_method, input$cluster_method, 'plot', sep = '_'),
                                                         format = "png", width = 1800, height = 800)
                         )
@@ -1974,7 +1985,7 @@ server <- function(input, output, session) {
                                        xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
                                        yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
                         ) %>%
-                        config(
+                        plotly::config(
                             toImageButtonOptions = list(filename = paste('MoNETAshiny', input$dr_method, input$cluster_method, 'plot', sep = '_'),
                                                         format = "png", width = 1800, height = 800)
                         )
@@ -1994,26 +2005,26 @@ server <- function(input, output, session) {
                     if (is.null(shiny::reactiveValuesToList(clusters)$num_clust)) {
                         tree <- shiny::reactiveValuesToList(clusters)$tree
                         tree %>%
-                            set("labels", '') %>%
-                            #set("branches_k_color", k = round(base::attr(tree, "height"), digits = 2)) %>%
+                            dendextend::set("labels", '') %>%
+                            #dendextend::set("branches_k_color", k = round(base::attr(tree, "height"), digits = 2)) %>%
                             plot(horiz=FALSE, axes=TRUE)
                     } else{
                         tree <- shiny::reactiveValuesToList(clusters)$tree
                         num_clust <- shiny::reactiveValuesToList(clusters)$num_clust
                         the_bars <- shiny::reactiveValuesToList(clusters)$cluster %>%
-                            column_to_rownames(var = "id") %>%
+                            tibble::column_to_rownames(var = "id") %>%
                             dplyr::mutate_if(is.character, as.factor) %>%
                             dplyr::mutate_if(is.factor, as.numeric)
                         par(mar = c(10, 3, 3, 4) + 0.1,
                             xpd = NA) # allow content to go into outer margin
                         tree_plot <- tree %>%
-                            #set("labels_col", k = num_clust) %>%
-                            set("labels", '') %>%
-                            set("branches_k_color", k = num_clust) %>%
+                            #dendextend::set("labels_col", k = num_clust) %>%
+                            dendextend::set("labels", '') %>%
+                            dendextend::set("branches_k_color", k = num_clust) %>%
                             plot(horiz=FALSE, axes=TRUE)
                         final_tree_plot <- tree_plot +
                             abline(h = input$h, lty = 'dotdash') +
-                            colored_bars(colors = the_bars, dend = tree,
+                            dendextend::colored_bars(colors = the_bars, dend = tree,
                                          rowLabels = colnames(the_bars),
                                          #y_shift = -10
                             )
