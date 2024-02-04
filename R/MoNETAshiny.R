@@ -21,8 +21,8 @@
 #' @export
 
 
-MoNETAshiny = function(max_request = 10000) {
-    options(shiny.maxRequestSize = max_request * 1024^2)
+MoNETAshiny = function() {
+    options(shiny.maxRequestSize = 10000 * 1024^2)
 
     shiny::shinyApp(ui, server)
 
