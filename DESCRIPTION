@@ -18,7 +18,8 @@ Imports: purrr, dplyr, stats, magrittr, doFuture, foreach, doParallel,
         doMC, ggplot2,
         Rcpp, uwot, Rtsne,
         shiny, shinydashboard, shinyalert, shinyFiles, shinyMatrix, DT,
-        readr, glue, conflicted, dendextend
+        readr, glue, conflicted, dendextend,
+        BiocNeighbors, BiocParallel, stringr
 Suggests: 
     rmarkdown,
     knitr
