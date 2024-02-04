@@ -23,7 +23,6 @@
 
 MoNETAshiny = function() {
     options(shiny.maxRequestSize = 10000 * 1024^2)
-
     shiny::shinyApp(ui, server)
 
 }
@@ -83,7 +82,8 @@ ui <- shinydashboard ::dashboardPage(
                                             conditionalPanel(
                                                 condition = 'input.omics_example_opt == "Yes"',
                                                 shiny::checkboxGroupInput(inputId = 'omics_example_files', label = 'Select one or more omics matrices',
-                                                                          choices = names(MoNETA::GBM_mtx), selected = names(MoNETA::GBM_mtx))
+                                                                          choices = c("GliomaCNV_norm","GliomaMethylation_norm", "GliomaExpression_norm" ),
+                                                                          selected = c("GliomaCNV_norm","GliomaMethylation_norm", "GliomaExpression_norm" ))
                                                              ),
                                             conditionalPanel(
                                                 condition = 'input.omics_example_opt == "No"',
