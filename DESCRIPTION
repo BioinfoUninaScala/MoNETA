@@ -12,13 +12,13 @@ LazyData: true
 RoxygenNote: 7.2.3
 Imports: purrr, dplyr, stats, magrittr, doFuture, foreach, doParallel,
         bigmemory, bigstatsr, Matrix, wordspace, 
-        igraph, visNetwork, tidyverse, network, RColorBrewer, igraph, FNN, 
+        igraph, visNetwork, tidyverse, network, RColorBrewer, FNN, 
         ggrepel, fpc, ggfortify, survival, survminer, plotly, umap,
         R.matlab, bc3net, kernlab, optparse, tibble, methods,
         doMC, ggplot2,
         Rcpp, uwot, Rtsne,
         shiny, shinydashboard, shinyalert, shinyFiles, shinyMatrix, DT,
-        readr, glue, conflicted, dendextend,
+        readr, glue, conflicted, dendextend, vroom, zip,
         BiocNeighbors, BiocParallel, stringr
 Suggests: 
     rmarkdown,

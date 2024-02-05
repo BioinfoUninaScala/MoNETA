@@ -17,12 +17,17 @@
 #' @import magrittr
 #' @import dplyr
 #' @import igraph
+#' @import vroom
+#' @import zip
+#' @importFrom utils data read.csv
+#' @importFrom stats as.dendrogram dist kmeans hclust
+#' @importFrom graphics abline par
 #' @return Shiny app
 #' @export
 
 
 MoNETAshiny = function() {
-    options(shiny.maxRequestSize = 10000 * 1024^2)
+    options(shiny.maxRequestSize = 200 * 1024^2)
     shiny::shinyApp(ui, server)
 
 }
@@ -36,7 +41,7 @@ netSummary <- function(network){
     # -------------------------------------------------------------------------
     nodes <- c(network$source, network$dest)
     degree <- table(nodes) %>%
-        tidyr::as_tibble(.) %>%
+        dplyr::as_tibble(.) %>%
         dplyr::arrange(desc(n))
     top10 <- c(degree[c(1:10), 'nodes'])
     netSummary_list <- list( 'dim'= dim(network),
@@ -290,8 +295,10 @@ server <- function(input, output, session) {
             }
 
         } else {
+            data("GBM_mtx", envir = environment())
             req(input$omics_example_files)
-            example_data <- MoNETA::GBM_mtx[input$omics_example_files]
+            #example_data <- MoNETA::GBM_mtx[input$omics_example_files]
+            example_data <- GBM_mtx[input$omics_example_files]
             omicsFiles <- example_data
         }
 
@@ -322,8 +329,10 @@ server <- function(input, output, session) {
                 }
             }
         }else{
-           listFiles[['annotation']] <- MoNETA::GBM_pdata
-           return(listFiles)
+            data("GBM_pdata", envir = environment())
+            #listFiles[['annotation']] <- MoNETA::GBM_pdata
+            listFiles[['annotation']] <- GBM_pdata
+            return(listFiles)
         }
     })
 
@@ -695,7 +704,7 @@ server <- function(input, output, session) {
 
             clusters$dr_mat <- shiny::reactiveValuesToList(dr_output)$dr_mat
             t_mat <- t(mat)
-            gPlot_mat <- tidyr::tibble("id" = rownames(t_mat))
+            gPlot_mat <- dplyr::tibble("id" = rownames(t_mat))
 
             if (input$cluster_method == "kmeans"){
                 to_create(NULL)
@@ -1135,7 +1144,7 @@ server <- function(input, output, session) {
                             id_col_check <- sapply(colnames(anno), FUN = function(x) sum(samples %in% anno[[x]]))
                             id <- colnames(anno)[which.max(id_col_check)]
                             f_anno <- anno[anno[[id]] %in% samples, ]
-                            final_anno <- f_anno %>% tidyr::as_tibble(.) %>% dplyr::select(id, everything())
+                            final_anno <- f_anno %>% dplyr::as_tibble(.) %>% dplyr::select(id, everything())
 
                             net_plot <- plot_net(edgeList = net, nodes_anno = final_anno,
                                                  id_name = id, id_anno_color = color, id_anno_shape = shape,
@@ -1290,7 +1299,7 @@ server <- function(input, output, session) {
                     shiny::isolate({
                         net <- nets[[x]]
                         fnet <- net[net$weight <= input[[paste0('omics_range', x)]],]
-                        summary <- netSummary(tidyr::tibble(fnet))
+                        summary <- netSummary(dplyr::tibble(fnet))
                         res <- c()
                         for (i in 2:length(summary))
                             res[i-1] <- (paste0(paste('<b>', names(summary)[i], '</b>'), ': ', toString(summary[[i]]), ' <br/>'))
@@ -1388,7 +1397,7 @@ server <- function(input, output, session) {
                             id_col_check <- sapply(colnames(anno), FUN = function(x) sum(samples %in% anno[[x]]))
                             id <- colnames(anno)[which.max(id_col_check)]
                             f_anno <- anno[anno[[id]] %in% samples, ]
-                            final_anno <- f_anno %>% tidyr::as_tibble(.) %>%  dplyr::select(id, everything())
+                            final_anno <- f_anno %>% dplyr::as_tibble(.) %>%  dplyr::select(id, everything())
 
                             net_plot <- plot_net(edgeList = filt_net, nodes_anno = final_anno,
                                                  id_name = id, id_anno_color = color, id_anno_shape = shape,
