@@ -4,7 +4,7 @@
 \alias{MoNETAshiny}
 \title{MoNETA Shiny app}
 \usage{
-MoNETAshiny()
+MoNETAshiny(MAXreq = 10000)
 }
 \value{
 Shiny app

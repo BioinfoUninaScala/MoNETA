@@ -26,8 +26,8 @@
 #' @export
 
 
-MoNETAshiny = function() {
-    options(shiny.maxRequestSize = 200 * 1024^2)
+MoNETAshiny = function(MAXreq = 10000) {
+    options(shiny.maxRequestSize = MAXreq * 1024^2)
     shiny::shinyApp(ui, server)
 
 }
@@ -295,9 +295,8 @@ server <- function(input, output, session) {
             }
 
         } else {
-            data("GBM_mtx", envir = environment())
+            data("GBM_mtx", package = 'MoNETA')
             req(input$omics_example_files)
-            #example_data <- MoNETA::GBM_mtx[input$omics_example_files]
             example_data <- GBM_mtx[input$omics_example_files]
             omicsFiles <- example_data
         }
@@ -329,8 +328,7 @@ server <- function(input, output, session) {
                 }
             }
         }else{
-            data("GBM_pdata", envir = environment())
-            #listFiles[['annotation']] <- MoNETA::GBM_pdata
+            data("GBM_pdata", package = 'MoNETA')
             listFiles[['annotation']] <- GBM_pdata
             return(listFiles)
         }
