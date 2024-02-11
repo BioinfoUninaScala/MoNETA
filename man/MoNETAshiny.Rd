@@ -6,6 +6,9 @@
 \usage{
 MoNETAshiny(MAXreq = 10000)
 }
+\arguments{
+\item{MAXreq}{shiny max request size}
+}
 \value{
 Shiny app
 }

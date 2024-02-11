@@ -17,7 +17,7 @@ Imports: purrr, dplyr, stats, magrittr, doFuture, foreach, doParallel,
         R.matlab, bc3net, kernlab, optparse, tibble, methods,
         doMC, ggplot2,
         Rcpp, uwot, Rtsne,
-        shiny, shinydashboard, shinyalert, shinyFiles, shinyMatrix, DT,
+        shiny, shinydashboard, shinyalert, shinyFiles, shinyMatrix, shinyjs, DT,
         readr, glue, conflicted, dendextend, vroom, zip,
         BiocNeighbors, BiocParallel, stringr
 Suggests: 
