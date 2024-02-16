@@ -6,6 +6,7 @@
 #' @import shinyFiles
 #' @import shinyMatrix
 #' @import shinyjs
+#' @import shinycssloaders
 #' @import readr
 #' @import glue
 #' @import conflicted
@@ -61,7 +62,7 @@ ui <- shinydashboard::dashboardPage(
         shinyjs::useShinyjs(),
         shinydashboard::sidebarMenu(id = 'tabs',
             #shiny::tags$head(shiny::tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")),
-            tags$head(tags$style(".inactiveLink {
+            shiny::tags$head(shiny::tags$style(".inactiveLink {
                             pointer-events: none;
                            cursor: default;
                            }")),
@@ -85,9 +86,9 @@ ui <- shinydashboard::dashboardPage(
         shinydashboard::tabItems(
             shinydashboard::tabItem(tabName = "mat_sub_1",
                                     shiny::fluidRow(
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('jump2P1.1')),
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('jump2P2'), align = 'right'
                                         )
                                     ),
@@ -96,13 +97,13 @@ ui <- shinydashboard::dashboardPage(
                                         shinydashboard::box(
                                             shiny::radioButtons(inputId = 'omics_example_opt', label = 'Load the example dataset',
                                                                 choices = c('Yes', 'No'), selected = 'No'),
-                                            conditionalPanel(
+                                            shiny::conditionalPanel(
                                                 condition = 'input.omics_example_opt == "Yes"',
                                                 shiny::checkboxGroupInput(inputId = 'omics_example_files', label = 'Select one or more omics matrices',
                                                                           choices = c("GliomaCNV_norm","GliomaMethylation_norm", "GliomaExpression_norm" ),
                                                                           selected = c("GliomaCNV_norm","GliomaMethylation_norm", "GliomaExpression_norm" ))
                                                              ),
-                                            conditionalPanel(
+                                            shiny::conditionalPanel(
                                                 condition = 'input.omics_example_opt == "No"',
                                                 shiny::fileInput(inputId = "omics_files", label = 'Select one or more files' ,
                                                                  multiple = TRUE),
@@ -117,7 +118,7 @@ ui <- shinydashboard::dashboardPage(
                                         shinydashboard::box(
                                             shiny::radioButtons(inputId = 'anno_example_opt', label = 'Load the example annotation file',
                                                                 choices = c('Yes', 'No'), selected = 'No'),
-                                            conditionalPanel(
+                                            shiny::conditionalPanel(
                                                 condition = 'input.anno_example_opt == "No"',
                                                  shiny::fileInput(inputId = "anno_file", label = 'Select a file',
                                                              multiple = FALSE)
@@ -155,9 +156,9 @@ ui <- shinydashboard::dashboardPage(
 
             shinydashboard::tabItem(tabName = 'net_sub_1',
                                     shiny::fluidRow(
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('back2P2')),
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('jump2P4'),  align = 'right'
                                         )
                                     ),
@@ -169,9 +170,9 @@ ui <- shinydashboard::dashboardPage(
             ),
             shinydashboard::tabItem(tabName = 'net_sub_2',
                                     shiny::fluidRow(
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('back2P3')),
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('jump2P5'),  align = 'right'
                                         )
                                     ),
@@ -186,10 +187,10 @@ ui <- shinydashboard::dashboardPage(
             shinydashboard::tabItem(tabName = "rwr_tab_1",
 
                                     shiny::fluidRow(
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('back2P1_from1.1')
                                                ),
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('jump2P5.1'),  align = 'right'
                                         )
                                     ),
@@ -220,10 +221,10 @@ ui <- shinydashboard::dashboardPage(
             ),
             shinydashboard::tabItem(tabName = "rwr_tab_2",
                                     shiny::fluidRow(
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('back2P4'),
                                                shiny::uiOutput('back2P1.1')),
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('jump2P6'),  align = 'right'
                                         )
                                     ),
@@ -232,9 +233,9 @@ ui <- shinydashboard::dashboardPage(
             ),
             shinydashboard::tabItem(tabName = "rwr_tab_3",
                                     shiny::fluidRow(
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('back2P5')),
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('jump2P7'),  align = 'right'
                                         )
                                     ),
@@ -296,9 +297,9 @@ ui <- shinydashboard::dashboardPage(
 
             shinydashboard::tabItem(tabName = "dr_tab",
                                     shiny::fluidRow(
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('back2P6')),
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('jump2P8'),  align = 'right'
                                         )
                                     ),
@@ -312,13 +313,13 @@ ui <- shinydashboard::dashboardPage(
 
             shinydashboard::tabItem(tabName = "cl_tab",
                                     shiny::fluidRow(
-                                        column(width = 6,
+                                        shiny::column(width = 6,
                                                shiny::uiOutput('back2P7'))
                                     ),
                                     shiny::h2(shiny::span("Clustering Analysis", style = "font-weight: bold")),
                                     shiny::fluidRow(
                                         shiny::uiOutput("cl_opt"),
-                                        shiny::uiOutput(outputId = "cl_plot_box"), #%>% withSpinner(. , image = spinner_image)
+                                        shinycssloaders::withSpinner(shiny::uiOutput(outputId = "cl_plot_box"))
                                     ),
                                     shiny::fluidRow(
                                         shiny::uiOutput('cluster_table_box'),
@@ -368,7 +369,7 @@ server <- function(input, output, session) {
                     sorted_file <- file[, sort(colnames(file))]
                     omicsFiles[[new_name]] <- sorted_file
                 }else{
-                    shinyalert::shinyalert("Type Error", "Uploaded Data is not a numeric matrix", type = "error")
+                    shinyalert::shinyalert("Type Error", "Uploaded Data is not a numeric matrix", closeOnClickOutside = TRUE, type = "error")
                     returnValue()
                 }
             }
@@ -426,7 +427,7 @@ server <- function(input, output, session) {
                     listFiles[['annotation']] <- file
                     annotation(listFiles)
                 }else {
-                    shinyalert::shinyalert("Type Error", "Uploaded Data is not a dataframe", type = "error")
+                    shinyalert::shinyalert("Type Error", "Uploaded Data is not a dataframe",closeOnClickOutside = TRUE, type = "error")
                     returnValue()
                 }
             }
@@ -520,14 +521,14 @@ server <- function(input, output, session) {
         processed_mats <- shiny::reactiveValuesToList(proc_matrices)
         #shiny::isolate({
         if (input$intersect_opt == 'YES'){
-            intersected_omics_mat$matrices <- get_intersection_matrices(processed_mats)
+            intersected_omics_mat$matrices <- MoNETA::get_intersection_matrices(processed_mats)
         }else {
             intersected_omics_mat$matrices <- processed_mats
         }
 
         shinyalert::shinyalert(
             title = "Success",
-            text = 'Intersection step done! <br/>  Now press "Next" in the top right-hand corner to continue.',
+            text = 'Intersection step done! <br/>  Now press <b> "Next" </b> in the top right-hand corner to continue.',
             closeOnEsc = TRUE,
             closeOnClickOutside = TRUE,
             html = TRUE,
@@ -553,7 +554,7 @@ server <- function(input, output, session) {
     observe({
         if (length(omics_files()) == 1 && length(reactiveValuesToList(proc_matrices)) != 0){
             shinyjs::removeCssClass(selector = "a[data-value='net_sub_1']", class = "inactiveLink")
-        } else if (length(omics_files()) >= 1 && length(reactiveValuesToList(proc_matrices)) != 0 && isTruthy(input$intersect_btn)){
+        } else if (length(omics_files()) >= 1 && length(reactiveValuesToList(proc_matrices)) != 0 && shiny::isTruthy(input$intersect_btn)){
             shinyjs::removeCssClass(selector = "a[data-value='net_sub_1']", class = "inactiveLink")
         }else{
             return(NULL)
@@ -603,10 +604,10 @@ server <- function(input, output, session) {
                 if (is.data.frame(file) & ncol(file) == 3){
                     listFiles[[new_name]] <- file
                 }else if (!is.data.frame(file) ){
-                    shinyalert::shinyalert("Type Error", "Uploaded Data is not a dataframe", type = "error")
+                    shinyalert::shinyalert("Type Error", "Uploaded Data is not a dataframe",closeOnClickOutside = TRUE, type = "error")
                     returnValue()
                 }else if (ncol(file) != 3){
-                    shinyalert::shinyalert("Column Error", "Uploaded Data has not 3 columns", type = "error")
+                    shinyalert::shinyalert("Column Error", "Uploaded Data has not 3 columns",closeOnClickOutside = TRUE, type = "error")
                     returnValue()
                 }
             }
@@ -675,7 +676,7 @@ server <- function(input, output, session) {
             if (is.data.frame(file)){
                 listFiles[[new_name]] <- file
             }else {
-                shinyalert::shinyalert("Type Error", "Uploaded Data is not a dataframe", type = "error")
+                shinyalert::shinyalert("Type Error", "Uploaded Data is not a dataframe",closeOnClickOutside = TRUE, type = "error")
                 returnValue()
             }
         }
@@ -745,15 +746,15 @@ server <- function(input, output, session) {
     shiny::observeEvent(input$gen_multiplex_btn, {
         print('Generating the multiplex network...')
         net_list <- if (!is.null(g_net_list())) g_net_list() else l_net_list()
-        multiplex <- create_multiplex(net_list, weighted = ifelse(input$weightMultiplex == 'YES', TRUE, FALSE))
+        multiplex <- MoNETA::create_multiplex(net_list, weighted = ifelse(input$weightMultiplex == 'YES', TRUE, FALSE))
         multiplex_network$multiplex <- multiplex %>% dplyr::ungroup(.)
         if(input$weightMultiplex == 'NO'){
             multiplex_network$pruned_multiplex <- multiplex
-            shinyalert::shinyalert(title = 'Success', type = 'success',
-                                   text = 'Unweighted Multiplex Network created. <br/> Now press "Next" in the top left-hand corner to continue', html = TRUE)
+            shinyalert::shinyalert(title = 'Success', type = 'success',closeOnClickOutside = TRUE,
+                                   text = 'Unweighted Multiplex Network created. <br/> Now press <b> "Next" </b> in the top left-hand corner to continue', html = TRUE)
         }else{
-            shinyalert::shinyalert(title = 'Success', type = 'success',
-                                   text = 'Weighted Multiplex Network created. <br/> Now move on to the Pruning step.', html = TRUE)
+            shinyalert::shinyalert(title = 'Success', type = 'success',closeOnClickOutside = TRUE,
+                                   text = 'Weighted Multiplex Network created. <br/> Now move on to the <b> Pruning </b>  step.', html = TRUE)
         }
     })
 
@@ -762,17 +763,17 @@ server <- function(input, output, session) {
         multiplex <- multiplex_network$multiplex
         if(input$pruneMultiplex == 'YES'){
             if (!is.numeric(input$pruneMultiplex_th)) {
-                shinyalert::shinyalert(title = 'Error', text = 'The threshold must be a real number.', type = 'error')
+                shinyalert::shinyalert(title = 'Error', text = 'The threshold must be a real number.',closeOnClickOutside = TRUE,type = 'error')
                 return(NULL)
             }
 
-            multiplex_network$pruned_multiplex <- prune_multiplex_network(multiplex, input$pruneMultiplex_th)
-            shinyalert::shinyalert(title = 'Success', type = 'success',
-                               text = 'Pruning step done! <br/> Now press "Next" in the top left-hand corner to continue', html = TRUE)
+            multiplex_network$pruned_multiplex <- MoNETA::prune_multiplex_network(multiplex, input$pruneMultiplex_th)
+            shinyalert::shinyalert(title = 'Success', type = 'success',closeOnClickOutside = TRUE,
+                               text = 'Pruning step done! <br/> Now press <b> "Next" </b> in the top left-hand corner to continue', html = TRUE)
         }else{
             multiplex_network$pruned_multiplex <- multiplex
-            shinyalert::shinyalert(title = 'Success', type = 'success',
-                                   text = 'Pruning step skipped! <br/> Now press "Next" in the top left-hand corner to continue', html = TRUE)
+            shinyalert::shinyalert(title = 'Success', type = 'success',closeOnClickOutside = TRUE,
+                                   text = 'Pruning step skipped! <br/> Now press <b> "Next" </b> in the top left-hand corner to continue', html = TRUE)
         }
     })
 
@@ -800,13 +801,15 @@ server <- function(input, output, session) {
             return(NULL)
         } else{
 
-            if (!is.na(omics_tau_list()) && sum(unlist(omics_tau_list())) != 1){
-                shinyalert::shinyalert("Error", "The sum of restarting probabilities per layer (taus) must be equal to 1", type = "error")
-                return(NULL)
+            if (!is.na(omics_tau_list())) {
+                if (sum(unlist(omics_tau_list())) != 1) {
+                    shinyalert::shinyalert("Error", "The sum of restarting probabilities per layer (taus) must be equal to 1",closeOnClickOutside = TRUE, type = "error")
+                    return(NULL)
+                }
             }
             max_cores <- parallel::detectCores()
             if (!is.numeric(input$cores_rwr) | input$cores_rwr < 1 | input$cores_rwr > max_cores){
-                shinyalert::shinyalert(title = 'Error', text = paste('Select a number of cores between 1 and', max_cores, '.'), type = 'error')
+                shinyalert::shinyalert(title = 'Error', text = paste('Select a number of cores between 1 and', max_cores, '.'),closeOnClickOutside = TRUE, type = 'error')
                 return(NULL)
             }
 
@@ -816,7 +819,7 @@ server <- function(input, output, session) {
 
             if (input$bioInf_transition == 'YES') {
                 net_list <- if (!is.null(g_net_list())) g_net_list() else l_net_list()
-                trans_mat <- create_layer_transition_matrix(net_list)
+                trans_mat <- MoNETA::create_layer_transition_matrix(net_list)
             }else {
                 trans_mat <- input$editable_trans_mat
             }
@@ -824,7 +827,7 @@ server <- function(input, output, session) {
 
             shinyalert::shinyalert(
                 title = "Wait",
-                text = "Waiting for RWR similarity matrix generation. <br/> Please check the progressbar in the bottom right-hand corner.",
+                text = "Waiting for RWR similarity matrix generation. <br/> Please check the <b> progressbar </b>  in the bottom right-hand corner.",
                 closeOnEsc = TRUE,
                 closeOnClickOutside = TRUE,
                 html = TRUE,
@@ -842,7 +845,7 @@ server <- function(input, output, session) {
 
             progress$set(message = "MoNETA", detail = paste("Doing RWR"), value = 0)
 
-            rwr_simMat <- gen_sim_mat_M(network = omics_multiplex,
+            rwr_simMat <- MoNETA::gen_sim_mat_M(network = omics_multiplex,
                                         tau = unlist(omics_tau_list()),
                                         restart = input$restart,
                                         delta = input$delta,
@@ -865,15 +868,16 @@ server <- function(input, output, session) {
                     paste('- Restart probability per layer (tau):  ', paste(omics_tau_list(), collapse = ', ')), '',
                     paste('- Weighted Multiplex Network:           ', input$weightMultiplex),'',
                     paste('- Jumping Neighborhood permission:      ', input$omics_jump_neigh),'',
-                    paste('- Weighted jump_neigh edges:            ', input$omics_weight_jump_neigh),''),
+                    paste('- Weighted jump_neigh edges:            ', input$omics_weight_jump_neigh),''
+                ),
                 'Transition layers matrix' = trans_mat
             )
 
             RWR_output$rwr_simMat <- rwr_simMat
             RWR_output$Summary <- Summary
 
-            shinyalert::shinyalert(title = 'Success', type = 'success',
-                                   text = 'Random Walk with Restart done! <br/> Now press "Next" in the top left-hand corner to continue', html = TRUE)
+            shinyalert::shinyalert(title = 'Success', type = 'success',closeOnClickOutside = TRUE,
+                                   text = 'Random Walk with Restart done! <br/> Now press <b> "Next" </b> in the top left-hand corner to continue', html = TRUE)
         }
     })
 
@@ -903,6 +907,7 @@ server <- function(input, output, session) {
             for (obj in names(to_download)) {
                 if (obj == 'Summary'){
                     sink(file = glue::glue(temp_directory, "/{obj}.txt"), append =  TRUE)
+                    print(to_download[[obj]])
                     sink(NULL)
                 } else {
                     file_name <- "RWR_sim_mat.csv"
@@ -947,7 +952,7 @@ server <- function(input, output, session) {
 
             shinyalert::shinyalert(
                 title = "Wait",
-                text = "It might take a little time at the end. <br/> Please check the progressbar in the bottom right-hand corner.",
+                text = "It might take a little time at the end. <br/> Please check the <b> progressbar </b> in the bottom right-hand corner.",
                 closeOnEsc = TRUE,
                 closeOnClickOutside = TRUE,
                 html = TRUE,
@@ -965,7 +970,7 @@ server <- function(input, output, session) {
             progress$set(message = "MoNETA", detail = paste("Doing Embedding"), value = 0)
 
             if (input$emb_opt == 'YES'){
-                emb_mat <- get_embedding(matrix = rwr_mat, embedding_size = input$dim_emb, cores = input$cores_emb)
+                emb_mat <- MoNETA::get_embedding(matrix = rwr_mat, embedding_size = input$dim_emb, cores = input$cores_emb)
                 dr_output$emb_mat <- emb_mat
             }else{
                 emb_mat <- rwr_mat
@@ -973,12 +978,12 @@ server <- function(input, output, session) {
 
             if (input$dr_method == 'UMAP'){
                 progress$inc(0.8, detail = paste("Doing UMAP"))
-                dr_mat <- get_parallel_umap_embedding(matrix = emb_mat,
+                dr_mat <- MoNETA::get_parallel_umap_embedding(matrix = emb_mat,
                                                       embedding_size = 2,
                                                       n_threads = input$threads)
             }else if (input$dr_method == 'PCA'){
                 progress$inc(0.8, detail = paste("Doing PCA"))
-                dr_mat <- get_pca_embedding(matrix = emb_mat, embedding_size = input$emb_size)
+                dr_mat <- MoNETA::get_pca_embedding(matrix = emb_mat, embedding_size = input$emb_size)
             }else if (input$dr_method == 'tSNE'){
                 progress$inc(0.8, detail = paste("Doing tSNE"))
                 dr_mat <- get_tsne_embedding(matrix = emb_mat,
@@ -990,8 +995,8 @@ server <- function(input, output, session) {
             progress$inc(1, detail = paste("Done!"))
             dr_output$dr_mat <- dr_mat
 
-            shinyalert::shinyalert(title = 'Success', type = 'success',
-                                   text = 'Dimensionality Reduction step done! <br/> Now press "Next" in the top left-hand corner to continue', html = TRUE)
+            shinyalert::shinyalert(title = 'Success', type = 'success', closeOnClickOutside = TRUE,
+                                   text = 'Dimensionality Reduction step done! <br/> Now press <b> "Next" </b> in the top left-hand corner to continue', html = TRUE)
         }
     })
 
@@ -1061,7 +1066,7 @@ server <- function(input, output, session) {
             shinyalert::shinyalert(
                 title = "Wait",
                 text = paste0("It might take a little time at the end of the clustering analysis. <br/>",
-                              "Please check the progressbar in the bottom right-hand corner."
+                              "Please check the <b> progressbar </b>  in the bottom right-hand corner."
                 ),
                 closeOnEsc = TRUE,
                 closeOnClickOutside = TRUE,
@@ -1110,6 +1115,7 @@ server <- function(input, output, session) {
                 cluster <- gPlot_mat
                 cluster$clust <- factor(db_clust$cluster)
                 cluster$shape <- NULL
+                cluster$num_clust <- length(unique(cluster$clust))
                 progress$inc(1, detail = paste("Done!"))
 
                 if ((  !is.null(anno())  |  shiny::isTruthy(input$anno_file1)) && ifelse(input$shape_bool == 'YES', TRUE, FALSE)){
@@ -1214,7 +1220,7 @@ server <- function(input, output, session) {
         if (input$cluster_method == "kmeans"){
             return(paste0('Kmeans clustering (k: ', input$k, ')' ))
         } else if (input$cluster_method == "dbscan") {
-            return(paste0('DBSCAN clustering (epsilon: ', input$eps, ')' ))
+            return(paste0('DBSCAN clustering (epsilon: ', input$eps, ', #cluster: ', shiny::reactiveValuesToList(clusters)$num_clust, ')' ))
         } else if (input$cluster_method == "hclust") {
             return(paste0('Hierarchical clustering (h: ', input$h, ', #cluster: ', shiny::reactiveValuesToList(clusters)$num_clust, ')' ))
         } else {
@@ -1340,9 +1346,9 @@ server <- function(input, output, session) {
             for (x in names(omics_files())){
                 processed_omics_mat <- omics_files()[[x]]
                 if (input[[paste0("remove0col_", x)]] == 'YES')
-                    processed_omics_mat <- remove_zeros_cols(processed_omics_mat)
+                    processed_omics_mat <- MoNETA::remove_zeros_cols(processed_omics_mat)
                 if (input[[paste0("norm_", x)]] == 'YES')
-                    processed_omics_mat <- normalize_omics(processed_omics_mat)
+                    processed_omics_mat <- MoNETA::normalize_omics(processed_omics_mat)
                 proc_matrices[[paste0('p_', x)]] <- processed_omics_mat
             }
             message('All matrices processed!')
@@ -1350,7 +1356,7 @@ server <- function(input, output, session) {
             if (length(omics_files()) == 1){
                 shinyalert::shinyalert(
                     title = "Success",
-                    text = 'Processig step done! <br/> Now press "Next" in the top right-hand corner to continue.',
+                    text = 'Processig step done! <br/> Now press <b> "Next" </b> in the top right-hand corner to continue.',
                     closeOnEsc = TRUE,
                     closeOnClickOutside = TRUE,
                     html = TRUE,
@@ -1365,7 +1371,7 @@ server <- function(input, output, session) {
             }else if (length(omics_files()) > 1){
                 shinyalert::shinyalert(
                     title = "Success",
-                    text = 'Processig step done! <br/>  Now decide to intersect or not omics matrices to continue.',
+                    text = 'Processig step done! <br/>  Now move on to the <b> Intersection </b> step.',
                     closeOnEsc = TRUE,
                     closeOnClickOutside = TRUE,
                     html = TRUE,
@@ -1602,20 +1608,20 @@ server <- function(input, output, session) {
                 max_cores <- parallel::detectCores()
 
                 if (!is.numeric(input[[paste0('sparsity_', x)]]) | input[[paste0('sparsity_', x)]] < 0){
-                    shinyalert::shinyalert(title = 'Error', text = 'Sparsity must be a positive real number.',type = 'error')
+                    shinyalert::shinyalert(title = 'Error', closeOnClickOutside = TRUE, text = 'Sparsity must be a positive real number.',type = 'error')
                     return(NULL)
                 }
                 if (!is.integer(input[[paste0('knn_', x)]]) | input[[paste0('knn_', x)]] <= 0){
-                    shinyalert::shinyalert(title = 'Error', text = 'Knn must be a positive integer.', type = 'error')
+                    shinyalert::shinyalert(title = 'Error', closeOnClickOutside = TRUE, text = 'Knn must be a positive integer.', type = 'error')
                     return(NULL)
                 }
                 if (!is.numeric(input[[paste0('cores_', x)]]) | input[[paste0('cores_', x)]] < 1 | input[[paste0('cores_', x)]] > max_cores){
-                    shinyalert::shinyalert(title = 'Error', text = paste('Select a number of cores between 1 and', max_cores, '.'), type = 'error')
+                    shinyalert::shinyalert(title = 'Error', closeOnClickOutside = TRUE, text = paste('Select a number of cores between 1 and', max_cores, '.'), type = 'error')
                     return(NULL)
                 }
                 if (input[[paste0('cores_', x)]] == max_cores){
 
-                    shinyalert::shinyalert(title = 'Error',
+                    shinyalert::shinyalert(title = 'Error', closeOnClickOutside = TRUE,
                                            text = tagList('You have selected the maximum number of cores available.',
                                                           #shiny::radioButtons(inputId = 'warn_continue',
                                                           #             label = 'Do you want to proceed anyway?',
@@ -1647,7 +1653,7 @@ server <- function(input, output, session) {
                 shinyalert::shinyalert(
                     title = "Wait",
                     text = paste0("Waiting for the inference of", paste("<b>", x, "</b>"), "network. <br/>",
-                                  "Please check the progressbar in the bottom right-hand corner."
+                                  "Please check the <b> progressbar </b> in the bottom right-hand corner."
                     ),
                     closeOnEsc = TRUE,
                     closeOnClickOutside = TRUE,
@@ -1687,7 +1693,7 @@ server <- function(input, output, session) {
                         title = "Success",
                         text = paste0(paste("<b>", x, "</b>"), " network created.<br/>",
                                       paste("<b> Network inferring status: </b>"), net_created, '/', length(omics_files()),"<br/>",
-                                      'Now press "Next" in the top right-hand corner to continue.'
+                                      'Now press <b> "Next" </b> in the top right-hand corner to continue.'
                                      ),
                         closeOnEsc = TRUE,
                         closeOnClickOutside = TRUE,
@@ -1719,11 +1725,14 @@ server <- function(input, output, session) {
                     )
                 }
 
+                output[[paste0(x, "_spinner")]] <- renderUI({
+                    shinycssloaders::withSpinner(visNetwork::visNetworkOutput(paste0(x, 'plot_net')))
+                })
 
                 output[[paste0(x, 'plot_net')]] <- visNetwork::renderVisNetwork({
-                    ids <- data.frame(id = base::union(net$source, net$dest))
-                    net_plot <- plot_net(edgeList = net, nodes_anno = ids, id_name = 'id', id_anno_color = 'id')
-                    return(net_plot)
+                        ids <- data.frame(id = base::union(net$source, net$dest))
+                        net_plot <- MoNETA::plot_net(edgeList = net, nodes_anno = ids, id_name = 'id', id_anno_color = 'id')
+                        return(net_plot)
                 })
 
                 return(net)
@@ -1732,6 +1741,10 @@ server <- function(input, output, session) {
 
             omics_network_list[[paste0('update_omics_net_plot_', x)]] <-
                 shiny::observeEvent(input[[paste0('update_omics_net_plot_', x)]], {
+
+                    output[[paste0(x, "_spinner")]] <- renderUI({
+                        shinycssloaders::withSpinner(visNetwork::visNetworkOutput(paste0(x, 'plot_net')))
+                    })
 
                     output[[paste0(x, 'plot_net')]] <- visNetwork::renderVisNetwork({
                         shiny::isolate({
@@ -1746,7 +1759,7 @@ server <- function(input, output, session) {
                             f_anno <- anno[anno[[id]] %in% samples, ]
                             final_anno <- f_anno %>% dplyr::as_tibble(.) %>% dplyr::select(id, everything())
 
-                            net_plot <- plot_net(edgeList = net, nodes_anno = final_anno,
+                            net_plot <- MoNETA::plot_net(edgeList = net, nodes_anno = final_anno,
                                                  id_name = id, id_anno_color = color, id_anno_shape = shape,
                                                  interactive = TRUE, wo_legend = FALSE)
                             return(net_plot)
@@ -1815,7 +1828,8 @@ server <- function(input, output, session) {
                                                      )
                                        ),
                                        shiny::column(width = 8,
-                                                     visNetwork::visNetworkOutput(paste0(x, 'plot_net')),
+                                                     #shinycssloaders::withSpinner(visNetwork::visNetworkOutput(paste0(x, 'plot_net'))),
+                                                     shiny::uiOutput(paste0(x, "_spinner")),
                                                      shiny::uiOutput(paste0(x, '_custom_net'))
                                        )
                                    ), shiny::hr(),
@@ -1878,10 +1892,10 @@ server <- function(input, output, session) {
 
     ###
     output$back2P2 <- renderUI({
-        if (length(omics_files()) == 1 && isTruthy(input$process_mat)){
+        if (length(omics_files()) == 1 && length(reactiveValuesToList(proc_matrices)) != 0){
             actionButton('back2P2', label = 'Back', icon("paper-plane"),
                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4; padding:20px")
-        } else if (length(omics_files()) >= 1 && isTruthy(input$process_mat) && isTruthy(input$intersect_btn)){
+        } else if (length(omics_files()) >= 1 && length(reactiveValuesToList(proc_matrices)) != 0 && isTruthy(input$intersect_btn)){
             actionButton('back2P2', label = 'Back', icon("paper-plane"),
                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4; padding:20px")
         }else{
@@ -1954,8 +1968,12 @@ server <- function(input, output, session) {
                 net <- nets[[x]]
                 fnet <- net[net$weight <= input[[paste0('omics_range', x)]],]
 
+                output[[paste0(x, "_spinner_weightDist")]] <- renderUI({
+                    shinycssloaders::withSpinner(plotly::plotlyOutput(paste0(x, "_weightDist")))
+                })
+
                 output[[paste0(x, "_weightDist")]] <- plotly::renderPlotly({
-                    shiny::isolate({
+                    #shiny::isolate({
                         plotly::ggplotly(ggplot2::ggplot(fnet, ggplot2::aes(x= weight)) + ggplot2::geom_histogram() +
                                      ggplot2::ggtitle('Weight Distribution') +
                                      ggplot2::xlab("Weight") + ggplot2::ylab("Counts") +
@@ -1964,11 +1982,16 @@ server <- function(input, output, session) {
                                                     axis.title.x = ggplot2::element_text(size = 10),
                                                     axis.title.y = ggplot2::element_text(size = 10))
                         )
-                    })
+                    #})
+                })
+
+
+                output[[paste0(x, "_spinner_nodeDegreeDist")]] <- renderUI({
+                    shinycssloaders::withSpinner(plotly::plotlyOutput(paste0(x, "_nodeDegreeDist")))
                 })
 
                 output[[paste0(x, "_nodeDegreeDist")]] <- plotly::renderPlotly({
-                    shiny::isolate({
+                    #shiny::isolate({
                         fnet1 <- fnet
                         fnet1$weight <- 1
                         graph <- igraph::graph_from_data_frame(fnet1, directed = FALSE)
@@ -1982,13 +2005,18 @@ server <- function(input, output, session) {
                                                          axis.title.y = ggplot2::element_text(size = 10))
                         )
                         return(p)
-                    })
+                    #})
+                })
+
+
+                output[[paste0(x, "_spinner")]] <- renderUI({
+                    shinycssloaders::withSpinner(visNetwork::visNetworkOutput(paste0(x, "_plot_fnet")))
                 })
 
                 output[[paste0(x, '_plot_fnet')]] <- visNetwork::renderVisNetwork({
                     shiny::isolate({
                         ids <- data.frame(id = base::union(fnet$source, fnet$dest))
-                        net_plot <- plot_net(edgeList = fnet, nodes_anno = ids, id_name = 'id', id_anno_color = 'id')
+                        net_plot <- MoNETA::plot_net(edgeList = fnet, nodes_anno = ids, id_name = 'id', id_anno_color = 'id')
                         return(net_plot)
                     })
                 })
@@ -2031,7 +2059,7 @@ server <- function(input, output, session) {
                         title = "Success",
                         text = paste0(paste("<b>", x, "</b>"), " network updated. <br/>",
                                      paste("<b> Network update status: </b>"), net_update, '/', length(omics_files()), "<br/>",
-                                     'Now press "Next" in the top right-hand corner to continue.'
+                                     'Now press <b> "Next" </b> in the top right-hand corner to continue.'
                         ),
                         closeOnEsc = TRUE,
                         closeOnClickOutside = TRUE,
@@ -2069,6 +2097,10 @@ server <- function(input, output, session) {
             filteredOmicsNetworks_list[[paste0('update_f_net_plot_', x)]] <-
                 shiny::observeEvent(input[[paste0('update_f_net_plot_', x)]], {
 
+                    output[[paste0(x, "_spinner")]] <- renderUI({
+                        shinycssloaders::withSpinner(visNetwork::visNetworkOutput(paste0(x, "_plot_fnet")))
+                    })
+
                     output[[paste0(x, '_plot_fnet')]] <- visNetwork::renderVisNetwork({
                         shiny::isolate({
                             net <- nets[[x]]
@@ -2083,7 +2115,7 @@ server <- function(input, output, session) {
                             f_anno <- anno[anno[[id]] %in% samples, ]
                             final_anno <- f_anno %>% dplyr::as_tibble(.) %>%  dplyr::select(id, everything())
 
-                            net_plot <- plot_net(edgeList = filt_net, nodes_anno = final_anno,
+                            net_plot <- MoNETA::plot_net(edgeList = filt_net, nodes_anno = final_anno,
                                                  id_name = id, id_anno_color = color, id_anno_shape = shape,
                                                  interactive = TRUE, wo_legend = FALSE)
                             return(net_plot)
@@ -2117,7 +2149,7 @@ server <- function(input, output, session) {
                                                      shiny::fluidRow(
                                                         shiny::actionButton(inputId = paste0('button_', x), 'Show'),
                                                         shiny::column(width = 6, shiny::actionButton(paste0("update_", x), 'UPDATE')),
-                                                        shiny::column(width = 6, shiny::uiOutput(paste0("update_f_net_plot_", x)))
+                                                        #shiny::column(width = 6, shiny::uiOutput(paste0("update_f_net_plot_", x)))
                                                      )
                                        ),
                                        shiny::column(width = 8,
@@ -2127,15 +2159,23 @@ server <- function(input, output, session) {
                                    shiny::hr(),
                                    shiny::fluidRow(
                                        shiny::column(width = 6,
-                                                     plotly::plotlyOutput(paste0(x, "_weightDist"))
+                                                     #plotly::plotlyOutput(paste0(x, "_weightDist") )
+                                                     shiny::uiOutput(paste0(x, "_spinner_weightDist"))
                                        ),
                                        shiny::column(width = 6,
-                                                     plotly::plotlyOutput(paste0(x, "_nodeDegreeDist"))
+                                                     #plotly::plotlyOutput(paste0(x, "_nodeDegreeDist") )
+                                                     shiny::uiOutput(paste0(x, "_spinner_nodeDegreeDist"))
                                        )
                                    ),
                                    shiny::fluidRow(
-                                       shiny::column(width = 8,  visNetwork::visNetworkOutput(paste0(x, '_plot_fnet'))),
+                                       shiny::column(width = 8,
+                                                     #visNetwork::visNetworkOutput(paste0(x, '_plot_fnet'))
+                                                     shiny::uiOutput(paste0(x, "_spinner"))
+                                                     ),
                                        shiny::column(width = 4, shiny::uiOutput(paste0(x, '_custom_fnet')))
+                                   ),
+                                   shiny::fluidRow(
+                                       shiny::column(width = 12, shiny::uiOutput(paste0("update_f_net_plot_", x)), align = 'right')
                                    )
             )
             return(tab)
@@ -2618,20 +2658,30 @@ server <- function(input, output, session) {
                                  ifelse(input$dr_method == 'PCA', 'PCA of', 'tSNE of'))
                 emb <- ifelse(input$emb_opt == 'YES', 'the Embedded RWR matrix', 'the RWR matrix')
                 dr_mat <- shiny::reactiveValuesToList(dr_output)$dr_mat
-                dr_plot <- MoNETA::plot_2D_matrix(coord = dr_mat[1:2,], nodes_anno = data.frame(id = colnames(dr_mat)),
-                                                  id_name = 'id',
-                                                  interactive = TRUE, wo_legend = FALSE) %>%
-                    plotly::layout(font = list(family = "LMRoman10", color = "black"),
-                                   title = list(text = paste(method, emb), font = list(family = "LMRoman10", color = "black", size = 20)),
-                                   xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
-                                   yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
-                    )%>%
-                    plotly::config(
-                        toImageButtonOptions = list(filename = paste('MoNETAshiny', gsub(x = method, replacement = '_', pattern = ' '),
-                                                                     gsub(x = emb, replacement = '_', pattern = ' '), 'plot', sep='_'),
-                                                    format = "png", width = 1800, height = 800)
-                    )
-                return(shinydashboard::box(width = 8, dr_plot, shiny::hr(), shiny::downloadButton(outputId = 'download_dr_plot', label = 'Download plot')))
+
+                output$dr_plot <- plotly::renderPlotly({
+                    isolate({
+                        MoNETA::plot_2D_matrix(coord = dr_mat[1:2,], nodes_anno = data.frame(id = colnames(dr_mat)),
+                                                      id_name = 'id',
+                                                      interactive = TRUE, wo_legend = FALSE) %>%
+                        plotly::layout(font = list(family = "LMRoman10", color = "black"),
+                                       title = list(text = paste(method, emb), font = list(family = "LMRoman10", color = "black", size = 20)),
+                                       xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
+                                       yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
+                        )%>%
+                        plotly::config(
+                            toImageButtonOptions = list(filename = paste('MoNETAshiny', gsub(x = method, replacement = '_', pattern = ' '),
+                                                                         gsub(x = emb, replacement = '_', pattern = ' '), 'plot', sep='_'),
+                                                        format = "png", width = 1800, height = 800)
+                        )
+                    })
+
+                })
+
+                return(shinydashboard::box(width = 8,
+                                           shinycssloaders::withSpinner(plotly::plotlyOutput('dr_plot')),
+                                           shiny::hr(),
+                                           shiny::downloadButton(outputId = 'download_dr_plot', label = 'Download plot')))
             }
         })
     })
@@ -2832,34 +2882,44 @@ server <- function(input, output, session) {
                 clusters <- shiny::reactiveValuesToList(clusters)
                 clu_anno <- clusters$cluster %>% dplyr::arrange(clust)
                 if (is.null(clu_anno$shape)){
-                    cl_plot <- MoNETA::plot_2D_matrix(coord = clusters$dr_mat[1:2,], nodes_anno = clu_anno,
+                    output$cl_plot <- plotly::renderPlotly({
+                        isolate({
+                            MoNETA::plot_2D_matrix(coord = clusters$dr_mat[1:2,], nodes_anno = clu_anno,
                                                       id_name = 'id', id_anno_color = 'clust',
                                                       interactive = TRUE, wo_legend = FALSE) %>%
-                        plotly::layout(font = list(family = "LMRoman10", color = "black"),
-                                       title = list(text = title(), font = list(family = "LMRoman10", color = "black", size = 20)),
-                                       xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
-                                       yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
-                        ) %>%
-                        plotly::config(
-                            toImageButtonOptions = list(filename = paste('MoNETAshiny', input$dr_method, input$cluster_method, 'plot', sep = '_'),
-                                                        format = "png", width = 1800, height = 800)
-                        )
+                            plotly::layout(font = list(family = "LMRoman10", color = "black"),
+                                           title = list(text = title(), font = list(family = "LMRoman10", color = "black", size = 20)),
+                                           xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
+                                           yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
+                            ) %>%
+                            plotly::config(
+                                toImageButtonOptions = list(filename = paste('MoNETAshiny', input$dr_method, input$cluster_method, 'plot', sep = '_'),
+                                                            format = "png", width = 1800, height = 800)
+                            )
+                        })
+                    })
                 } else{
-                    cl_plot <- MoNETA::plot_2D_matrix(coord = clusters$dr_mat[1:2,], nodes_anno = clu_anno,
-                                                      id_name = 'id', id_anno_color = 'clust', id_anno_shape = 'shape',
-                                                      interactive = TRUE, wo_legend = FALSE) %>%
-                        plotly::layout(font = list(family = "LMRoman10", color = "black"),
-                                       title = list(text = title(), font = list(family = "LMRoman10", color = "black", size = 20)),
-                                       xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
-                                       yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
-                        ) %>%
-                        plotly::config(
-                            toImageButtonOptions = list(filename = paste('MoNETAshiny', input$dr_method, input$cluster_method, 'plot', sep = '_'),
-                                                        format = "png", width = 1800, height = 800)
-                        )
+                    output$cl_plot <- plotly::renderPlotly({
+                        isolate({
+                            MoNETA::plot_2D_matrix(coord = clusters$dr_mat[1:2,], nodes_anno = clu_anno,
+                                                          id_name = 'id', id_anno_color = 'clust', id_anno_shape = 'shape',
+                                                          interactive = TRUE, wo_legend = FALSE) %>%
+                            plotly::layout(font = list(family = "LMRoman10", color = "black"),
+                                           title = list(text = title(), font = list(family = "LMRoman10", color = "black", size = 20)),
+                                           xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
+                                           yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
+                            ) %>%
+                            plotly::config(
+                                toImageButtonOptions = list(filename = paste('MoNETAshiny', input$dr_method, input$cluster_method, 'plot', sep = '_'),
+                                                            format = "png", width = 1800, height = 800)
+                            )
+                        })
+                    })
                 }
                 return(shinydashboard::box(width = 8,
-                                           cl_plot, shiny::hr(), shiny::downloadButton(outputId = 'download_cl_plot', label = 'Download plot')))
+                                           shinycssloaders::withSpinner(plotly::plotlyOutput('cl_plot')),
+                                           shiny::hr(),
+                                           shiny::downloadButton(outputId = 'download_cl_plot', label = 'Download plot')))
             }
         })
     })
@@ -2879,7 +2939,9 @@ server <- function(input, output, session) {
 
                         shinyalert::shinyalert(
                             title = "Next step",
-                            text = paste0("After reviewing the dendrogram that was just displayed, please select a threshold 'h' to cut the dendrogram using the slider. Then click the 'Run' button again."
+                            text = paste0("i) Look at the <b> dendrogram </b> that was just displayed; <br/>
+                                          ii) <b> move the slider </b> to select a threshold <b> 'h' </b> to cut the dendrogram; <br/>
+                                          iii) click the <b> 'Run' </b> button again."
                             ),
                             closeOnEsc = TRUE,
                             closeOnClickOutside = TRUE,
@@ -2917,7 +2979,8 @@ server <- function(input, output, session) {
                     }
                 })
             })
-            shinydashboard::box(width = 8, shiny::plotOutput(outputId = "plotHclust"))
+            shinydashboard::box(width = 8,
+                                shinycssloaders::withSpinner(shiny::plotOutput(outputId = "plotHclust")))
         }else {
             return(NULL)
         }
