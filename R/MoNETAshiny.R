@@ -47,8 +47,8 @@ netSummary <- function(network){
     netSummary_list <- list( 'dim'= dim(network),
                              'edges'= dim(network)[1],
                              'nodes'= length(unique(nodes)),
-                             'maxConnections'= degree[[1, 'n']],
-                             'maxDegreeNodes'= top10$nodes
+                             'maxConnections'= degree[[1, 'n']]#,
+                             #'maxDegreeNodes'= top10$nodes
     )
     return(netSummary_list)
 }
@@ -61,278 +61,461 @@ ui <- shinydashboard::dashboardPage(
     shinydashboard::dashboardSidebar(
         shinyjs::useShinyjs(),
         shinydashboard::sidebarMenu(id = 'tabs',
-            #shiny::tags$head(shiny::tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")),
-            shiny::tags$head(shiny::tags$style(".inactiveLink {
+                                    shiny::tags$head(shiny::tags$link(rel = "stylesheet", type = "text/css", href = "custom.css")),
+                                    shiny::tags$head(shiny::tags$style(".inactiveLink {
                             pointer-events: none;
                            cursor: default;
                            }")),
-            #style = "position: fixed; height: 90vh; overflow-y: auto;",
-            shinydashboard::menuItem("Omics Data", tabName = "mat_tab", icon = shiny::icon("table"),
-                                     shinydashboard::menuItem("Loading", tabName = "mat_sub_1"),
-                                     shinydashboard::menuItem("Pre-processing", tabName = "mat_sub_2")),
-            shinydashboard::menuItem("Network", tabName = "net_tab", icon = shiny::icon("circle-nodes"),
-                                     shinydashboard::menuItem("Network inference", tabName = "net_sub_1"),
-                                     shinydashboard::menuItem("Network Filtering", tabName =  "net_sub_2")),
-            shinydashboard::menuItem("RWR", tabName = "rwr_tab", icon = shiny::icon("person-running"),
-                                     shinydashboard::menuItem("Loading networks", tabName = "rwr_tab_1"),
-                                     shinydashboard::menuItem("Multiplex network", tabName = "rwr_tab_2"),
-                                     shinydashboard::menuItem("RWR Parameters", tabName = "rwr_tab_3")),
-            shinydashboard::menuItem("Dimensionality Reduction", tabName = "dr_tab", icon = shiny::icon("filter")),
-            shinydashboard::menuItem("Clustering", tabName = "cl_tab", icon = shiny::icon("layer-group"))
+                                    style = "position: fixed; height: 90vh; overflow-y: auto;",
+                                    shinydashboard::menuItem("Omics Data", tabName = "mat_tab", icon = shiny::icon("table"),
+                                                             shinydashboard::menuItem("Loading", tabName = "mat_sub_1"),
+                                                             shinydashboard::menuItem("Pre-processing", tabName = "mat_sub_2")),
+                                    shinydashboard::menuItem("Network", tabName = "net_tab", icon = shiny::icon("circle-nodes"),
+                                                             shinydashboard::menuItem("Network inference", tabName = "net_sub_1"),
+                                                             shinydashboard::menuItem("Network Filtering", tabName =  "net_sub_2")),
+                                    shinydashboard::menuItem("RWR", tabName = "rwr_tab", icon = shiny::icon("person-running"),
+                                                             shinydashboard::menuItem("Loading networks", tabName = "rwr_tab_1"),
+                                                             shinydashboard::menuItem("Multiplex network", tabName = "rwr_tab_2"),
+                                                             shinydashboard::menuItem("RWR Parameters", tabName = "rwr_tab_3")),
+                                    shinydashboard::menuItem("Dimensionality Reduction", tabName = "dr_tab", icon = shiny::icon("filter")),
+                                    shinydashboard::menuItem("Clustering", tabName = "cl_tab", icon = shiny::icon("layer-group"))
 
         )),
 
     shinydashboard::dashboardBody(
-        shinydashboard::tabItems(
-            shinydashboard::tabItem(tabName = "mat_sub_1",
-                                    shiny::fluidRow(
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('jump2P1.1')),
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('jump2P2'), align = 'right'
-                                        )
-                                    ),
-                                    shiny::h2(shiny::span("Upload omics matrices", style = "font-weight: bold")),
-                                    shiny::fluidRow(
-                                        shinydashboard::box(
-                                            shiny::radioButtons(inputId = 'omics_example_opt', label = 'Load the example dataset',
-                                                                choices = c('Yes', 'No'), selected = 'No'),
-                                            shiny::conditionalPanel(
-                                                condition = 'input.omics_example_opt == "Yes"',
-                                                shiny::checkboxGroupInput(inputId = 'omics_example_files', label = 'Select one or more omics matrices',
-                                                                          choices = c("GliomaCNV_norm","GliomaMethylation_norm", "GliomaExpression_norm" ),
-                                                                          selected = c("GliomaCNV_norm","GliomaMethylation_norm", "GliomaExpression_norm" ))
+        shinydashboard::tabItems(shinydashboard::tabItem(tabName = "mat_sub_1",
+                                                         shiny::fluidRow(
+                                                             shiny::column(width = 6,
+                                                                           shiny::uiOutput('jump2P1.1')),
+                                                             shiny::column(width = 6,
+                                                                           shiny::uiOutput('jump2P2'), align = 'right'
+                                                             )
+                                                         ),
+
+                                                         shiny::fluidRow(
+
+                                                             shiny::column(width = 6,
+                                                                           shiny::fluidRow(
+                                                                               shiny::column(width = 12,
+                                                                                             shiny::tags$hr(),
+                                                                                             shinydashboard::box(
+                                                                                                 title = shiny::h2(shiny::span("Upload omics matrices", style = "font-weight: bold")),
+                                                                                                 width = 12, status = "primary", solidHeader = FALSE,
+                                                                                                 shiny::radioButtons(inputId = 'omics_example_opt',
+                                                                                                                     label = shiny::h4(shiny::span('Load the example dataset', style = "font-weight: bold")),
+                                                                                                                     choices = c('Yes', 'No'), selected = 'No'),
+                                                                                                 shiny::conditionalPanel(
+                                                                                                     condition = 'input.omics_example_opt == "Yes"',
+                                                                                                     shiny::checkboxGroupInput(inputId = 'omics_example_files',
+                                                                                                                               label = shiny::h4(shiny::span('Select one or more omics matrices', style = "font-weight: bold")),
+                                                                                                                               choices = c("GliomaCNV_norm","GliomaMethylation_norm", "GliomaExpression_norm" ),
+                                                                                                                               selected = c("GliomaCNV_norm","GliomaMethylation_norm", "GliomaExpression_norm" )),
+                                                                                                     shiny::tags$hr()
+                                                                                                 ),
+                                                                                                 shiny::conditionalPanel(
+                                                                                                     condition = 'input.omics_example_opt == "No"',
+                                                                                                     shiny::fileInput(inputId = "omics_files", label = shiny::h4(shiny::span('Select one or more files', style = "font-weight: bold")),
+                                                                                                                      multiple = TRUE),
+                                                                                                     shiny::uiOutput('omics_names')
+                                                                                                 ),
+                                                                                                 shiny::actionButton('load_mat_button', 'Load')
+                                                                                             )
+                                                                               ),
+
+                                                                               shiny::column(width = 12,
+                                                                                             shiny::htmlOutput(outputId = "omics_sum_info")
+                                                                               ),
+
+                                                                               shiny::column(width = 12,
+                                                                                             shinydashboard::box(
+                                                                                                 width = 12, status = "primary", solidHeader = FALSE,
+                                                                                                 title = shiny::h2(shiny::span("Upload annotation file", style = "font-weight: bold")),
+                                                                                                 shiny::radioButtons(inputId = 'anno_example_opt',
+                                                                                                                     label = shiny::h4(shiny::span('Load the example annotation file', style = "font-weight: bold")),
+                                                                                                                     choices = c('Yes', 'No'), selected = 'No'),
+                                                                                                 shiny::conditionalPanel(
+                                                                                                     condition = 'input.anno_example_opt == "No"',
+                                                                                                     shiny::fileInput(inputId = "anno_file", label = shiny::h4(shiny::span('Select a file', style = "font-weight: bold")),
+                                                                                                                      multiple = FALSE)
+                                                                                                 ),
+                                                                                                 shiny::tags$hr(),
+                                                                                                 shiny::actionButton('load_anno_button', 'Load')
+                                                                                             )
+                                                                               ),
+
+                                                                               shiny::column(width = 12,
+                                                                                             shiny::htmlOutput(outputId = "anno_info")
+                                                                               ),
+
+                                                                               shiny::column(width = 12,
+                                                                                             shiny::htmlOutput(outputId = "anno_info_extra")
+                                                                               )
+                                                                           )
                                                              ),
-                                            shiny::conditionalPanel(
-                                                condition = 'input.omics_example_opt == "No"',
-                                                shiny::fileInput(inputId = "omics_files", label = 'Select one or more files' ,
-                                                                 multiple = TRUE),
-                                                shiny::uiOutput('omics_names')
-                                            ),
-                                            shiny::actionButton('load_mat_button', 'Load')
-                                        ),
-                                        shiny::htmlOutput(outputId = "omics_sum_info")
-                                    ),
-                                    shiny::h2(shiny::span("Upload annotation file", style = "font-weight: bold")),
-                                    shiny::fluidRow(
-                                        shinydashboard::box(
-                                            shiny::radioButtons(inputId = 'anno_example_opt', label = 'Load the example annotation file',
-                                                                choices = c('Yes', 'No'), selected = 'No'),
-                                            shiny::conditionalPanel(
-                                                condition = 'input.anno_example_opt == "No"',
-                                                 shiny::fileInput(inputId = "anno_file", label = 'Select a file',
-                                                             multiple = FALSE)
-                                            ),
-                                            shiny::actionButton('load_anno_button', 'Load')
-                                        ),
-                                        shiny::htmlOutput(outputId = "anno_info"),
-                                        shiny::htmlOutput(outputId = "anno_info_extra")
+                                                             shiny::column(width = 6,
+                                                                           shiny::tags$hr(),
+                                                                           shinydashboard::infoBox(
+                                                                               title = shiny::h3(shiny::span('Information', style = "font-weight: bold")),
+                                                                               value = shiny::uiOutput('info_box_1'),
+                                                                               subtitle = NULL,
+                                                                               icon = shiny::icon("info"), color = "aqua", width = NULL,
+                                                                               fill = FALSE)
+                                                             )
+                                                         )
+        ),
+        shinydashboard::tabItem(tabName = "mat_sub_2",
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('back2P1')),
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('jump2P3'),  align = 'right'
                                     )
-            ),
-            shinydashboard::tabItem(tabName = "mat_sub_2",
-                                    shiny::fluidRow(
-                                        shiny::column(width = 6,
-                                                      shiny::uiOutput('back2P1')),
-                                        shiny::column(width = 6,
-                                                      shiny::uiOutput('jump2P3'),  align = 'right'
-                                        )
+                                ),
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::fluidRow(
+                                                      shiny::tags$hr(),
+                                                      shiny::column(width = 12,
+                                                                    #shiny::h2(shiny::span("Omics matrices Pre-processing", style = "font-weight: bold")),
+                                                                    shiny::uiOutput("process_omics_mat"),
+                                                      ),
+                                                      shiny::column(width = 12,
+                                                                    shiny::uiOutput('pro_matrices_sum_info')
+                                                      ),
+                                                      shiny::column(width = 12,
+                                                                    shiny::uiOutput('intersection')
+                                                      ),
+                                                      shiny::column(width = 12,
+                                                                    shiny::uiOutput('intersection_info')
+                                                      )
+                                                  )
                                     ),
-                                    shiny::h2(shiny::span("Omics matrices Pre-processing", style = "font-weight: bold")),
-                                    shiny::fluidRow(
-                                                    shiny::uiOutput("process_omics_mat"),
-                                                    shiny::uiOutput('pro_matrices_sum_info'),
-                                                    shiny::uiOutput('download_proc_mat_box')
-                                    ),
-                                    #shiny::fluidRow(
-                                    #    shinydashboard::box(shiny::actionButton("process_mat", 'Submit'))
-                                    #    ),
+                                    shiny::column(width = 6,
+                                                  shiny::tags$hr(),
+                                                  shiny::fluidRow(
+                                                            shinydashboard::infoBox(
+                                                                title = shiny::h3(shiny::span('Information', style = "font-weight: bold")),
+                                                                value = shiny::uiOutput('info_box_2'),
+                                                                subtitle = NULL,
+                                                                icon = shiny::icon("info"), color = "aqua", width = NULL,
+                                                                fill = FALSE),
+                                                            shiny::uiOutput('download_proc_mat_box')
+                                                  )
+                                    )
+                                )
+        ),
 
-                                    shiny::h2(shiny::span("Omics matrices Intersection", style = "font-weight: bold")),
-                                    shiny::fluidRow(
-                                        shiny::uiOutput('intersection'),
-                                        shiny::uiOutput('intersection_info')
+        shinydashboard::tabItem(tabName = 'net_sub_1',
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('back2P2')),
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('jump2P4'),  align = 'right'
                                     )
-            ),
+                                ),
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::tags$hr(),
+                                                  shiny::h2(shiny::span("Omics Network Inference", style = "font-weight: bold")),
+                                                  shiny::fluidRow(
+                                                      shiny::uiOutput("omics_net_arguments"),
+                                                      shiny::uiOutput("download_net_box")
+                                                  )
+                                    ),
+                                    shiny::column(width = 6,
+                                                  shiny::tags$hr(),
+                                                  shiny::column(width = 12,
+                                                                shinydashboard::infoBox(
+                                                                    title = shiny::h3(shiny::span('Information', style = "font-weight: bold")),
+                                                                    value = shiny::uiOutput('info_box_3'),
+                                                                    subtitle = NULL,
+                                                                    icon = shiny::icon("info"), color = "aqua", width = NULL,
+                                                                    fill = FALSE)
 
-            shinydashboard::tabItem(tabName = 'net_sub_1',
-                                    shiny::fluidRow(
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('back2P2')),
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('jump2P4'),  align = 'right'
-                                        )
-                                    ),
-                                    shiny::h2(shiny::span("Omics Network Inference", style = "font-weight: bold")),
-                                    shiny::fluidRow(
-                                        shiny::uiOutput("omics_net_arguments"),
-                                        shiny::uiOutput("download_net_box")
+                                                  )
                                     )
-            ),
-            shinydashboard::tabItem(tabName = 'net_sub_2',
-                                    shiny::fluidRow(
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('back2P3')),
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('jump2P5'),  align = 'right'
-                                        )
-                                    ),
-                                    shiny::h2(shiny::span("Omics Network Filtering", style = "font-weight: bold")),
-                                    shiny::fluidRow(
-                                        shiny::uiOutput("plot_net_box"),
-                                        shiny::uiOutput("f_net_sum_info"),
-                                        shiny::uiOutput("download_fnet_box")
+                                )
+        ),
+        shinydashboard::tabItem(tabName = 'net_sub_2',
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('back2P3')),
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('jump2P5'),  align = 'right'
                                     )
-            ),
+                                ),
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::tags$hr(),
+                                                  shiny::h2(shiny::span("Omics Network Filtering", style = "font-weight: bold")),
+                                                  shiny::fluidRow(
+                                                      shiny::uiOutput("plot_net_box")
+                                                  )
+                                    ),
+                                    shiny::column(width = 6,
+                                                  shiny::tags$hr(),
+                                                  shiny::column(width = 12,
+                                                                shinydashboard::infoBox(
+                                                                    title = shiny::h3(shiny::span('Information', style = "font-weight: bold")),
+                                                                    value = shiny::uiOutput('info_box_4'),
+                                                                    subtitle = NULL,
+                                                                    icon = shiny::icon("info"), color = "aqua", width = NULL,
+                                                                    fill = FALSE),
+                                                                shiny::uiOutput("download_fnet_box")
+                                                  )
+                                    )
+                                )
+        ),
 
-            shinydashboard::tabItem(tabName = "rwr_tab_1",
+        shinydashboard::tabItem(tabName = "rwr_tab_1",
 
-                                    shiny::fluidRow(
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('back2P1_from1.1')
-                                               ),
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('jump2P5.1'),  align = 'right'
-                                        )
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('back2P1_from1.1')
                                     ),
-                                    shiny::h2(shiny::span("Upload omics networks", style = "font-weight: bold")),
-                                    shiny::fluidRow(
-                                        shinydashboard::box(
-                                            shiny::fileInput("omics_net_files", label =  'Select one or more files',
-                                                             multiple = TRUE,
-                                                             accept = c("text/csv", '.RDS', "text/comma-separated-values,text/plain", ".csv")
-                                            ),
-                                            shiny::uiOutput('omics_net_names'),
-                                            shiny::actionButton('load_omics_net_button', 'Load')
-                                        ),
-                                        shiny::htmlOutput(outputId = "omics_net_sum_info")
-                                    ),
-                                    shiny::h2(shiny::span("Upload annotation file", style = "font-weight: bold")),
-                                    shiny::fluidRow(
-                                        shinydashboard::box(
-                                            shiny::fileInput(inputId = "anno_file1",
-                                                             label = 'Select a file',
-                                                             multiple = FALSE),
-                                            shiny::actionButton('load_anno_button1', 'Load')
-                                        ),
-                                        shiny::htmlOutput(outputId = "anno_info1"),
-                                        shiny::htmlOutput(outputId = "anno_info_extra1"),
-                                        shiny::htmlOutput(outputId = "anno_info_extra2")
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('jump2P5.1'),  align = 'right'
                                     )
-            ),
-            shinydashboard::tabItem(tabName = "rwr_tab_2",
-                                    shiny::fluidRow(
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('back2P4'),
-                                               shiny::uiOutput('back2P1.1')),
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('jump2P6'),  align = 'right'
-                                        )
-                                    ),
-                                    shiny::h2(shiny::span("Construction of Multiplex network", style = "font-weight: bold")),
-                                    shiny::uiOutput("multiplex_func"),
-            ),
-            shinydashboard::tabItem(tabName = "rwr_tab_3",
-                                    shiny::fluidRow(
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('back2P5')),
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('jump2P7'),  align = 'right'
-                                        )
-                                    ),
-                                    shiny::h2(shiny::span("Parameters setting for RWR-(M)", style = "font-weight: bold")),
-                                    shiny::fluidRow(
-                                        shinydashboard::box(width = 12,
-                                                            shiny::tabPanel(shiny::h4(shiny::span('Parameters', style = "font-weight: bold")),
-                                                                            shiny::fluidRow(
-                                                                                shiny::column( width = 4,
-                                                                                               shiny::h4(shiny::span('General Parameters', style = "font-weight: bold")),
-                                                                                               shiny::sliderInput('restart', 'r', min = 0, max = 1, value = 0.7, step = 0.01),
-                                                                                               shiny::sliderInput('delta',  shiny::HTML("&delta;"),  min = 0, max = 1, value = 0.5, step = 0.01)
-                                                                                ),
-                                                                                shiny::column(width = 4,
-                                                                                              shiny::h4(shiny::span('Restarting Probabilities', style = "font-weight: bold")),
-                                                                                              shiny::radioButtons('tao_opt', label = 'Do you want to enter restarting probabilities per layer or select default ones?',
-                                                                                                                  choices = c('Custumize restarting probabilities per layer', 'Use default restarting probabilities'),
-                                                                                                                  selected = 'Use default restarting probabilities'),
-                                                                                              shiny::uiOutput(outputId = "tauBIO")
-                                                                                ),
-                                                                                shiny::column(width = 4,
-                                                                                              shiny::h4(shiny::span('RWR-NF', style = "font-weight: bold")),
-                                                                                              shiny::radioButtons('omics_jump_neigh', 'Connect nodes of different layers by neighborhood', c('YES', 'NO'), selected = 'NO'),
-                                                                                              shiny::conditionalPanel(
-                                                                                                  condition = 'input.omics_jump_neigh == "YES"',
-                                                                                                  shiny::radioButtons('omics_weight_jump_neigh', 'Weight inter-layers edges', c('YES', 'NO'), selected = 'YES')
-                                                                                              )
-                                                                                )
-                                                                            ),
-                                                                            shiny::fluidRow(
-                                                                                shiny::column(width = 12,
-                                                                                              shiny::hr(),
-                                                                                              shiny::h4(shiny::span('Transition layer matrices', style = "font-weight: bold")),
-                                                                                              shiny::radioButtons(inputId = 'bioInf_transition',
-                                                                                                                  label = 'Do you want to create a biologically informed layer transition matrix?',
-                                                                                                                  choices = c('YES', 'NO'), selected = 'NO'),
-                                                                                              shiny::conditionalPanel(
-                                                                                                  condition = 'input.bioInf_transition == "NO"',
-                                                                                                  shiny::uiOutput('omics_trans_mat')
-                                                                                              )
-                                                                                )
-                                                                            ),
-                                                                            shiny::fluidRow(
-                                                                                shiny::column(width = 4,
-                                                                                              shiny::hr(),
-                                                                                              shiny::h4(shiny::span('Cores', style = "font-weight: bold")),
-                                                                                              shiny::numericInput('cores_rwr', 'Select the number of cores to run the RWR ', min = 1, max = 190, value = 1)
-                                                                                )
-                                                                            ),
-                                                                            shiny::fluidRow(
-                                                                                shiny::tags$hr(),
-                                                                                shiny::column(width = 6, shiny::actionButton('rwr_button', 'Run RWR')),
-                                                                                shiny::column(width = 6, shiny::uiOutput('download_rwr_mat')),
-                                                                            )
-                                                            )
-                                        )
-                                    )
-            ),
+                                ),
 
-            shinydashboard::tabItem(tabName = "dr_tab",
-                                    shiny::fluidRow(
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('back2P6')),
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('jump2P8'),  align = 'right'
-                                        )
-                                    ),
-                                    shiny::h2(shiny::span("Dimensionality Reduction Methods", style = "font-weight: bold")),
-                                    shiny::fluidRow(
-                                        shiny::uiOutput("dr_opt"),
-                                        shiny::uiOutput('dr_plot_box'),
-                                        shiny::uiOutput('download_dr_box')
-                                    )
-            ),
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::fluidRow(
+                                                      shiny::column(width = 12,
+                                                                    shiny::tags$hr(),
+                                                                    shinydashboard::box(
+                                                                        title = shiny::h2(shiny::span("Upload omics networks", style = "font-weight: bold")),
+                                                                        width = 12, status = "primary", solidHeader = FALSE,
+                                                                        shiny::fileInput("omics_net_files", label = shiny::h4(shiny::span( 'Select one or more files', style = "font-weight: bold")),
+                                                                                         multiple = TRUE,
+                                                                                         accept = c("text/csv", '.RDS', "text/comma-separated-values,text/plain", ".csv")
+                                                                        ),
+                                                                        shiny::uiOutput('omics_net_names'),
+                                                                        shiny::actionButton('load_omics_net_button', 'Load')
+                                                                    )
+                                                      ),
+                                                      shiny::column(width = 12,
+                                                                    shiny::htmlOutput(outputId = "omics_net_sum_info")
+                                                      ),
+                                                      shiny::column(width = 12,
+                                                                    shinydashboard::box(
+                                                                        title = shiny::h2(shiny::span("Upload annotation file", style = "font-weight: bold")),
+                                                                        width = 12, status = "primary", solidHeader = FALSE,
+                                                                        shiny::fileInput(inputId = "anno_file1",
+                                                                                         label = shiny::h4(shiny::span( 'Select a file', style = "font-weight: bold")),
+                                                                                         multiple = FALSE),
+                                                                        shiny::actionButton('load_anno_button1', 'Load')
+                                                                    ),
+                                                                    shiny::htmlOutput(outputId = "anno_info1")
+                                                      )
 
-            shinydashboard::tabItem(tabName = "cl_tab",
-                                    shiny::fluidRow(
-                                        shiny::column(width = 6,
-                                               shiny::uiOutput('back2P7'))
+                                                  )
                                     ),
-                                    shiny::h2(shiny::span("Clustering Analysis", style = "font-weight: bold")),
-                                    shiny::fluidRow(
-                                        shiny::uiOutput("cl_opt"),
-                                        shinycssloaders::withSpinner(shiny::uiOutput(outputId = "cl_plot_box"))
-                                    ),
-                                    shiny::fluidRow(
-                                        shiny::uiOutput('cluster_table_box'),
-                                        shiny::conditionalPanel(
-                                            condition = "input.cluster_method == 'hclust'",
-                                            shiny::uiOutput(outputId = "plotHclust_box")
-                                        )
+                                    shiny::column(width = 6,
+                                                  shiny::tags$hr(),
+                                                  shinydashboard::infoBox(
+                                                      title = shiny::h3(shiny::span('Information', style = "font-weight: bold")),
+                                                      value = shiny::uiOutput('info_box_5'),
+                                                      subtitle = NULL,
+                                                      icon = shiny::icon("info"), color = "aqua", width = NULL,
+                                                      fill = FALSE),
+                                                  shiny::htmlOutput(outputId = "anno_info_extra1"),
+                                                  shiny::htmlOutput(outputId = "anno_info_extra2")
                                     )
-            )
+
+                                )
+        ),
+
+        shinydashboard::tabItem(tabName = "rwr_tab_2",
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('back2P4'),
+                                                  shiny::uiOutput('back2P1.1')),
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('jump2P6'),  align = 'right'
+                                    )
+                                ),
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::fluidRow(
+                                                      shiny::column(width=12,
+                                                                    shiny::tags$hr(),
+                                                                    shinydashboard::box(width = 12, status = "primary", solidHeader = FALSE,
+                                                                                        title =  shiny::h2(shiny::span("Construction of Multiplex network", style = "font-weight: bold")),
+                                                                                        shiny::radioButtons(inputId = 'weightMultiplex',
+                                                                                                            label = shiny::h4(shiny::span('Do you want to create a weighted multiplex network?', style = "font-weight: bold")),
+                                                                                                            choices = c("YES", "NO"), selected = "NO"),
+                                                                                        shiny::tags$hr(),
+                                                                                        shiny::conditionalPanel(
+                                                                                            condition = 'input.weightMultiplex == "YES"',
+                                                                                            shiny::radioButtons(inputId = 'pruneMultiplex',
+                                                                                                                label = shiny::h4(shiny::span('Do you want to prune the multiplex network?', style = "font-weight: bold")),
+                                                                                                                choices = c('YES', 'NO'), selected = 'NO'),
+                                                                                            shiny::conditionalPanel(
+                                                                                                condition = 'input.pruneMultiplex == "YES"',
+                                                                                                shiny::numericInput(inputId = 'pruneMultiplex_th',
+                                                                                                                    label = shiny::h4(shiny::span('Select a threshold to prune the multiplex network', style = "font-weight: bold")),
+                                                                                                                    min = 0, max = 100, value = 50)
+                                                                                            ),
+                                                                                            shiny::tags$hr()
+                                                                                        ),
+                                                                                        shiny::actionButton(inputId = 'gen_multiplex_btn', label = 'GO'))
+                                                      ),
+                                                      shiny::column(width=12,
+                                                                    shiny::htmlOutput(outputId = "multi_net_sum_info")
+                                                      )
+                                                  )
+                                    ),
+                                    shiny::column(width = 6,
+                                                  shiny::tags$hr(),
+                                                  shinydashboard::infoBox(
+                                                      title = shiny::h3(shiny::span('Information', style = "font-weight: bold")),
+                                                      value = shiny::uiOutput('info_box_6'),
+                                                      subtitle = NULL,
+                                                      icon = shiny::icon("info"), color = "aqua", width = NULL,
+                                                      fill = FALSE)
+                                    )
+                                )
+        ),
+        shinydashboard::tabItem(tabName = "rwr_tab_3",
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('back2P5')),
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('jump2P7'),  align = 'right'
+                                    )
+                                ),
+
+                                shiny::fluidRow(
+
+                                    shiny::column(width = 6,
+                                                  shiny::tags$hr(),
+                                                  shinydashboard::box(width=12,
+                                                                      status = "primary", solidHeader = FALSE,
+                                                                      title = shiny::h2(shiny::span("Random Walk with Restart", style = "font-weight: bold")),
+                                                                      shinydashboard::tabBox(width=12,
+                                                                                             title = shiny::column(width = 6, shiny::uiOutput('download_rwr_mat')),
+                                                                                             shiny::tabPanel(title = shiny::h3(shiny::span('Restart', style = "font-weight: bold")),
+                                                                                                             shiny::fluidRow(shiny::column(width = 12,
+                                                                                                                                           shiny::sliderInput('restart', shiny::h4(shiny::span('Select the restarting parameter (r)', style = "font-weight: bold")),
+                                                                                                                                                              min = 0, max = 1, value = 0.7, step = 0.01)
+                                                                                                             )
+                                                                                                             ),
+                                                                                                             shiny::tags$hr(),
+                                                                                                             shiny::fluidRow(shiny::column(width = 12,
+                                                                                                                                           shiny::radioButtons('tao_opt',
+                                                                                                                                                               label = shiny::h4(shiny::HTML('<span style:"font-family = LM Roman 10"><b>Restarting Probabilities (&tau;) </b></span>')),
+                                                                                                                                                               choices = c('Custumize restarting probabilities per layer', 'Use default restarting probabilities'),
+                                                                                                                                                               selected = 'Use default restarting probabilities'),
+                                                                                                                                           shiny::uiOutput(outputId = "tauBIO")
+                                                                                                             )
+                                                                                                             )
+                                                                                             ),
+                                                                                             shiny::tabPanel(title = shiny::h3(shiny::span('Transition', style = "font-weight: bold")),
+                                                                                                             shiny::fluidRow(
+                                                                                                                 shiny::column(width = 12,
+                                                                                                                               shiny::sliderInput('delta',
+                                                                                                                                                  shiny::h4(shiny::HTML('<span style:"font-family = LM Roman 10"><b>Select the transition parameter (&delta;)')),
+                                                                                                                                                  min = 0, max = 1, value = 0.5, step = 0.01)
+                                                                                                                 )
+                                                                                                             ),
+                                                                                                             shiny::tags$hr(),
+                                                                                                             shiny::fluidRow(
+                                                                                                                 shiny::column(width = 12,
+                                                                                                                               shiny::radioButtons('omics_jump_neigh',
+                                                                                                                                                   shiny::h4(shiny::span('RWR-NF option', style = "font-weight: bold")),
+                                                                                                                                                   c('YES', 'NO'), selected = 'NO'),
+                                                                                                                               shiny::conditionalPanel(
+                                                                                                                                   condition = 'input.omics_jump_neigh == "YES"',
+                                                                                                                                   shiny::tags$hr(),
+                                                                                                                                   shiny::radioButtons('omics_weight_jump_neigh',
+                                                                                                                                                       shiny::h4(shiny::span('Weight inter-layers edges', style = "font-weight: bold")),
+                                                                                                                                                       c('YES', 'NO'), selected = 'YES')
+                                                                                                                               )
+                                                                                                                 )
+                                                                                                             ),
+                                                                                                             shiny::tags$hr(),
+                                                                                                             shiny::fluidRow(
+                                                                                                                 shiny::column(width = 12,
+                                                                                                                               shiny::h4(shiny::span('Transition layer matrices', style = "font-weight: bold")),
+                                                                                                                               shiny::radioButtons(inputId = 'bioInf_transition',
+                                                                                                                                                   label = 'Do you want to create a biologically informed layer transition matrix?',
+                                                                                                                                                   choices = c('YES', 'NO'), selected = 'NO'),
+                                                                                                                               shiny::conditionalPanel(
+                                                                                                                                   condition = 'input.bioInf_transition == "NO"',
+                                                                                                                                   shiny::uiOutput('omics_trans_mat')
+                                                                                                                               )
+                                                                                                                 )
+                                                                                                             )
+                                                                                             )
+                                                                      ),
+
+                                                                      shiny::fluidRow(
+                                                                          shiny::column(width = 12,
+                                                                                        shinydashboard::box(width = 12,
+                                                                                                            shiny::numericInput('cores_rwr',
+                                                                                                                                shiny::h4(shiny::span('Select the number of cores to run the RWR', style = "font-weight: bold")),
+                                                                                                                                min = 1, max = 190, value = 1)
+                                                                                        )
+                                                                          )
+                                                                      ),
+                                                                      shiny::fluidRow(
+                                                                          shiny::tags$hr(),
+                                                                          shiny::column(width = 6, shiny::actionButton('rwr_button', 'Run RWR')),
+                                                                          #shiny::column(width = 6, shiny::uiOutput('download_rwr_mat')),
+                                                                      )
+                                                  )
+                                    ),
+                                    shiny::column(width = 6,
+                                                  shiny::tags$hr(),
+                                                  shinydashboard::infoBox(
+                                                      title = shiny::h3(shiny::span('Information', style = "font-weight: bold")),
+                                                      value = shiny::uiOutput('info_box_7'),
+                                                      subtitle = NULL,
+                                                      icon = shiny::icon("info"), color = "aqua", width = NULL,
+                                                      fill = FALSE)
+                                    )
+                                )
+        ),
+
+        shinydashboard::tabItem(tabName = "dr_tab",
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('back2P6')),
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('jump2P8'),  align = 'right'
+                                    )
+                                ),
+                                shiny::h2(shiny::span("Dimensionality Reduction Methods", style = "font-weight: bold")),
+                                shiny::fluidRow(
+                                    shiny::uiOutput("dr_opt"),
+                                    shiny::uiOutput('dr_plot_box'),
+                                    shiny::uiOutput('download_dr_box')
+                                )
+        ),
+
+        shinydashboard::tabItem(tabName = "cl_tab",
+                                shiny::fluidRow(
+                                    shiny::column(width = 6,
+                                                  shiny::uiOutput('back2P7'))
+                                ),
+                                shiny::h2(shiny::span("Clustering Analysis", style = "font-weight: bold")),
+                                shiny::fluidRow(
+                                    shiny::uiOutput("cl_opt"),
+                                    shinycssloaders::withSpinner(shiny::uiOutput(outputId = "cl_plot_box"))
+                                ),
+                                shiny::fluidRow(
+                                    shiny::uiOutput('cluster_table_box'),
+                                    shiny::conditionalPanel(
+                                        condition = "input.cluster_method == 'hclust'",
+                                        shiny::uiOutput(outputId = "plotHclust_box")
+                                    )
+                                )
+        )
         )
     ),
 
-    shiny::tags$head(shiny::tags$style(shiny::HTML('* {font-family: "LM Roman 10"};')))
+    shiny::tags$head(shiny::tags$style(shiny::HTML('* {font-family: "LM Roman 10"}; font-size: 1em;')))
 
 )
 
@@ -342,6 +525,51 @@ server <- function(input, output, session) {
     ############################################################################################
     #                            OMICS DATA: LOADING DATA (INPUT)                       #
     ############################################################################################
+
+    output$info_box_1 <- renderText({
+        HTML("<br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            Welcome to the MoNETA Shiny app, an R package for network-based multi-omics data integration.<br/>
+            You can start the pipeline by uploading omics matrices on the following page,
+            or click the <b> Skip </b> button in the top left-hand corner to directly load patient networks. </span> <br/>
+            </p>
+            <hr style='border-top: 1px solid white;'>
+
+            <b> Upload Omic Matrices </b>: <br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            These matrices should have features on rows and the same or non-overlapping sets of samples on columns.
+            Accepted formats include .csv, .txt, and .RDS. </span> <br/>
+            </p>
+            <hr style='border-top: 1px solid white;'>
+
+            <b> Use Example Dataset </b>: <br/>  <span style='font-weight:normal;'>
+             <p align='justify'>
+            Alternatively, you can upload the example dataset consisting of three omic matrices related to the analysis of 788 glioma patients,
+            generated by <span style= 'color: blue;'> <u>  <a href='https://www.ceccarellilab.org/'  target='_blank'> Ceccarelli Lab</a></u>. </span> </span>
+            </p>
+            <hr style='border-top: 1px solid white;'>
+
+            <b> Upload Annotation File </b>: <br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            This step is not mandatory but useful to enrich subsequent plots.
+            The file should be a dataframe with a variable number of columns,
+            where one column must contain the sample IDs, the same ones present as column names in the uploaded files.
+            Accepted formats include .csv, .txt, and .RDS. </span> <br/>
+            </p>
+            <hr style='border-top: 1px solid white;'>
+
+            <b> Use Example Annotation File </b>: <br/>  <span style='font-weight:normal;'>
+            <p align='justify'>
+            If you have selected the Example Dataset, you can use the related annotation file.
+            The 788 samples are classified based on three different criteria: <b>histology</b>, genetic background (<b>IDH-status</b>)
+            and DNA methylation profiles (<b>Supervised.DNA.Methylation.Cluster</b>).
+            The sampleIDs are stored in the <b>Case</b> column.
+            For further details, please refer to the following paper
+            <span style= 'color: blue;'> <u>  <a href='https://www.ceccarellilab.org/'  target='_blank'> (link)</a></u></span>. </span>
+            </p>
+            <hr style='border-top: 1px solid white;'>")
+    })
+
 
     ############## inputs loading #############
 
@@ -386,25 +614,25 @@ server <- function(input, output, session) {
 
 
     observeEvent(input$load_mat_button, {
-                     shinyalert::shinyalert(
-                         title = "Wait",
-                         text = "Waiting for data loading",
-                         size = "xs",
-                         closeOnEsc = TRUE,
-                         closeOnClickOutside = TRUE,
-                         html = TRUE,
-                         type = "info",
-                         showConfirmButton = TRUE,
-                         confirmButtonText = "OK",
-                         confirmButtonCol = "#004192",
-                         showCancelButton = FALSE,
-                         imageUrl = "",
-                         animation = TRUE
-                     )
+        shinyalert::shinyalert(
+            title = "Wait",
+            text = "Waiting for data loading",
+            size = "xs",
+            closeOnEsc = TRUE,
+            closeOnClickOutside = TRUE,
+            html = TRUE,
+            type = "info",
+            showConfirmButton = TRUE,
+            confirmButtonText = "OK",
+            confirmButtonCol = "#004192",
+            showCancelButton = FALSE,
+            imageUrl = "",
+            animation = TRUE
+        )
 
-                 },
-                 ignoreNULL = FALSE,
-                 ignoreInit = TRUE
+    },
+    ignoreNULL = FALSE,
+    ignoreInit = TRUE
     )
 
     ### Load annotation file
@@ -496,8 +724,8 @@ server <- function(input, output, session) {
 
     ###
     output$jump2P1.1 <- renderUI({
-            actionButton('jump2P1.1', label = 'Skip', icon("paper-plane"),
-                         style="color: #fff; background-color: #337ab7; border-color: #2e6da4; padding:20px")
+        actionButton('jump2P1.1', label = 'Skip', icon("paper-plane"),
+                     style="color: #fff; background-color: #337ab7; border-color: #2e6da4; padding:20px")
     })
 
     observeEvent(input$jump2P1.1, {
@@ -515,6 +743,35 @@ server <- function(input, output, session) {
             shinyjs::removeCssClass(selector = "a[data-value='mat_sub_2']", class = "inactiveLink")
         }
     })
+
+    ############
+    output$info_box_2 <- renderText({
+        HTML("<br/> <span style='font-weight:normal;'>
+        <p align='justify'>
+            Welcome to the MoNETA Shiny app, an R package for network-based multi-omics data integration.<br/>
+            In this section you can manage the omics matrices before inferring the networks. </span> <br/>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <b> Omics Matrices Pre-processing </b>: <br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            Here, you can decide for each omics matrix whether to remove samples with no detected features  and/or normalize them by column.
+            When the <b> Submit </b> button is pressed, the omics matrices will be processed <u>all at once</u> </span> <br/>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <b> Omics Matrices Intersection </b>: <br/>  <span style='font-weight:normal;'>
+            <p align='justify'>
+            This box will be shown only if you have loaded more than one omics matrix and the <b> Submit </b> button have already been  pressed.
+            If you select <b> Yes</b>, only the overlapping sets of samples will be kept.</span>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <span style='font-weight:normal;'>
+            <p align='justify'>
+            The processed matrices can be downloaded from the <b>download box</b> displayed below. </span>
+            </p> <hr style='border-top: 1px solid white;'>
+            ")
+    })
+
+    ############
 
     intersected_omics_mat <- shiny::reactiveValues()
     shiny::observeEvent(input$intersect_btn, {
@@ -562,6 +819,45 @@ server <- function(input, output, session) {
 
     })
 
+    ############
+    output$info_box_3 <- renderText({
+        HTML("<br/> <span style='font-weight:normal;'>
+        <p align='justify'>
+            Welcome to the MoNETA Shiny app, an R package for network-based multi-omics data integration.<br/>
+            In this section you can create the networks starting from each omics matrix. </span> <br/>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <b> Omics Network Inference </b>: <br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            Here, you can set the parameters of MoNETA <b>k_star_net</b> function: <br/>
+            i) <b>distance metrics</b>; <br/>
+            ii) the <b>sparsity</b> of the data in the features space; <br/>
+            iii) the maximum number of neighbors per node (<b>knn</b>);<br/>
+            iv) the number of <b>cores</b> for parallelization; <br/>
+            v) dynamic or fixed choice of number of neighbors per node (<b>k_star</b>). <br/>
+            *Euclidean and Cosine distances are recommended for continuous data,
+            while Manhattan distance is suitable for discrete data.
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <span style='color: red;'>
+            <p align='justify'>
+            After clicking the button to infer a network, please wait for the process to finish before clicking the next one.
+            If you click them one after the other, the second process will be queued, and the <b>Wait</b> message will be displayed accordingly. </span>
+            </p> <hr style='border-top: 1px solid white;'> </span>
+
+            Network Visualization: <br/>  <span style='font-weight:normal;'>
+            <p align='justify'>
+            Once the network is created, the plot is shown. The nodes are colored according to their nodeID by default,
+            but, if an annotation file is loaded, the color and the shape can be updated by clicking the <b<Update plot</b> button.</span>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <span style='font-weight:normal;'>
+            <p align='justify'>
+            The networks can be downloaded from the <b>download box</b> located on the left-hand side. </span>
+            </p> <hr style='border-top: 1px solid white;'>
+            ")
+    })
+
 
     ############################################################################################
     #                        NETWORK : NETWORK FILTERING (INPUT)                      #
@@ -576,10 +872,67 @@ server <- function(input, output, session) {
         }
     })
 
+    output$info_box_4 <- renderText({
+        HTML("<br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            Welcome to the MoNETA Shiny app, an R package for network-based multi-omics data integration.<br/>
+            Here you can prune the edges of inferred networks by filtering the <b>weight</b> column. </span> <br/>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <b> Show button </b>: <br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            When the <b>Show</b> button is pressed, the network and the related
+            edge weight and node degree distributions (based on the chosen filtering threshold) will be displayed.
+            This action does not trigger the update of the networks. </span> <br/>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <b> Submit button </b>: <br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            When the <b>Submit</b> button is pressed, the networks will be updated
+            <u>all at once</u>, allowing you to proceed. </span> <br/>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <span style='font-weight:normal;'>
+            <p align='justify'>
+            The filtered networks can be downloaded from the <b>download box</b> displayed below. </span>
+            </p> <hr style='border-top: 1px solid white;'>
+            ")
+    })
+
 
     ############################################################################################
     #                                 RWR: LOADING NETWORKS (INPUT)                            #
     ############################################################################################
+
+    output$info_box_5 <- renderText({
+        HTML("<br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            Welcome to the MoNETA Shiny app, an R package for network-based multi-omics data integration.<br/>
+            You can start the pipeline here by uploading omics networks,
+            or click the <b> Back </b> button in the top left-hand corner to return back to the 'Omics Matrices Uploading' page. </span> <br/>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <b> Upload Omics Networks </b>: <br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            The networks are undirected and are loaded as tables with three columns: source, target, and weight.
+            The first two columns contain the samples/nodes, while the last one contains the weights of the edges.
+            The higher the weight, the stronger the interaction. A 'weight' column containing only '1' represents an unweighted network.</span> <br/>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <b> Upload Annotation File </b>: <br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            This step is not mandatory but useful to enrich subsequent plots.
+            The file should be a dataframe with a variable number of columns,
+            where one column must contain the sample IDs representing the nodes in the uploaded files. </span> <br/>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <span style='font-weight:normal;'>
+            <p align='justify'>
+            Accepted formats include .csv, .txt, and .RDS. </span>
+             </p> <hr style='border-top: 1px solid white;'>
+            ")
+    })
+
 
     #################### load networks #####################
 
@@ -742,39 +1095,30 @@ server <- function(input, output, session) {
         }
     })
 
-    multiplex_network <- shiny::reactiveValues()
-    shiny::observeEvent(input$gen_multiplex_btn, {
+    multiplex_network <- shiny::eventReactive(input$gen_multiplex_btn, {
         print('Generating the multiplex network...')
         net_list <- if (!is.null(g_net_list())) g_net_list() else l_net_list()
-        multiplex <- MoNETA::create_multiplex(net_list, weighted = ifelse(input$weightMultiplex == 'YES', TRUE, FALSE))
-        multiplex_network$multiplex <- multiplex %>% dplyr::ungroup(.)
-        if(input$weightMultiplex == 'NO'){
-            multiplex_network$pruned_multiplex <- multiplex
-            shinyalert::shinyalert(title = 'Success', type = 'success',closeOnClickOutside = TRUE,
-                                   text = 'Unweighted Multiplex Network created. <br/> Now press <b> "Next" </b> in the top left-hand corner to continue', html = TRUE)
-        }else{
-            shinyalert::shinyalert(title = 'Success', type = 'success',closeOnClickOutside = TRUE,
-                                   text = 'Weighted Multiplex Network created. <br/> Now move on to the <b> Pruning </b>  step.', html = TRUE)
-        }
-    })
 
-    shiny::observeEvent(input$prune_multiplex_btn, {
-        print('Pruning the multiplex network...')
-        multiplex <- multiplex_network$multiplex
-        if(input$pruneMultiplex == 'YES'){
-            if (!is.numeric(input$pruneMultiplex_th)) {
-                shinyalert::shinyalert(title = 'Error', text = 'The threshold must be a real number.',closeOnClickOutside = TRUE,type = 'error')
-                return(NULL)
+        if(input$weightMultiplex == 'YES'){
+            multiplex <- MoNETA::create_multiplex(net_list, weighted = TRUE)
+            multiplex_type <- 'Weighted'
+            if(input$pruneMultiplex == 'YES'){
+                if (!is.numeric(input$pruneMultiplex_th)) {
+                    shinyalert::shinyalert(title = 'Error', text = 'The threshold must be a real number.',closeOnClickOutside = TRUE,type = 'error')
+                    return(NULL)
+                }
+                multiplex <- MoNETA::prune_multiplex_network(multiplex, input$pruneMultiplex_th)
+            }else{
+                multiplex <- multiplex
             }
-
-            multiplex_network$pruned_multiplex <- MoNETA::prune_multiplex_network(multiplex, input$pruneMultiplex_th)
-            shinyalert::shinyalert(title = 'Success', type = 'success',closeOnClickOutside = TRUE,
-                               text = 'Pruning step done! <br/> Now press <b> "Next" </b> in the top left-hand corner to continue', html = TRUE)
         }else{
-            multiplex_network$pruned_multiplex <- multiplex
-            shinyalert::shinyalert(title = 'Success', type = 'success',closeOnClickOutside = TRUE,
-                                   text = 'Pruning step skipped! <br/> Now press <b> "Next" </b> in the top left-hand corner to continue', html = TRUE)
+            multiplex <- MoNETA::create_multiplex(net_list, weighted = FALSE)
+            multiplex_type <- 'Unweighted'
         }
+
+        shinyalert::shinyalert(title = 'Success', type = 'success',closeOnClickOutside = TRUE,
+                               text = paste(multiplex_type,' Multiplex Network created. <br/> Now press <b> "Next" </b> in the top left-hand corner to continue'), html = TRUE)
+        return(multiplex)
     })
 
 
@@ -784,9 +1128,7 @@ server <- function(input, output, session) {
 
     shinyjs::addCssClass(selector = "a[data-value='rwr_tab_3']", class = "inactiveLink")
     observe({
-        if (isTruthy(input$gen_multiplex_btn) && input$weightMultiplex == 'NO'){
-            shinyjs::removeCssClass(selector = "a[data-value='rwr_tab_3']", class = "inactiveLink")
-        } else if (isTruthy(input$gen_multiplex_btn) && input$weightMultiplex == 'YES' && isTruthy(input$prune_multiplex_btn)){
+        if (isTruthy(input$gen_multiplex_btn)){
             shinyjs::removeCssClass(selector = "a[data-value='rwr_tab_3']", class = "inactiveLink")
         }else{
             return(NULL)
@@ -797,7 +1139,7 @@ server <- function(input, output, session) {
 
     RWR_output <- shiny::reactiveValues()
     shiny::observeEvent(input$rwr_button, {
-        if (is.null(shiny::reactiveValuesToList(multiplex_network)$pruned_multiplex)){
+        if (is.null(multiplex_network())){
             return(NULL)
         } else{
 
@@ -814,8 +1156,7 @@ server <- function(input, output, session) {
             }
 
             req(multiplex_network)
-            multiplex_list <- shiny::reactiveValuesToList(multiplex_network)
-            omics_multiplex <- if (is.null(multiplex_list$pruned_multiplex)) multiplex_list$multiplex else multiplex_list$pruned_multiplex
+            omics_multiplex <- multiplex_network()
 
             if (input$bioInf_transition == 'YES') {
                 net_list <- if (!is.null(g_net_list())) g_net_list() else l_net_list()
@@ -846,13 +1187,13 @@ server <- function(input, output, session) {
             progress$set(message = "MoNETA", detail = paste("Doing RWR"), value = 0)
 
             rwr_simMat <- MoNETA::gen_sim_mat_M(network = omics_multiplex,
-                                        tau = unlist(omics_tau_list()),
-                                        restart = input$restart,
-                                        delta = input$delta,
-                                        layer_transition = trans_mat,
-                                        jump_neighborhood = ifelse(input$omics_jump_neigh == 'YES', TRUE, FALSE),
-                                        weighted_multiplex  = ifelse(input$omics_weight_jump_neigh == 'YES', TRUE, FALSE),
-                                        cores = input$cores_rwr)
+                                                tau = unlist(omics_tau_list()),
+                                                restart = input$restart,
+                                                delta = input$delta,
+                                                layer_transition = trans_mat,
+                                                jump_neighborhood = ifelse(input$omics_jump_neigh == 'YES', TRUE, FALSE),
+                                                weighted_multiplex  = ifelse(input$omics_weight_jump_neigh == 'YES', TRUE, FALSE),
+                                                cores = input$cores_rwr)
 
             progress$inc(0.8, detail = paste("Creating summary file!"))
 
@@ -979,8 +1320,8 @@ server <- function(input, output, session) {
             if (input$dr_method == 'UMAP'){
                 progress$inc(0.8, detail = paste("Doing UMAP"))
                 dr_mat <- MoNETA::get_parallel_umap_embedding(matrix = emb_mat,
-                                                      embedding_size = 2,
-                                                      n_threads = input$threads)
+                                                              embedding_size = 2,
+                                                              n_threads = input$threads)
             }else if (input$dr_method == 'PCA'){
                 progress$inc(0.8, detail = paste("Doing PCA"))
                 dr_mat <- MoNETA::get_pca_embedding(matrix = emb_mat, embedding_size = input$emb_size)
@@ -1011,9 +1352,9 @@ server <- function(input, output, session) {
             ggplot2::ggtitle(paste(method, emb)) +
             ggplot2::xlab(paste0(input$dr_method, '1')) +  ggplot2::ylab( paste0(input$dr_method, '2')) +
             ggplot2::theme(text = ggplot2::element_text(family="Times New Roman"),
-                  plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
-                  axis.title.x = ggplot2::element_text(size = 10),
-                  axis.title.y = ggplot2::element_text(size = 10))
+                           plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
+                           axis.title.x = ggplot2::element_text(size = 10),
+                           axis.title.y = ggplot2::element_text(size = 10))
         return(dr_plot)
     })
 
@@ -1242,9 +1583,9 @@ server <- function(input, output, session) {
                 ggplot2::ggtitle(title()) +
                 ggplot2::xlab(paste0(input$dr_method, '1')) +  ggplot2::ylab( paste0(input$dr_method, '2')) +
                 ggplot2::theme(text = ggplot2::element_text(family="Times New Roman"),
-                      plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
-                      axis.title.x = ggplot2::element_text(size = 10),
-                      axis.title.y = ggplot2::element_text(size = 10))
+                               plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
+                               axis.title.x = ggplot2::element_text(size = 10),
+                               axis.title.y = ggplot2::element_text(size = 10))
         } else{
             cl_plot <- MoNETA::plot_2D_matrix(coord = clusters$dr_mat[1:2,], nodes_anno = clu_anno,
                                               id_name = 'id', id_anno_color = 'clust', id_anno_shape = 'shape',
@@ -1252,9 +1593,9 @@ server <- function(input, output, session) {
                 ggplot2::ggtitle(title()) +
                 ggplot2::xlab(paste0(input$dr_method, '1')) +  ggplot2::ylab( paste0(input$dr_method, '2')) +
                 ggplot2::theme(text = ggplot2::element_text(family="Times New Roman"),
-                      plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
-                      axis.title.x = ggplot2::element_text(size = 10),
-                      axis.title.y = ggplot2::element_text(size = 10))
+                               plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
+                               axis.title.x = ggplot2::element_text(size = 10),
+                               axis.title.y = ggplot2::element_text(size = 10))
         }
     })
 
@@ -1271,9 +1612,14 @@ server <- function(input, output, session) {
         if (length(omics_files()) != 0){
             nsamples <- sapply(omics_files(), ncol)
             nfeatures <- sapply(omics_files(), nrow)
-            shinydashboard::box(
-                shiny::HTML(paste0(paste("<b>", names(omics_files()), "</b>"), " loaded: <br/>",
-                                   paste("&ensp; <b>", nfeatures, "</b>"), " features and", paste("<b>", nsamples, "</b>"), " samples <br/>")))
+            shinydashboard::box(width = 12,
+                                shiny::HTML(" "),
+                                shiny::HTML(paste0(
+                                    "<span style='font-family: LM Roman 10;' > <h4>",
+                                    paste("<b>", names(omics_files()), "</b> </span> "),
+                                    "<span style='font-family: LM Roman 10;' > loaded: ", paste("<b>", nfeatures, "</b>"), " features and", paste("<b>", nsamples, "</b>"), " samples <br/>"),
+                                    '</span> </h4>')
+            )
         } else {
             shiny::HTML("<br/>")
         }
@@ -1285,10 +1631,15 @@ server <- function(input, output, session) {
         {
             ncolumns <- ncol(annotation()$annotation)
             nrows <- nrow(annotation()$annotation)
-            shinydashboard::box(
-                shiny::HTML(paste0(paste("<b>", 'Annotation file', "</b>"), " loaded: ",  paste("<b>", ncolumns, "</b>"), " columns and ", paste("<b>", nrows, "</b>"), " rows <br/>")),
-                shiny::HTML(paste0(paste("<b> Column names: </b>"), "<br/>")),
-                shiny::HTML(paste('&ensp;', colnames(annotation()$annotation), "<br/>"))
+            shinydashboard::box(width = 12,
+                                shiny::HTML("<span style='font-family: LM Roman 10;' >"),
+                                shiny::HTML(paste0(paste("<h4> <b>", 'Annotation file', "</b>"),
+                                                   "<span style='font-family: LM Roman 10;' > loaded: ",
+                                                   paste("<b>", ncolumns, "</b>"), " columns and ",
+                                                   paste("<b>", nrows, "</b>"), " rows <br/> </span> ")),
+                                shiny::HTML(paste0(paste("<b> Column names: </b>"), "<br/>")),
+                                shiny::HTML(paste("&ensp; <span style='font-family: LM Roman 10;' >", colnames(annotation()$annotation), "<br/>")),
+                                shiny::HTML('</h4> </span> ')
             )
         } else {
             shiny::HTML("<br/>")
@@ -1316,8 +1667,8 @@ server <- function(input, output, session) {
                 }else if (length(not_annotated_samples) != 0){
                     message2 <- shiny::HTML(paste('&ensp;', paste("<b>", length(not_annotated_samples), "</b>"), " samples are not annotated in the provided annotation file", "<br/>"))
                 }
-                shinydashboard::box(
-                    shiny::HTML(paste("<b>", p('WARNING!', style = "color:red"), "</b>")), message1, message2
+                shinydashboard::box(width = 12,
+                                    shiny::HTML(paste("<b>", p('WARNING!', style = "color:red"), "</b>")), message1, message2
                 )
             }
         } else {
@@ -1394,38 +1745,27 @@ server <- function(input, output, session) {
         else{
             thetabs <- lapply(names(omics_files()), function(x) {
 
-                #processed_mat_list[['process_mat']] <- shiny::observeEvent(input$process_mat, {
-                #    processed_omics_mat <- omics_files()[[x]]
-                #    if (input[[paste0("remove0col_", x)]] == 'YES')
-                #        processed_omics_mat <- remove_zeros_cols (processed_omics_mat)
-                #    if (input[[paste0("norm_", x)]] == 'YES')
-                #        processed_omics_mat <- normalize_omics(processed_omics_mat)
-                #    proc_matrices[[paste0('p_', x)]] <- processed_omics_mat
-                #    print('Pre-processing...done!')
-                #    return(processed_omics_mat)
-                #})
-
                 tab <- shiny::tabPanel(title = x,
                                        shiny::fluidRow(
                                            shiny::column(width = 12,
-                                                         shiny::radioButtons(inputId = paste0("remove0col_", x), "Do you want to remove zeros columns?",
+                                                         shiny::radioButtons(inputId = paste0("remove0col_", x),
+                                                                             label = shiny::h4(shiny::span("Do you want to remove zeros columns?", style = "font-weight: bold")),
                                                                              choices = c('YES', 'NO'), selected = 'NO'
                                                          ),
-                                                         shiny::radioButtons(inputId = paste0("norm_", x), "Do you want to normalize the omics matrix by column?",
+                                                         shiny::radioButtons(inputId = paste0("norm_", x),
+                                                                             label =  shiny::h4(shiny::span("Do you want to normalize the omics matrix by column?", style = "font-weight: bold")),
                                                                              choices = c('YES', 'NO'), selected = 'NO'
                                                          )
                                            )
                                        ), shiny::hr(),
                                        shiny::fluidRow(
                                            shiny::column(width = 12, shiny::actionButton(paste0('process_mat_', x), "Submit"))
-                                           #shiny::column(width = 12, shiny::actionButton(paste0('process_mat_', x), paste0("Process matrix ", x)))
-                                           #shiny::column(width = 12, shiny::actionButton(paste0('process_mat_', x), "Submit"))
                                        )
                 )
                 return(tab)
             })
-        thetabs$width <- 6
-        do.call(shinydashboard::tabBox, thetabs)
+            thetabs$width <- 12
+            do.call(shinydashboard::tabBox, thetabs)
         }
     })
 
@@ -1437,9 +1777,9 @@ server <- function(input, output, session) {
             if (length(processed_mats) != 0){
                 nsamples <- sapply(processed_mats, ncol)
                 nfeatures <- sapply(processed_mats, nrow)
-                shinydashboard::box(
-                    shiny::HTML(paste0(paste("<b>", names(processed_mats), "</b>"), " processed: <br/>",
-                                       paste("&ensp; <b>", nfeatures, "</b>"), " features and ", paste("<b>", nsamples, "</b>"), " samples <br/>")))
+                shinydashboard::box(width = 12,
+                                    shiny::HTML(paste0(paste("<b>", names(processed_mats), "</b>"), " processed: ",
+                                                       paste("<b>", nfeatures, "</b>"), " features and ", paste("<b>", nsamples, "</b>"), " samples <br/>")))
             } else {
                 return(NULL)
             }
@@ -1452,9 +1792,10 @@ server <- function(input, output, session) {
         if (length(shiny::reactiveValuesToList(proc_matrices)) == 0) {
             return(NULL)
         } else {
-            shinydashboard::box(shiny::h4(shiny::span('Download', style = "font-weight: bold")),  solidHeader = TRUE, collapsible = FALSE,
+            shinydashboard::box(width = 12, solidHeader = TRUE, collapsible = FALSE,
+                                title = shiny::h3(shiny::span('Download', style = "font-weight: bold")),
                                 checkboxGroupInput('download_proc_mat',
-                                                   'Select one or more processed matrices',
+                                                   label = shiny::h4(shiny::span('Select one or more processed matrices', style = "font-weight: bold")),
                                                    choices = names(shiny::reactiveValuesToList(proc_matrices))
                                 ),
 
@@ -1493,21 +1834,20 @@ server <- function(input, output, session) {
     )
 
 
-
-
     ############## not mandatory intersection #############
 
     output$intersection <- shiny::renderUI({
         loaded_mats <- omics_files()
         processed_mats <- shiny::reactiveValuesToList(proc_matrices)
         if (length(loaded_mats) > 1 & length(processed_mats) == length(loaded_mats))
-            shinydashboard::box(
-                shiny::radioButtons(inputId = 'intersect_opt',
-                                    label = 'Do you want to intersect omics matrices by samples?',
-                                    choices = c('YES', 'NO'), selected = 'YES'
-                ),
-                shiny::hr(),
-                shiny::actionButton(inputId = 'intersect_btn', label = 'Go')
+            shinydashboard::box(width = 12,  status = "primary", solidHeader = FALSE,
+                                shiny::h2(shiny::span("Omics matrices Intersection", style = "font-weight: bold")),
+                                shiny::radioButtons(inputId = 'intersect_opt',
+                                                    label = shiny::h4(shiny::span('Do you want to intersect omics matrices by samples?', style = "font-weight: bold")),
+                                                    choices = c('YES', 'NO'), selected = 'YES'
+                                ),
+                                shiny::hr(),
+                                shiny::actionButton(inputId = 'intersect_btn', label = 'Go')
             )
     })
 
@@ -1519,9 +1859,9 @@ server <- function(input, output, session) {
             if (length(int_mats) != 0){
                 nsamples <- sapply(int_mats, ncol)
                 nfeatures <- sapply(int_mats, nrow)
-                shinydashboard::box(
-                    shiny::HTML(paste0(paste("<b>", names(int_mats), "</b>"), " processed: <br/>",
-                                       paste("&ensp; <b>", nfeatures, "</b>"), " features and ", paste("<b>", nsamples, "</b>"), " samples <br/>")))
+                shinydashboard::box(width = 12,
+                                    shiny::HTML(paste0(paste("<b>", names(int_mats), "</b>"), " processed: ",
+                                                       paste("<b>", nfeatures, "</b>"), " features and ", paste("<b>", nsamples, "</b>"), " samples <br/>")))
             } else {
                 return(NULL)
             }
@@ -1540,7 +1880,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$back2P1, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "mat_sub_1")
+                                       selected = "mat_sub_1")
     })
 
     ###
@@ -1558,7 +1898,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$jump2P3, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "net_sub_1")
+                                       selected = "net_sub_1")
     })
 
 
@@ -1584,8 +1924,8 @@ server <- function(input, output, session) {
         }
 
         for (x in input_names){
-                count_net[[x]] <- 0
-            }
+            count_net[[x]] <- 0
+        }
     })
 
     output$omics_net_arguments <- shiny::renderUI({
@@ -1626,9 +1966,9 @@ server <- function(input, output, session) {
                                                           #shiny::radioButtons(inputId = 'warn_continue',
                                                           #             label = 'Do you want to proceed anyway?',
                                                           #             choices = c('Yes', 'No'), selected = 'No')
-                                                          ),
+                                           ),
                                            type = 'error', html = TRUE
-                                           )
+                    )
 
 
                     #shinyalert::shinyalert(title = 'Warning',
@@ -1694,7 +2034,7 @@ server <- function(input, output, session) {
                         text = paste0(paste("<b>", x, "</b>"), " network created.<br/>",
                                       paste("<b> Network inferring status: </b>"), net_created, '/', length(omics_files()),"<br/>",
                                       'Now press <b> "Next" </b> in the top right-hand corner to continue.'
-                                     ),
+                        ),
                         closeOnEsc = TRUE,
                         closeOnClickOutside = TRUE,
                         html = TRUE,
@@ -1730,9 +2070,9 @@ server <- function(input, output, session) {
                 })
 
                 output[[paste0(x, 'plot_net')]] <- visNetwork::renderVisNetwork({
-                        ids <- data.frame(id = base::union(net$source, net$dest))
-                        net_plot <- MoNETA::plot_net(edgeList = net, nodes_anno = ids, id_name = 'id', id_anno_color = 'id')
-                        return(net_plot)
+                    ids <- data.frame(id = base::union(net$source, net$dest))
+                    net_plot <- MoNETA::plot_net(edgeList = net, nodes_anno = ids, id_name = 'id', id_anno_color = 'id')
+                    return(net_plot)
                 })
 
                 return(net)
@@ -1760,8 +2100,8 @@ server <- function(input, output, session) {
                             final_anno <- f_anno %>% dplyr::as_tibble(.) %>% dplyr::select(id, everything())
 
                             net_plot <- MoNETA::plot_net(edgeList = net, nodes_anno = final_anno,
-                                                 id_name = id, id_anno_color = color, id_anno_shape = shape,
-                                                 interactive = TRUE, wo_legend = FALSE)
+                                                         id_name = id, id_anno_color = color, id_anno_shape = shape,
+                                                         interactive = TRUE, wo_legend = FALSE)
                             return(net_plot)
                         })
                     })
@@ -1804,26 +2144,27 @@ server <- function(input, output, session) {
                                        shiny::column(width = 4,
                                                      shiny::selectInput(
                                                          inputId = paste0('distFUN_', x),
-                                                         label = "Select a distance measure",
+                                                         label = shiny::h4(shiny::span("Select a distance measure", style = "font-weight: bold")),
                                                          choices =  c("Euclidean", "Manhattan", "Cosine"),
                                                          selected = "Euclidean"
                                                      ),
                                                      shiny::numericInput(
                                                          inputId = paste0('sparsity_', x),
-                                                         label = "Select the sparsity",
+                                                         label = shiny::h4(shiny::span("Select the sparsity", style = "font-weight: bold")),
                                                          min = 0, max = 1, value = 0.7, step = 0.1
                                                      ),
                                                      shiny::numericInput(
                                                          inputId = paste0('knn_', x),
-                                                         label = "Select the number of neighbors",
+                                                         label = shiny::h4(shiny::span("Select the number of neighbors (knn)", style = "font-weight: bold")),
                                                          min = 1, max = 100, value = 25
                                                      ),
                                                      shiny::numericInput(
                                                          inputId = paste0('cores_', x),
-                                                         label = "Select the number of cores",
+                                                         label = shiny::h4(shiny::span("Select the number of cores", style = "font-weight: bold")),
                                                          min = 1, max = 200, value = 1
                                                      ),
-                                                     shiny::radioButtons(inputId = paste0("kstar_", x), "Do you want to perform the kstar?",
+                                                     shiny::radioButtons(inputId = paste0("kstar_", x),
+                                                                         shiny::h4(shiny::span("Do you want to perform the kstar?", style = "font-weight: bold")),
                                                                          choices = c('YES', 'NO'), selected = 'YES'
                                                      )
                                        ),
@@ -1835,12 +2176,12 @@ server <- function(input, output, session) {
                                    ), shiny::hr(),
                                    shiny::fluidRow(
                                        shiny::column(width = 6, shiny::actionButton(paste0('generate_omics_net_', x), paste0("Generate network ", x))),
-                                       shiny::column(width = 6, shiny::uiOutput(paste0('update_omics_net_plot_', x)))
+                                       shiny::column(width = 6, shiny::uiOutput(paste0('update_omics_net_plot_', x)), align = 'right')
                                    )
             )
             return(tab)
         })
-        thetabs$width <- 8
+        thetabs$width <- 12
         do.call(shinydashboard::tabBox, thetabs)
     })
 
@@ -1850,9 +2191,9 @@ server <- function(input, output, session) {
         if (length(shiny::reactiveValuesToList(gene_networks)) == 0) {
             return(NULL)
         } else {
-            shinydashboard::box(shiny::h4(shiny::span('Download', style = "font-weight: bold")), solidHeader = TRUE, collapsible = FALSE, width = 4,
+            shinydashboard::box(shiny::h3(shiny::span('Download', style = "font-weight: bold")), solidHeader = TRUE, collapsible = FALSE, width = 12,
                                 checkboxGroupInput('download_net',
-                                                   'Select one or more inferred networks',
+                                                   label = shiny::h4(shiny::span('Select one or more networks', style = "font-weight: bold")),
                                                    choices = names(shiny::reactiveValuesToList(gene_networks))
                                 ),
                                 shiny::tags$hr(),
@@ -1905,7 +2246,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$back2P2, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "mat_sub_2")
+                                       selected = "mat_sub_2")
     })
 
     ###
@@ -1920,7 +2261,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$jump2P4, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "net_sub_2")
+                                       selected = "net_sub_2")
     })
 
 
@@ -1959,8 +2300,9 @@ server <- function(input, output, session) {
                         summary <- netSummary(dplyr::tibble(fnet))
                         res <- c()
                         for (i in 2:length(summary))
-                            res[i-1] <- (paste0(paste('<b>', names(summary)[i], '</b>'), ': ', toString(summary[[i]]), ' <br/>'))
-                        shiny::HTML(res)
+                            res[i-1] <- (paste0(paste('<b>', names(summary)[i], '</b>'),
+                                                ': <span style="font-family: LM Roman 10;"> ', toString(summary[[i]]), '</span> <br/>'))
+                        shiny::HTML(paste('<h4>', res, '</h4> '))
                     })
                 })
 
@@ -1974,14 +2316,14 @@ server <- function(input, output, session) {
 
                 output[[paste0(x, "_weightDist")]] <- plotly::renderPlotly({
                     #shiny::isolate({
-                        plotly::ggplotly(ggplot2::ggplot(fnet, ggplot2::aes(x= weight)) + ggplot2::geom_histogram() +
-                                     ggplot2::ggtitle('Weight Distribution') +
-                                     ggplot2::xlab("Weight") + ggplot2::ylab("Counts") +
-                                     ggplot2::theme(text = ggplot2::element_text(family="LM Roman 10"),
-                                                    plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
-                                                    axis.title.x = ggplot2::element_text(size = 10),
-                                                    axis.title.y = ggplot2::element_text(size = 10))
-                        )
+                    plotly::ggplotly(ggplot2::ggplot(fnet, ggplot2::aes(x= weight)) + ggplot2::geom_histogram() +
+                                         ggplot2::ggtitle('Weight Distribution') +
+                                         ggplot2::xlab("Weight") + ggplot2::ylab("Counts") +
+                                         ggplot2::theme(text = ggplot2::element_text(family="LM Roman 10"),
+                                                        plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
+                                                        axis.title.x = ggplot2::element_text(size = 10),
+                                                        axis.title.y = ggplot2::element_text(size = 10))
+                    )
                     #})
                 })
 
@@ -1992,19 +2334,19 @@ server <- function(input, output, session) {
 
                 output[[paste0(x, "_nodeDegreeDist")]] <- plotly::renderPlotly({
                     #shiny::isolate({
-                        fnet1 <- fnet
-                        fnet1$weight <- 1
-                        graph <- igraph::graph_from_data_frame(fnet1, directed = FALSE)
-                        degree_table <- data.frame(Degree = igraph::degree(graph))
-                        p <- plotly::ggplotly(ggplot2::ggplot(degree_table, ggplot2::aes(x = Degree)) + ggplot2::geom_histogram() +
-                                          ggplot2::ggtitle('Nodes Degree Distribution') +
-                                          ggplot2::ylab("Number of nodes") + ggplot2::xlab("Node degree") +
-                                          ggplot2::theme(text = ggplot2::element_text(family="LM Roman 10"),
-                                                         plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
-                                                         axis.title.x = ggplot2::element_text(size = 10),
-                                                         axis.title.y = ggplot2::element_text(size = 10))
-                        )
-                        return(p)
+                    fnet1 <- fnet
+                    fnet1$weight <- 1
+                    graph <- igraph::graph_from_data_frame(fnet1, directed = FALSE)
+                    degree_table <- data.frame(Degree = igraph::degree(graph))
+                    p <- plotly::ggplotly(ggplot2::ggplot(degree_table, ggplot2::aes(x = Degree)) + ggplot2::geom_histogram() +
+                                              ggplot2::ggtitle('Nodes Degree Distribution') +
+                                              ggplot2::ylab("Number of nodes") + ggplot2::xlab("Node degree") +
+                                              ggplot2::theme(text = ggplot2::element_text(family="LM Roman 10"),
+                                                             plot.title = ggplot2::element_text(size = 16, hjust = 0.5, face = 'bold'),
+                                                             axis.title.x = ggplot2::element_text(size = 10),
+                                                             axis.title.y = ggplot2::element_text(size = 10))
+                    )
+                    return(p)
                     #})
                 })
 
@@ -2043,7 +2385,8 @@ server <- function(input, output, session) {
             })
 
 
-            filteredOmicsNetworks_list[[paste0("update_", x)]] <- shiny::observeEvent(input[[paste0("update_", x)]], {
+            #filteredOmicsNetworks_list[[paste0("update_", x)]] <- shiny::observeEvent(input[[paste0("update_", x)]], {
+            filteredOmicsNetworks_list$update_all_nets <- shiny::observeEvent(input$update_all_nets, {
                 #shiny::isolate({
                 filt_net <- net[net$weight <= input[[paste0('omics_range', x)]],]
                 filteredOmicsNetworks[[paste0('f_', x)]] <- filt_net
@@ -2058,8 +2401,8 @@ server <- function(input, output, session) {
                     shinyalert::shinyalert(
                         title = "Success",
                         text = paste0(paste("<b>", x, "</b>"), " network updated. <br/>",
-                                     paste("<b> Network update status: </b>"), net_update, '/', length(omics_files()), "<br/>",
-                                     'Now press <b> "Next" </b> in the top right-hand corner to continue.'
+                                      paste("<b> Network update status: </b>"), net_update, '/', length(omics_files()), "<br/>",
+                                      'Now press <b> "Next" </b> in the top right-hand corner to continue.'
                         ),
                         closeOnEsc = TRUE,
                         closeOnClickOutside = TRUE,
@@ -2116,8 +2459,8 @@ server <- function(input, output, session) {
                             final_anno <- f_anno %>% dplyr::as_tibble(.) %>%  dplyr::select(id, everything())
 
                             net_plot <- MoNETA::plot_net(edgeList = filt_net, nodes_anno = final_anno,
-                                                 id_name = id, id_anno_color = color, id_anno_shape = shape,
-                                                 interactive = TRUE, wo_legend = FALSE)
+                                                         id_name = id, id_anno_color = color, id_anno_shape = shape,
+                                                         interactive = TRUE, wo_legend = FALSE)
                             return(net_plot)
                         })
                     })
@@ -2136,52 +2479,59 @@ server <- function(input, output, session) {
             })
 
             net <- nets[[x]]
-            #output[[paste0('table_net', x)]] <- renderTable(net)
             min <-  round(min(net$weight), digits = 2)
             max <-  round(max(net$weight), digits = 2)
 
             tab <- shiny::tabPanel(x,
                                    shiny::fluidRow(
+                                       shiny::column(width = 8,
+                                                     shiny::sliderInput(inputId = paste0("omics_range", x),
+                                                                        label = shiny::h4(shiny::span( 'Select a threshold:', style = "font-weight: bold")),
+                                                                        min = min, max = max, value = max, step = 0.01)
+                                       ),
                                        shiny::column(width = 4,
-                                                     shiny::sliderInput(inputId = paste0("omics_range", x), "Select a threshold:",
-                                                                        min = min, max = max, value = max, step = 0.01),
-                                                     shiny::hr(),
-                                                     shiny::fluidRow(
-                                                        shiny::actionButton(inputId = paste0('button_', x), 'Show'),
-                                                        shiny::column(width = 6, shiny::actionButton(paste0("update_", x), 'UPDATE')),
-                                                        #shiny::column(width = 6, shiny::uiOutput(paste0("update_f_net_plot_", x)))
-                                                     )
-                                       ),
-                                       shiny::column(width = 8,
-                                                     shiny::uiOutput(paste0(x, '_info'))
+                                                     fluidRow(
+                                                         shiny::tags$hr(style='border-top: 1px solid white;'),
+                                                         shiny::tags$hr(style='border-top: 1px solid white;'),
+                                                         shiny::actionButton(inputId = paste0('button_', x), 'Show'), align = 'center')
                                        )
                                    ),
-                                   shiny::hr(),
+
                                    shiny::fluidRow(
-                                       shiny::column(width = 6,
-                                                     #plotly::plotlyOutput(paste0(x, "_weightDist") )
-                                                     shiny::uiOutput(paste0(x, "_spinner_weightDist"))
-                                       ),
-                                       shiny::column(width = 6,
-                                                     #plotly::plotlyOutput(paste0(x, "_nodeDegreeDist") )
-                                                     shiny::uiOutput(paste0(x, "_spinner_nodeDegreeDist"))
+                                       shinydashboard::tabBox( width = 12,
+                                                               shiny::tabPanel(title = 'Distributions',
+                                                                               shiny::fluidRow(
+                                                                                   shiny::column(width = 6,
+                                                                                                 shiny::uiOutput(paste0(x, "_spinner_weightDist"))
+                                                                                   ),
+                                                                                   shiny::column(width = 6,
+                                                                                                 shiny::uiOutput(paste0(x, "_spinner_nodeDegreeDist"))
+                                                                                   )
+                                                                               )
+                                                               ),
+                                                               shiny::tabPanel(title = 'Network',
+                                                                               shiny::fluidRow(
+                                                                                   shiny::column(width = 8,
+                                                                                                 shiny::uiOutput(paste0(x, "_spinner"))
+                                                                                   ),
+                                                                                   shiny::column(width = 4,
+                                                                                                 shiny::uiOutput(paste0(x, '_info')),
+                                                                                                 shiny::tags$hr(style='border-top: 1px solid white;'),
+                                                                                                 shiny::uiOutput(paste0(x, '_custom_fnet')),
+                                                                                   )
+                                                                               ),
+                                                                               shiny::fluidRow(
+                                                                                   shiny::column(width = 12, shiny::uiOutput(paste0("update_f_net_plot_", x)), align = 'right')
+                                                                               )
+                                                               )
                                        )
-                                   ),
-                                   shiny::fluidRow(
-                                       shiny::column(width = 8,
-                                                     #visNetwork::visNetworkOutput(paste0(x, '_plot_fnet'))
-                                                     shiny::uiOutput(paste0(x, "_spinner"))
-                                                     ),
-                                       shiny::column(width = 4, shiny::uiOutput(paste0(x, '_custom_fnet')))
-                                   ),
-                                   shiny::fluidRow(
-                                       shiny::column(width = 12, shiny::uiOutput(paste0("update_f_net_plot_", x)), align = 'right')
                                    )
             )
             return(tab)
         })
 
-        thetabs$width <- 8
+        thetabs$width <- 12
+        thetabs$title <- actionButton(inputId = 'update_all_nets', label = 'Submit')
         do.call(shinydashboard::tabBox, thetabs)
     })
 
@@ -2209,9 +2559,9 @@ server <- function(input, output, session) {
         if (length(shiny::reactiveValuesToList(filteredOmicsNetworks)) == 0) {
             return(NULL)
         } else {
-            shinydashboard::box(shiny::h4(shiny::span('Download', style = "font-weight: bold")), solidHeader = TRUE, collapsible = FALSE, width = 4,
+            shinydashboard::box(shiny::h3(shiny::span('Download', style = "font-weight: bold")), solidHeader = TRUE, collapsible = FALSE, width = 12,
                                 checkboxGroupInput('download_fnet',
-                                                   'Select one or more filtered networks',
+                                                   label = shiny::h4(shiny::span('Select one or more filtered networks', style = "font-weight: bold")),
                                                    choices = names(shiny::reactiveValuesToList(filteredOmicsNetworks))
                                 ),
                                 shiny::tags$hr(),
@@ -2260,7 +2610,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$back2P3, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "net_sub_1")
+                                       selected = "net_sub_1")
     })
 
     ###
@@ -2275,7 +2625,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$jump2P5, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "rwr_tab_2")
+                                       selected = "rwr_tab_2")
     })
 
 
@@ -2289,7 +2639,8 @@ server <- function(input, output, session) {
         if (length(loaded_omics_net_list()) != 0){
             n_nodes <- sapply(loaded_omics_net_list(), function(x){length(unique(c(x[[1]], x[[2]])))})
             n_edges <- sapply(loaded_omics_net_list(), nrow)
-            shinydashboard::box(shiny::HTML(paste0(paste("<b>", names(loaded_omics_net_list()), "</b>"), " loaded: ",  paste("<b>", n_nodes, "</b>"), " nodes and ", paste("<b>", n_edges, "</b>"), " edges <br/>")))
+            shinydashboard::box(width = 12,
+                                shiny::HTML(paste0(paste("<b>", names(loaded_omics_net_list()), "</b>"), " loaded: ",  paste("<b>", n_nodes, "</b>"), " nodes and ", paste("<b>", n_edges, "</b>"), " edges <br/>")))
         } else {
             shiny::HTML("<br/>")
         }
@@ -2303,10 +2654,10 @@ server <- function(input, output, session) {
         {
             ncolumns <- ncol(annotation1()$annotation1)
             nrows <- nrow(annotation1()$annotation1)
-            shinydashboard::box(
-                shiny::HTML(paste0(paste("<b>", 'Annotation file', "</b>"), " loaded: ",  paste("<b>", ncolumns, "</b>"), " columns and ", paste("<b>", nrows, "</b>"), " rows <br/>")),
-                shiny::HTML(paste0(paste("<b> Colnames </b>"), "<br/>")),
-                shiny::HTML(paste('&ensp;', colnames(annotation1()$annotation1), "<br/>"))
+            shinydashboard::box(width = 12,
+                                shiny::HTML(paste0(paste("<b>", 'Annotation file', "</b>"), " loaded: ",  paste("<b>", ncolumns, "</b>"), " columns and ", paste("<b>", nrows, "</b>"), " rows <br/>")),
+                                shiny::HTML(paste0(paste("<b> Colnames </b>"), "<br/>")),
+                                shiny::HTML(paste('&ensp;', colnames(annotation1()$annotation1), "<br/>"))
             )
         } else {
             shiny::HTML("<br/>")
@@ -2331,8 +2682,8 @@ server <- function(input, output, session) {
                 }else if (length(not_annotated_samples) != 0){
                     message2 <- shiny::HTML(paste('&ensp;', paste("<b>", length(not_annotated_samples), "</b>"), " samples are not annotated in the provided annotation file", "<br/>"))
                 }
-                shinydashboard::box(
-                    shiny::HTML(paste("<b>", p('WARNING!', style = "color:red"), "</b>")), message1, message2
+                shinydashboard::box(width = 12,
+                                    shiny::HTML(paste("<b>", p('WARNING!', style = "color:red"), "</b>")), message1, message2
                 )
             }
         } else {
@@ -2360,8 +2711,8 @@ server <- function(input, output, session) {
                 }else if (length(not_annotated_samples) != 0){
                     message2 <- shiny::HTML(paste('&ensp;', paste("<b>", length(not_annotated_samples), "</b>"), " samples are not annotated in the provided annotation file", "<br/>"))
                 }
-                shinydashboard::box(
-                    shiny::HTML(paste("<b>", p('WARNING!', style = "color:red"), "</b>")), message1, message2
+                shinydashboard::box(width = 12,
+                                    shiny::HTML(paste("<b>", p('WARNING!', style = "color:red"), "</b>")), message1, message2
                 )
             }
         } else {
@@ -2377,7 +2728,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$back2P1_from1.1, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "mat_sub_1")
+                                       selected = "mat_sub_1")
     })
 
     ###
@@ -2392,7 +2743,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$jump2P5.1, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "rwr_tab_2")
+                                       selected = "rwr_tab_2")
     })
 
 
@@ -2400,39 +2751,28 @@ server <- function(input, output, session) {
     #                               RWR: MULTIPLEX NETWORK (OUTPUT)                            #
     ############################################################################################
 
-    output$multiplex_func <- shiny::renderUI({
-        #if (is.null(g_net_list()) & is.null(l_net_list())){
-        #  return(NULL)
-        #}else {
-        boxes <- list(
-            shiny::fluidRow(
-                shinydashboard::box(
-                    shiny::radioButtons(inputId = 'weightMultiplex', label = 'Do you want to create a weighted multiplex network?',
-                                        choices = c("YES", "NO"), selected = "NO"),
-                    shiny::hr(),
-                    shiny::actionButton(inputId = 'gen_multiplex_btn', label = 'GO')),
-                shiny::htmlOutput(outputId = "multi_net_sum_info")
-            ),
-            shiny::fluidRow(
-                shiny::conditionalPanel(
-                    condition = 'input.gen_multiplex_btn >= 1 && input.weightMultiplex == "YES"',
-                    shinydashboard::box(
-                        shiny::radioButtons(inputId = 'pruneMultiplex', label = 'Do you want to prune the multiplex network?',
-                                            choices = c('YES', 'NO'), selected = 'NO'),
-                        shiny::conditionalPanel(
-                            condition = 'input.pruneMultiplex == "YES"',
-                            shiny::numericInput(inputId = 'pruneMultiplex_th', label = 'Select a threshold to prune the multiplex network',
-                                                min = 0, max = 100, value = 50)
-                        ),
-                        shiny::hr(),
-                        shiny::actionButton(inputId = 'prune_multiplex_btn', label = 'Go')
-                    ),
-                    shiny::htmlOutput(outputId = "pruned_multi_net_sum_info")
-                )
-            )
-        )
-        return(boxes)
-        #}
+    output$info_box_6 <- renderText({
+        HTML("<br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            Welcome to the MoNETA Shiny app, an R package for network-based multi-omics data integration.<br/>
+            In this section of the app, you can create a multiplex network,
+            which is a multilayered network with as many layers as the number of networks inferred in the previous steps. </span> <br/>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <b> Weighted Multiplex </b>: <br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+             If you choose to create a <u>weighted</u> multiplex network, the edge weights of each
+             network will be retained and contribute to the node visit probability
+             in the next phase of the pipeline. Subsequently,
+             you can filter the multiplex network by selecting a threshold.  </span> <br/>
+            </p> <hr style='border-top: 1px solid white;'>
+
+            <b> Unweighted Multiplex </b>: <br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+             If you decide not to weight the multiplex network, the weight column will be filled with <b>1</b>,
+             and consequently, each <span style='color:red;'>intra-layer </span> edge will have an equal probability of being traversed by the random walker. </span> <br/>
+            </p> <hr style='border-top: 1px solid white;'>
+            ")
     })
 
     ############## output multiplex net info #############
@@ -2440,35 +2780,14 @@ server <- function(input, output, session) {
     output$multi_net_sum_info <- shiny::renderUI({
         input$gen_multiplex_btn
         shiny::isolate({
-            req(multiplex_network)
-            multiplex <- shiny::reactiveValuesToList(multiplex_network)$multiplex
+            multiplex <- multiplex_network()
             if (!is.null(multiplex)){
+                multiplex_type <- ifelse(input$weightMultiplex == 'YES', 'Weighted', 'Unweighted')
                 n_layers <- multiplex %>%  dplyr::select(EdgeType) %>% unique(.) %>% nrow(.)
                 n_nodes <- base::union(multiplex$source, multiplex$target) %>% length(.)
                 n_edges <- multiplex %>% nrow(.)
-                weighted <- ifelse(input$weightMultiplex == 'YES', 'Weighted', 'Unweighted')
-                shinydashboard::box(shiny::HTML(paste0(paste("<b>", weighted ,"Multiplex network</b>"), " created: <br/>")),
-                                    shiny::HTML(paste('&ensp;', "<b>", n_layers, "</b>", " layers, <br/>")),
-                                    shiny::HTML(paste('&ensp;',"<b>", n_nodes, "</b>", " nodes <br/>")),
-                                    shiny::HTML(paste('&ensp;',"<b>", n_edges, "</b>", "edges <br/>"))
-                )
-            } else {
-                shiny::HTML("<br/>")
-            }
-        })
-    })
-
-    ############## output pruned multiplex net info #############
-
-    output$pruned_multi_net_sum_info <- shiny::renderUI({
-        input$prune_multiplex_btn
-        shiny::isolate({
-            pruned_multiplex <- shiny::reactiveValuesToList(multiplex_network)$pruned_multiplex
-            if (!is.null(pruned_multiplex)){
-                n_layers <- pruned_multiplex %>%  dplyr::select(EdgeType) %>% unique(.) %>% nrow(.)
-                n_nodes <- base::union(pruned_multiplex$source, pruned_multiplex$target) %>% length(.)
-                n_edges <- pruned_multiplex %>% nrow(.)
-                shinydashboard::box(shiny::HTML(paste0(paste("<b>Weighted Multiplex network</b>"), " pruned: <br/>")),
+                shinydashboard::box(width = 12,
+                                    shiny::HTML(paste0(paste("<b>",multiplex_type, "Multiplex network:</b>"), "<br/>")),
                                     shiny::HTML(paste('&ensp;', "<b>", n_layers, "</b>", " layers, <br/>")),
                                     shiny::HTML(paste('&ensp;',"<b>", n_nodes, "</b>", " nodes <br/>")),
                                     shiny::HTML(paste('&ensp;',"<b>", n_edges, "</b>", "edges <br/>"))
@@ -2484,7 +2803,7 @@ server <- function(input, output, session) {
         if (length(shiny::reactiveValuesToList(filteredOmicsNetworks)) == length(omics_files())){
             actionButton('back2P4', label = 'Back', icon("paper-plane"),
                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4; padding:20px")
-       }else{
+        }else{
             return(NULL)
         }
     })
@@ -2499,44 +2818,82 @@ server <- function(input, output, session) {
 
     observeEvent(input$back2P4, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "net_sub_2")
+                                       selected = "net_sub_2")
     })
 
     observeEvent(input$back2P1.1, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "rwr_tab_1")
+                                       selected = "rwr_tab_1")
     })
 
     ###
     output$jump2P6 <- renderUI({
-        if (isTruthy(input$gen_multiplex_btn) && input$weightMultiplex == 'NO'){
+        if (isTruthy(input$gen_multiplex_btn)){
             actionButton('jump2P6', label = 'Next', icon("paper-plane"),
-                         style="color: #fff; background-color: #337ab7; border-color: #2e6da4; padding:20px")
-        } else if (isTruthy(input$gen_multiplex_btn) && input$weightMultiplex == 'YES' && isTruthy(input$prune_multiplex_btn)){
-            actionButton('jump2P6', label = 'Next', icon("paper-plane"),
-                         style="color: #fff; background-color: #337ab7; border-color: #2e6da4; padding:20px")
-        }else{
-            return(NULL)
-        }
+                         style="color: #fff; background-color: #337ab7; border-color: #2e6da4; padding:20px")}else{
+                             return(NULL)
+                         }
     })
 
     observeEvent(input$jump2P6, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "rwr_tab_3")
+                                       selected = "rwr_tab_3")
     })
 
     ############################################################################################
     #                                    RWR: PARAMETERS (OUTPUT)                              #
     ############################################################################################
 
+    output$info_box_7 <- renderText({
+        HTML("<br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+            Welcome to the MoNETA Shiny app, an R package for network-based multi-omics data integration.<br/>
+            Here, you can integrate multi-omics network through the Random Walk with Restart (RWR) algorithm,
+            tath simulates the traversal of an imaginary particle. <br/>
+            <hr style='border-top: 1px solid white;'>
+
+            The random walker can:<br/>
+            i) walk within a layer of the multiplex through <b><span style='color:red;'>intra-layer</span></b> edges; <br/>
+            ii) return back to the <span style='color:red;'>seed</span>  (<b>Restart</b> panel); <br/>
+            iii) jump to another node in a different layer (<b>Transition</b> panel). <br/>
+            </p> </span> <hr style='border-top: 1px solid white;'>
+
+            <b> Restart panel</b>: <br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+                 The parameter <b>r</b> represents the probability for the random walker
+                 to return back to the seed, while the vector parameter <b>&tau;</b> measures
+                 the probability of restarting in the seed of each layer. If you <u>use
+                 default restarting probabilities</u>, all layers will have the same probability of being visited during the restart. <br/>
+            </p> </span>
+             <hr style='border-top: 1px solid white;'>
+
+            <b>Transition panel</b>: <br/> <span style='font-weight:normal;'>
+            <p align='justify'>
+                The parameter <b>&delta;</b> represents the general probability for the random walker
+                to jump between layers of the multiplex network. <br/>
+                &ensp; Actually, it is possible to specified the jumping probability
+                between all possible pairs of layers by modifing the <b>Transition Layer Matrix</b>.
+                If the <u>biologically</u> informed strategy is selected, the random walker can transition between
+                omics layers with probability proportional to the number of shared relationships. <br/>
+                &ensp; By default, the <b><span style='color:red;'>inter-layers</span></b> edges connect nodes representing the same entity across layers, but
+                if you select the <b>RWR-NF</b> option, the edge set will also include their neighborhood across layers.
+                Only if RWR-NF is selected, it is possible to weight these edges.
+                For further details, please refer to the following paper
+                <span style= 'color: blue;'> <u>  <a href='https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04029-3' target='_blank'> (link)</a></u></span>.<br/>
+             </p> </span>
+             <hr style='border-top: 1px solid white;'>
+            ")
+    })
+
     #### Taus
     output$tauBIO <- shiny::renderUI({
         if (input$tao_opt == 'Custumize restarting probabilities per layer'){
+            net_list <- if (!is.null(g_net_list())) g_net_list() else l_net_list()
             numInput <- if (!is.null(g_net_list())) length(g_net_list()) else length(l_net_list())
             lapply(1:numInput, function(i) {
                 shiny::numericInput(
                     inputId = paste0('omics_tau', i),
-                    label = shiny::HTML("&tau;", i),
+                    label = shiny::HTML("&tau;", i, "(", names(net_list)[i] ,")"),
                     min = 0,
                     max = 1,
                     value = 0,
@@ -2579,10 +2936,7 @@ server <- function(input, output, session) {
     ###
     output$back2P5 <- renderUI({
 
-        if (isTruthy(input$gen_multiplex_btn) && input$weightMultiplex == 'NO'){
-            actionButton('back2P5', label = 'Back', icon("paper-plane"),
-                         style="color: #fff; background-color: #337ab7; border-color: #2e6da4; padding:20px")
-        } else if (isTruthy(input$gen_multiplex_btn) && input$weightMultiplex == 'YES' && isTruthy(input$prune_multiplex_btn)){
+        if (isTruthy(input$gen_multiplex_btn)){
             actionButton('back2P5', label = 'Back', icon("paper-plane"),
                          style="color: #fff; background-color: #337ab7; border-color: #2e6da4; padding:20px")
         }else{
@@ -2592,7 +2946,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$back2P5, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "rwr_tab_2")
+                                       selected = "rwr_tab_2")
     })
 
     ###
@@ -2607,7 +2961,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$jump2P7, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "dr_tab")
+                                       selected = "dr_tab")
     })
 
 
@@ -2662,18 +3016,18 @@ server <- function(input, output, session) {
                 output$dr_plot <- plotly::renderPlotly({
                     isolate({
                         MoNETA::plot_2D_matrix(coord = dr_mat[1:2,], nodes_anno = data.frame(id = colnames(dr_mat)),
-                                                      id_name = 'id',
-                                                      interactive = TRUE, wo_legend = FALSE) %>%
-                        plotly::layout(font = list(family = "LMRoman10", color = "black"),
-                                       title = list(text = paste(method, emb), font = list(family = "LMRoman10", color = "black", size = 20)),
-                                       xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
-                                       yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
-                        )%>%
-                        plotly::config(
-                            toImageButtonOptions = list(filename = paste('MoNETAshiny', gsub(x = method, replacement = '_', pattern = ' '),
-                                                                         gsub(x = emb, replacement = '_', pattern = ' '), 'plot', sep='_'),
-                                                        format = "png", width = 1800, height = 800)
-                        )
+                                               id_name = 'id',
+                                               interactive = TRUE, wo_legend = FALSE) %>%
+                            plotly::layout(font = list(family = "LMRoman10", color = "black"),
+                                           title = list(text = paste(method, emb), font = list(family = "LMRoman10", color = "black", size = 20)),
+                                           xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
+                                           yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
+                            )%>%
+                            plotly::config(
+                                toImageButtonOptions = list(filename = paste('MoNETAshiny', gsub(x = method, replacement = '_', pattern = ' '),
+                                                                             gsub(x = emb, replacement = '_', pattern = ' '), 'plot', sep='_'),
+                                                            format = "png", width = 1800, height = 800)
+                            )
                     })
 
                 })
@@ -2752,7 +3106,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$back2P6, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "rwr_tab_3")
+                                       selected = "rwr_tab_3")
     })
 
     ###
@@ -2767,7 +3121,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$jump2P8, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "cl_tab")
+                                       selected = "cl_tab")
     })
 
 
@@ -2885,34 +3239,34 @@ server <- function(input, output, session) {
                     output$cl_plot <- plotly::renderPlotly({
                         isolate({
                             MoNETA::plot_2D_matrix(coord = clusters$dr_mat[1:2,], nodes_anno = clu_anno,
-                                                      id_name = 'id', id_anno_color = 'clust',
-                                                      interactive = TRUE, wo_legend = FALSE) %>%
-                            plotly::layout(font = list(family = "LMRoman10", color = "black"),
-                                           title = list(text = title(), font = list(family = "LMRoman10", color = "black", size = 20)),
-                                           xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
-                                           yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
-                            ) %>%
-                            plotly::config(
-                                toImageButtonOptions = list(filename = paste('MoNETAshiny', input$dr_method, input$cluster_method, 'plot', sep = '_'),
-                                                            format = "png", width = 1800, height = 800)
-                            )
+                                                   id_name = 'id', id_anno_color = 'clust',
+                                                   interactive = TRUE, wo_legend = FALSE) %>%
+                                plotly::layout(font = list(family = "LMRoman10", color = "black"),
+                                               title = list(text = title(), font = list(family = "LMRoman10", color = "black", size = 20)),
+                                               xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
+                                               yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
+                                ) %>%
+                                plotly::config(
+                                    toImageButtonOptions = list(filename = paste('MoNETAshiny', input$dr_method, input$cluster_method, 'plot', sep = '_'),
+                                                                format = "png", width = 1800, height = 800)
+                                )
                         })
                     })
                 } else{
                     output$cl_plot <- plotly::renderPlotly({
                         isolate({
                             MoNETA::plot_2D_matrix(coord = clusters$dr_mat[1:2,], nodes_anno = clu_anno,
-                                                          id_name = 'id', id_anno_color = 'clust', id_anno_shape = 'shape',
-                                                          interactive = TRUE, wo_legend = FALSE) %>%
-                            plotly::layout(font = list(family = "LMRoman10", color = "black"),
-                                           title = list(text = title(), font = list(family = "LMRoman10", color = "black", size = 20)),
-                                           xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
-                                           yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
-                            ) %>%
-                            plotly::config(
-                                toImageButtonOptions = list(filename = paste('MoNETAshiny', input$dr_method, input$cluster_method, 'plot', sep = '_'),
-                                                            format = "png", width = 1800, height = 800)
-                            )
+                                                   id_name = 'id', id_anno_color = 'clust', id_anno_shape = 'shape',
+                                                   interactive = TRUE, wo_legend = FALSE) %>%
+                                plotly::layout(font = list(family = "LMRoman10", color = "black"),
+                                               title = list(text = title(), font = list(family = "LMRoman10", color = "black", size = 20)),
+                                               xaxis = list(title = list(text = paste0(input$dr_method, '1'))),
+                                               yaxis = list(title = list(text =  paste0(input$dr_method, '2')))
+                                ) %>%
+                                plotly::config(
+                                    toImageButtonOptions = list(filename = paste('MoNETAshiny', input$dr_method, input$cluster_method, 'plot', sep = '_'),
+                                                                format = "png", width = 1800, height = 800)
+                                )
                         })
                     })
                 }
@@ -2972,8 +3326,8 @@ server <- function(input, output, session) {
                         final_tree_plot <- tree_plot +
                             abline(h = input$h, lty = 'dotdash') +
                             dendextend::colored_bars(colors = the_bars, dend = tree,
-                                         rowLabels = colnames(the_bars),
-                                         #y_shift = -10
+                                                     rowLabels = colnames(the_bars),
+                                                     #y_shift = -10
                             )
                         return(final_tree_plot)
                     }
@@ -3039,7 +3393,7 @@ server <- function(input, output, session) {
 
     observeEvent(input$back2P7, {
         shinydashboard::updateTabItems(session, inputId = "tabs",
-                       selected = "dr_tab")
+                                       selected = "dr_tab")
     })
 
 }
