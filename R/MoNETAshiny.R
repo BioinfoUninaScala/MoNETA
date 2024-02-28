@@ -415,7 +415,7 @@ ui <- shinydashboard::dashboardPage(
                                                                                                              shiny::fluidRow(
                                                                                                                  shiny::column(width = 12,
                                                                                                                                shiny::sliderInput('delta',
-                                                                                                                                                  shiny::h4(shiny::HTML('<span style:"font-family = LM Roman 10"><b>Select the transition parameter (&delta;)')),
+                                                                                                                                                  shiny::h4(shiny::HTML('<span style:"font-family = LM Roman 10"><b>Select the transition parameter (&delta;) </b></span>')),
                                                                                                                                                   min = 0, max = 1, value = 0.5, step = 0.01)
                                                                                                                  )
                                                                                                              ),
