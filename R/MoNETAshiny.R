@@ -845,7 +845,7 @@ server <- function(input, output, session) {
             If you click them one after the other, the second process will be queued, and the <b>Wait</b> message will be displayed accordingly. </span>
             </p> <hr style='border-top: 1px solid white;'> </span>
 
-            Network Visualization: <br/>  <span style='font-weight:normal;'>
+            <b>Network Visualization:</b> <br/>  <span style='font-weight:normal;'>
             <p align='justify'>
             Once the network is created, the plot is shown. The nodes are colored according to their nodeID by default,
             but, if an annotation file is loaded, the color and the shape can be updated by clicking the <b<Update plot</b> button.</span>
@@ -2873,7 +2873,7 @@ server <- function(input, output, session) {
                 to jump between layers of the multiplex network. <br/>
                 &ensp; Actually, it is possible to specified the jumping probability
                 between all possible pairs of layers by modifing the <b>Transition Layer Matrix</b>.
-                If the <u>biologically</u> informed strategy is selected, the random walker can transition between
+                If the <u>biologically informed</u> strategy is selected, the random walker can transition between
                 omics layers with probability proportional to the number of shared relationships. <br/>
                 &ensp; By default, the <b><span style='color:red;'>inter-layers</span></b> edges connect nodes representing the same entity across layers, but
                 if you select the <b>RWR-NF</b> option, the edge set will also include their neighborhood across layers.
