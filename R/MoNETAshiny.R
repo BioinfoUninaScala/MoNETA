@@ -1151,6 +1151,7 @@ server <- function(input, output, session) {
                     return(NULL)
                 }
             }
+            print( 'skip')
             max_cores <- parallel::detectCores()
             if (!is.numeric(input$cores_rwr) | input$cores_rwr < 1 | input$cores_rwr > max_cores){
                 shinyalert::shinyalert(title = 'Error', text = paste('Select a number of cores between 1 and', max_cores, '.'),closeOnClickOutside = TRUE, type = 'error')
