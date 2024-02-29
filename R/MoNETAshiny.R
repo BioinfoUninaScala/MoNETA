@@ -1142,7 +1142,9 @@ server <- function(input, output, session) {
         if (is.null(multiplex_network())){
             return(NULL)
         } else{
-
+            print(omics_tau_list())
+            print(unlist(omics_tau_list()))
+            print(sum(unlist(omics_tau_list()))
             if (!is.na(omics_tau_list())) {
                 if (sum(unlist(omics_tau_list())) != 1) {
                     shinyalert::shinyalert("Error", "The sum of restarting probabilities per layer (taus) must be equal to 1",closeOnClickOutside = TRUE, type = "error")
