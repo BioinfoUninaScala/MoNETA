@@ -14,6 +14,7 @@ RUN R -e "BiocManager::install('BiocNeighbors')"
 
 RUN R -e "remotes::install_github('BioinfoUninaScala/MoNETA', build_vignettes=FALSE, repos=BiocManager::repositories(),dependencies=TRUE, type='source')"
 
+RUN R -e "remotes::install_github('daattali/shinycssloaders')"
 
 
 COPY Rprofile.site /usr/local/lib/R/etc/
