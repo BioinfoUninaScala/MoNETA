@@ -41,13 +41,12 @@ To pull the docker image, run in the terminal:
 $ docker pull bioinfouninascala/moneta
 ```
 
-
-Then, you can run the shiny with:
+To run the docker image, map http port 3838 on the host port 8585:
 ```
 $ docker run --rm -p 8585:3838 bioinfouninascala/moneta
 ```
 
-and use it in a browser by typing http://localhost:8585 (if you are on a local machine) or https://server_name:8585 (if you are on a server machine).
+Finally, use MoNETA shiny in a browser by typing http://localhost:8585 (if you are on a local machine) or https://server_name:8585 (if you are on a server machine).
 <br/>
 
 ### Usage 
