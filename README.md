@@ -24,10 +24,34 @@ install_github("BioinfoUninaScala/MoNETA",
 ```
 ----------
 
+### MoNETA shiny
+
+The MoNETA pipeline is also implemented as a user-friendly shiny app, available both in MoNETA package and as docker image (https://hub.docker.com/r/bioinfouninascala/moneta). <br/>
+
+#### MoNETA function
+In R, you can run:
+```r
+library(MoNETA)
+MoNETAshiny()
+```
+
+#### MoNETA docker image
+To pull the docker image, run in the terminal:
+```
+$ docker pull bioinfouninascala/moneta
+```
+
+To run the docker image, map http port 3838 on the host port 8585:
+```
+$ docker run --rm -p 8585:3838 bioinfouninascala/moneta
+```
+
+Finally, use MoNETA shiny in a browser by typing http://localhost:8585 (if you are on a local machine) or https://server_name:8585 (if you are on a server machine).
+<br/>
+
 ### Usage 
 
 We provide an example of the workflow for our project. To access it, follow the link : [MoNETA use case](https://bioinfouninascala.github.io/MoNETA/inst/doc/MoNETA_use_case.html).
-
 
 #### Main functions
 
@@ -49,6 +73,10 @@ We provide an example of the workflow for our project. To access it, follow the 
 
 * `plot_net`
 * `plot_2D_matrix`
+
+#### Other functions
+
+* `MoNETAshiny`
 
 ### Workflow 
 
@@ -106,8 +134,4 @@ It is possible to choose different kind of dimensionality reduction algorithm.
 * `plot_net` : plot the networks created by `k_star_net`
 
 * `plot_2D_matrix` : plot the a 2D matrix with two rows representing the coordinates
-
-
-
-
 
