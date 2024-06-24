@@ -10,7 +10,8 @@ get_parallel_umap_embedding(
   n_neighbors = 15,
   n_threads = NULL,
   n_sgd_threads = 0,
-  grain_size = 1
+  grain_size = 1,
+  metric = "cosine"
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ get_parallel_umap_embedding(
 \item{n_sgd_threads}{number of thread for stochastic gradient descent, if > 1 it will not be reproducible}
 
 \item{grain_size}{minimum amount of work to do on each thread}
+
+\item{metric}{distance metric to use with umap}
 }
 \value{
 a \emph{embedding_size} x n matrix having observations on columns

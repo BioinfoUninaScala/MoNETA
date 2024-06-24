@@ -4,12 +4,14 @@
 \alias{get_umap_embedding}
 \title{UMAP embedding of matrix}
 \usage{
-get_umap_embedding(matrix, embedding_size)
+get_umap_embedding(matrix, embedding_size, metric = "cosine")
 }
 \arguments{
 \item{matrix}{a squared n n x n numeric matrix with values in the range 0-1, with observations on columns}
 
 \item{embedding_size}{size of the output embedding}
+
+\item{metric}{distance metric to use with umap}
 }
 \value{
 a \emph{embedding_size} x n matrix having observations on columns
