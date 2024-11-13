@@ -6,5 +6,5 @@
 
 
 remove_zeros_cols <- function(matrix) {
-    matrix[, colSums(matrix) > 0]
+    matrix[, colSums( abs(matrix) ) > 0] 
 }
