@@ -141,8 +141,8 @@ Scala, G., Ferraro, L., Brandi, A., Guo, Y., Majello, B. and Ceccarelli, M. MoNE
 
 	@article{Scala2024,
 	  author = {Scala, Giovanni and Ferraro, Luigi and Brandi, Aurora and Guo, Yan and Majello, Barbara and Ceccarelli, Michele},
-	  title = {{MoNETA}: {MultiOmics} {Network} {Embedding} for {SubType} {Analysis}},
-          doi = {10.1093/nargab/lqae141},
+	  title = {MoNETA: MultiOmics Network Embedding for SubType Analysis},
+   	  doi = {10.1093/nargab/lqae141},
 	  url = {https://academic.oup.com/nargab/article/doi/10.1093/nargab/lqae141/7824226},
 	  year = {2024},
 	  month = sep,
