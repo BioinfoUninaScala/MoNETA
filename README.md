@@ -135,3 +135,21 @@ It is possible to choose different kind of dimensionality reduction algorithm.
 
 * `plot_2D_matrix` : plot the a 2D matrix with two rows representing the coordinates
 
+
+### Citation
+Luo, Y., Zhao, X., Zhou, J., Yang, J., Zhang, Y., Kuang, W., Peng, J., Chen, L. & Zeng, J. A network integration approach for drug-target interaction prediction and computational drug repositioning from heterogeneous information. *Nature Communications* **8**, (2017).
+Scala, G., Ferraro, L., Brandi, A., Guo, Y., Majello, B. and Ceccarelli, M. MoNETA: MultiOmics Network Embedding for SubType Analysis. *NAR Genomics and Bioinformatics* **6**, (2024).
+
+@article{Scala_2024,
+	author = {Scala, Giovanni and Ferraro, Luigi and Brandi, Aurora and Guo, Yan and Majello, Barbara and Ceccarelli, Michele},
+	title = {{MoNETA}: {MultiOmics} {Network} {Embedding} for {SubType} {Analysis}},
+	doi = {10.1093/nargab/lqae141},
+	url = {https://academic.oup.com/nargab/article/doi/10.1093/nargab/lqae141/7824226},
+	year = {2024},
+	month = sep,
+ publisher = {Oxford Academic},
+	volume = {6},
+	number = {4},
+	journal = {NAR Genomics and Bioinformatics}
+}
+
